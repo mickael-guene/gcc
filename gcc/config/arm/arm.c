@@ -2002,6 +2002,12 @@ arm_option_override (void)
 	arm_pic_register = pic_register;
     }
 
+  /* if in fdpic then force arm_pic_register to be r9 */
+  if (TARGET_FDPIC)
+  {
+    arm_pic_register = 9;
+  }
+
   /* Enable -mfix-cortex-m3-ldrd by default for Cortex-M3 cores.  */
   if (fix_cm3_ldrd == 2)
     {
@@ -5348,6 +5354,10 @@ arm_function_ok_for_sibcall (tree decl, tree exp)
   if (cfun->machine->sibcall_blocked)
     return false;
 
+  /* no sibcall optimization for fdpic (at least now) */
+  if (TARGET_FDPIC)
+    return false;
+
   /* Never tailcall something for which we have no decl, or if we
      are generating code for Thumb-1.  */
   if (decl == NULL || TARGET_THUMB1)
@@ -5670,7 +5680,7 @@ arm_load_pic_register (unsigned long saved_regs ATTRIBUTE_UNUSED)
 {
   rtx l1, labelno, pic_tmp, pic_rtx, pic_reg;
 
-  if (crtl->uses_pic_offset_table == 0 || TARGET_SINGLE_PIC_BASE)
+  if (crtl->uses_pic_offset_table == 0 || TARGET_SINGLE_PIC_BASE || TARGET_FDPIC)
     return;
 
   gcc_assert (flag_pic);
@@ -5730,6 +5740,47 @@ arm_load_pic_register (unsigned long saved_regs ATTRIBUTE_UNUSED)
   emit_use (pic_reg);
 }
 
+static bool isInRodata(rtx orig)
+{
+#if 0
+
+/* TODO : following code make wrong decision when we have such init :
+extern int foo1_main(int a, char **argv);
+extern int foo2_main(int a, char **argv);
+
+<static or extern> int (*const applet_main[])(int argc, char **argv) = {
+foo1_main,
+foo2_main,
+};
+
+This is due to the fact that TREE_READONLY() is true whereas applet_main is put into
+data.rel.ro section into data segment. I have not found a direct way to know if
+output section will be writable or not but the good way to proceed is the one into
+frv_emit_movsi from frv.c (look for attribute section + get reloc number and if
+section is readonly (cf frv.c + varasm.c))
+
+for the moment just return false so we will use less optimize way to access it using
+GOT reloc
+
+*/
+
+  unsigned int flags = SYMBOL_REF_FLAGS(orig);
+  tree dcl = SYMBOL_REF_DECL(orig);
+
+  if (GET_CODE(orig) == LABEL_REF)
+    return true;
+  if (GET_CODE(orig) == SYMBOL_REF && SYMBOL_REF_DECL(orig) && TREE_READONLY(SYMBOL_REF_DECL(orig)))
+    return true;
+  if (GET_CODE(orig) == SYMBOL_REF && (SYMBOL_REF_FLAGS(orig) & SYMBOL_FLAG_ANCHOR))
+  {
+    if ((SYMBOL_REF_BLOCK(orig)->sect->common.flags & SECTION_WRITE) == 0)
+      return true;
+  }
+#endif
+
+  return false;
+}
+
 /* Generate code to load the address of a static var when flag_pic is set.  */
 static rtx
 arm_pic_static_addr (rtx orig, rtx reg)
@@ -5738,20 +5789,66 @@ arm_pic_static_addr (rtx orig, rtx reg)
 
   gcc_assert (flag_pic);
 
-  /* We use an UNSPEC rather than a LABEL_REF because this label
-     never appears in the code stream.  */
-  labelno = GEN_INT (pic_labelno++);
-  l1 = gen_rtx_UNSPEC (Pmode, gen_rtvec (1, labelno), UNSPEC_PIC_LABEL);
-  l1 = gen_rtx_CONST (VOIDmode, l1);
+#if 0
+  if (TARGET_FDPIC && !isInRodata(orig))
+#else
+  if (TARGET_FDPIC && !SYMBOL_REF_FUNCTION_P(orig))
+#endif
+  {
+#if 0
+/* code for GOTOFF */
+      rtx pic_reg = gen_rtx_REG (Pmode, 9);
 
-  /* On the ARM the PC register contains 'dot + 8' at the time of the
-     addition, on the Thumb it is 'dot + 4'.  */
-  offset_rtx = plus_constant (l1, TARGET_ARM ? 8 : 4);
-  offset_rtx = gen_rtx_UNSPEC (Pmode, gen_rtvec (2, orig, offset_rtx),
-                               UNSPEC_SYMBOL_OFFSET);
-  offset_rtx = gen_rtx_CONST (Pmode, offset_rtx);
+      rtx l1 = gen_rtx_UNSPEC(Pmode, gen_rtvec (1, orig), UNSPEC_PIC_SYM);
+      emit_insn (gen_movsi (reg, l1));
+      insn = emit_insn (gen_addsi3 (reg, reg, pic_reg));
+#else
+/* code for GOT */
+    rtx pat;
+    rtx mem;
+    rtx pic_reg = gen_rtx_REG (Pmode, 9);
 
-  insn = emit_insn (gen_pic_load_addr_unified (reg, offset_rtx, labelno));
+    pat = gen_calculate_pic_address (reg, pic_reg, orig);
+
+    /* Make the MEM as close to a constant as possible.  */
+    mem = SET_SRC (pat);
+    gcc_assert (MEM_P (mem) && !MEM_VOLATILE_P (mem));
+    MEM_READONLY_P (mem) = 1;
+    MEM_NOTRAP_P (mem) = 1;
+
+    insn = emit_insn (pat);
+#endif
+  }
+  else
+  {
+    if (TARGET_FDPIC && SYMBOL_REF_FUNCTION_P(orig))
+    {
+      rtx pic_reg = gen_rtx_REG (Pmode, 9);
+
+      rtx l1 = gen_rtx_UNSPEC(Pmode, gen_rtvec (1, orig), UNSPEC_PIC_SYM);
+      emit_insn (gen_movsi (reg, l1));
+      insn = emit_insn (gen_addsi3 (reg, reg, pic_reg));
+    }
+    else
+    {
+      /* We use an UNSPEC rather than a LABEL_REF because this label
+         never appears in the code stream.  */
+      labelno = GEN_INT (pic_labelno++);
+      l1 = gen_rtx_UNSPEC (Pmode, gen_rtvec (1, labelno), UNSPEC_PIC_LABEL);
+      l1 = gen_rtx_CONST (VOIDmode, l1);
+
+      /* On the ARM the PC register contains 'dot + 8' at the time of the
+         addition, on the Thumb it is 'dot + 4'.  */
+      offset_rtx = plus_constant (l1, TARGET_ARM ? 8 : 4);
+      offset_rtx = gen_rtx_UNSPEC (Pmode, gen_rtvec (2, orig, offset_rtx),
+                                   UNSPEC_SYMBOL_OFFSET);
+      offset_rtx = gen_rtx_CONST (Pmode, offset_rtx);
+
+      insn = emit_insn (gen_pic_load_addr_unified (reg, offset_rtx, labelno));
+    }
+  }
+
+
   return insn;
 }
 
@@ -14278,6 +14375,29 @@ vfp_emit_fstmd (int base_reg, int count)
   return count * 8;
 }
 
+/* Emit insns to load the function address from FUNCDESC (an FDPIC
+   function descriptor) into r8 and the GOT address into r9,
+   returning an rtx for r8.  */
+
+rtx
+arm_load_function_descriptor (rtx funcdesc)
+{
+  rtx r8 = gen_rtx_REG (Pmode, 8);
+  rtx pic_reg = gen_rtx_REG (Pmode, 9);
+  rtx fnaddr = gen_rtx_MEM (Pmode, funcdesc);
+  rtx gotaddr = gen_rtx_MEM (Pmode, plus_constant (funcdesc, 4));
+
+  emit_move_insn (r8, fnaddr);
+  /* The ABI requires the entry point address to be loaded first, so
+     prevent the load from being moved after that of the GOT
+     address.  */
+  emit_insn (gen_blockage ());
+  emit_move_insn (pic_reg, gotaddr);
+  emit_insn(gen_rtx_USE (VOIDmode, pic_reg));
+
+  return r8;
+}
+
 /* Emit a call instruction with pattern PAT.  ADDR is the address of
    the call target.  */
 
@@ -18608,13 +18728,31 @@ arm_assemble_integer (rtx x, unsigned int size, int aligned_p)
 	     TARGET_VXWORKS_RTP check.  */
 	  if (TARGET_VXWORKS_RTP
 	      || (GET_CODE (x) == SYMBOL_REF && !SYMBOL_REF_LOCAL_P (x)))
-	    fputs ("(GOT)", asm_out_file);
-	  else
-	    fputs ("(GOTOFF)", asm_out_file);
-	}
+    {
+      if (TARGET_FDPIC && SYMBOL_REF_FUNCTION_P(x))
+        fputs ("(GOTFUNCDESC)", asm_out_file);
+      else
+	      fputs ("(GOT)", asm_out_file);
+	  } else {
+      if (TARGET_FDPIC && SYMBOL_REF_FUNCTION_P(x))
+        fputs ("(GOTOFFFUNCDESC)", asm_out_file);
+      else
+#if 0
+	      fputs ("(GOTOFF)", asm_out_file);
+#else
+        fputs ("(GOT)", asm_out_file); /* see blah blah in isInRodata() */
+#endif
+	  }
+   }
+    /* for fdpic we also have to mark symbol for .data section */
+    if (TARGET_FDPIC && NEED_GOT_RELOC && flag_pic && !making_const_table && GET_CODE (x) == SYMBOL_REF)
+    {
+      if (SYMBOL_REF_FUNCTION_P (x))
+        fputs ("(FUNCDESC)", asm_out_file);
+    }
       fputc ('\n', asm_out_file);
       return true;
-    }
+  }
 
   mode = GET_MODE (x);
 

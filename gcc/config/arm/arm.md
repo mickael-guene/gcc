@@ -8443,6 +8443,15 @@
   {
     rtx callee, pat;
     
+    /* force r9 before call */
+    if (TARGET_FDPIC)
+    {
+        emit_insn(gen_blockage());
+        rtx pic_reg = gen_rtx_REG (Pmode, 9);
+        emit_move_insn (pic_reg, get_hard_reg_initial_val (Pmode, 9));
+        emit_insn(gen_rtx_USE (VOIDmode, pic_reg));
+    }
+
     /* In an untyped call, we can get NULL for operand 2.  */
     if (operands[2] == NULL_RTX)
       operands[2] = const0_rtx;
@@ -8456,8 +8465,24 @@
 	: !REG_P (callee))
       XEXP (operands[0], 0) = force_reg (Pmode, callee);
 
+    if (TARGET_FDPIC && GET_CODE (XEXP (operands[0], 0)) != SYMBOL_REF)
+    {
+        /* indirect call */
+        XEXP (operands[0], 0) = arm_load_function_descriptor(XEXP (operands[0], 0));
+    }
+
     pat = gen_call_internal (operands[0], operands[1], operands[2]);
     arm_emit_call_insn (pat, XEXP (operands[0], 0));
+
+    /* restore r9 after call */
+    if (TARGET_FDPIC)
+    {
+        rtx pic_reg = gen_rtx_REG (Pmode, 9);
+        emit_move_insn (pic_reg, get_hard_reg_initial_val (Pmode, 9));
+        emit_insn(gen_rtx_USE (VOIDmode, pic_reg));
+        emit_insn(gen_blockage());
+    }
+
     DONE;
   }"
 )
@@ -8552,6 +8577,14 @@
   {
     rtx pat, callee;
     
+    if (TARGET_FDPIC)
+    {
+        emit_insn(gen_blockage());
+        rtx pic_reg = gen_rtx_REG (Pmode, 9);
+        emit_move_insn (pic_reg, get_hard_reg_initial_val (Pmode, 9));
+        emit_insn(gen_rtx_USE (VOIDmode, pic_reg));
+    }
+
     /* In an untyped call, we can get NULL for operand 2.  */
     if (operands[3] == 0)
       operands[3] = const0_rtx;
@@ -8565,9 +8598,25 @@
 	: !REG_P (callee))
       XEXP (operands[1], 0) = force_reg (Pmode, callee);
 
+    if (TARGET_FDPIC && GET_CODE (XEXP (operands[1], 0)) != SYMBOL_REF)
+    {
+        /* indirect call */
+        XEXP (operands[1], 0) = arm_load_function_descriptor(XEXP (operands[1], 0));
+    }
+
     pat = gen_call_value_internal (operands[0], operands[1],
 				   operands[2], operands[3]);
     arm_emit_call_insn (pat, XEXP (operands[1], 0));
+
+    /* force r9 after call */
+    if (TARGET_FDPIC)
+    {
+        rtx pic_reg = gen_rtx_REG (Pmode, 9);
+        emit_move_insn (pic_reg, get_hard_reg_initial_val (Pmode, 9));
+        emit_insn(gen_rtx_USE (VOIDmode, pic_reg));
+        emit_insn(gen_blockage());
+    }
+
     DONE;
   }"
 )
@@ -8866,7 +8915,7 @@
 		    (const_int 0))
 	      (match_operand 1 "" "")
 	      (match_operand 2 "" "")])]
-  "TARGET_EITHER"
+  "TARGET_EITHER && !TARGET_FDPIC"
   "
   {
     int i;

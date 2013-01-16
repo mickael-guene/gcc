@@ -110,6 +110,8 @@ extern char arm_arch_name[];
 	  }						\
 	if (TARGET_IDIV)				\
 	  builtin_define ("__ARM_ARCH_EXT_IDIV__");	\
+    if (TARGET_FDPIC)       \
+        builtin_define ("__FDPIC__");   \
     } while (0)
 
 #include "config/arm/arm-opts.h"
@@ -1977,6 +1979,10 @@ extern unsigned arm_pic_register;
 /* The register number of the register used to address a table of static
    data addresses in memory.  */
 #define PIC_OFFSET_TABLE_REGNUM arm_pic_register
+
+/* For FDPIC, the FDPIC register is call-clobbered (otherwise PLT
+   entries would need to handle saving and restoring it).  */
+#define PIC_OFFSET_TABLE_REG_CALL_CLOBBERED TARGET_FDPIC
 
 /* We can't directly access anything that contains a symbol,
    nor can we indirect via the constant pool.  One exception is
