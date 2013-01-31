@@ -58,7 +58,7 @@
 #endif
 
 #undef  SUBTARGET_EXTRA_LINK_SPEC
-#define SUBTARGET_EXTRA_LINK_SPEC " -m " TARGET_LINKER_EMULATION
+#define SUBTARGET_EXTRA_LINK_SPEC " %{!mno-fdpic: -m armelf_linux_fdpiceabi} %{mno-fdpic: -m " TARGET_LINKER_EMULATION "} "
 
 /* GNU/Linux on ARM currently supports three dynamic linkers:
    - ld-linux.so.2 - for the legacy ABI
