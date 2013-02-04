@@ -3984,6 +3984,7 @@ compute_reloc_for_constant (tree exp)
 
     CASE_CONVERT:
     case VIEW_CONVERT_EXPR:
+    case NON_LVALUE_EXPR:
       reloc = compute_reloc_for_constant (TREE_OPERAND (exp, 0));
       break;
 
