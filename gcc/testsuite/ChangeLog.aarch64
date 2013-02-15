@@ -1,3 +1,55 @@
+2012-12-04  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	Backport form mainline
+	2012-12-04  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+	* gcc.target/aarch64/121127.c: New test.
+
+2012-11-22  Ian Bolton  <ian.bolton@arm.com>
+
+	Backport from mainline
+	2012-11-22  Ian Bolton  <ian.bolton@arm.com>
+
+        * gcc.target/aarch64/builtin-bswap-1.c: New test.
+        * gcc.target/aarch64/builtin-bswap-2.c: New test.
+
+2012-11-20  Sofiane Naci  <sofiane.naci@arm.com>
+
+	Backport from mainline
+	2012-11-20  Sofiane Naci  <sofiane.naci@arm.com>
+
+	* gcc.target/aarch64/atomic-comp-swap-release-acquire.c: New testcase.
+	* gcc.target/aarch64/atomic-op-acq_rel.c: Likewise.
+	* gcc.target/aarch64/atomic-op-acquire.c: Likewise.
+	* gcc.target/aarch64/atomic-op-char.c: Likewise.
+	* gcc.target/aarch64/atomic-op-consume.c: Likewise.
+	* gcc.target/aarch64/atomic-op-imm.c: Likewise.
+	* gcc.target/aarch64/atomic-op-int.c: Likewise.
+	* gcc.target/aarch64/atomic-op-long.c: Likewise.
+	* gcc.target/aarch64/atomic-op-relaxed.c: Likewise.
+	* gcc.target/aarch64/atomic-op-release.c: Likewise.
+	* gcc.target/aarch64/atomic-op-seq_cst.c: Likewise.
+	* gcc.target/aarch64/atomic-op-short.c: Likewise.
+
+2012-11-13  Ian Bolton  <ian.bolton@arm.com>
+
+	Backport from mainline
+	2012-11-12  Ian Bolton  <ian.bolton@arm.com>
+
+	* gcc.target/aarch64/csinc-2.c: New test.
+
+2012-11-13  Ian Bolton  <ian.bolton@arm.com>
+
+	Backport from mainline
+	2012-11-12  Ian Bolton  <ian.bolton@arm.com>
+
+	* gcc.target/aarch64/cmn.c: New test.
+	* gcc.target/aarch64/adds.c: New test.
+	* gcc.target/aarch64/subs.c: New test.
+
+2012-11-07  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* gcc.target/aarch64/dwarf-cfa-reg.c: New test.
+
 2011-10-16  Tejas Belagod  <tejas.belagod@arm.com>
 
 	* gcc.target/aarch64/vector_intrinsics.c: Update tests to reflect

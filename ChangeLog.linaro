@@ -1,3 +1,306 @@
+2012-12-11  Yvan Roux  <yvan.roux@linaro.org>
+
+	GCC Linaro 4.7-2012.12 released.
+
+	gcc/
+	* LINARO-VERSION: Update.
+
+2012-12-05  Michael Hope  <michael.hope@linaro.org>
+
+	Merge from FSF arm/aarch64-4.7-branch r193937..r194154.
+
+	Backport arm-aarch64-4.7 r193937:
+	gcc/ChangeLog.aarch64
+	
+	Backport from mainline.
+	2012-11-20  James Greenhalgh  <james.greenhalgh@arm.com>
+	Tejas Belagod  <tejas.belagod@arm.com>
+	
+	* config/aarch64/aarch64-builtins.c
+	(aarch64_simd_builtin_type_bits): Rename to...
+	(aarch64_simd_builtin_type_mode): ...this, make sequential.
+	(aarch64_simd_builtin_datum): Refactor members.
+	(VAR1, VAR2, ..., VAR12): Update accordingly.
+	(aarch64_simd_builtin_data): Include from aarch64-simd-builtins.def.
+	(aarch64_builtins): Update accordingly.
+	(init_aarch64_simd_builtins): Refactor, rename to...
+	(aarch64_init_simd_builtins): ...this.
+	(aarch64_simd_builtin_compare): Remove.
+	(locate_simd_builtin_icode): Likewise.
+	* config/aarch64/aarch64-protos.h (aarch64_init_builtins): New.
+	(aarch64_expand_builtin): Likewise.
+	(aarch64_load_tp): Likewise.
+	* config/aarch64/aarch64-simd-builtins.def: New file.
+	* config/aarch64/aarch64.c (aarch64_init_builtins):
+	Move to aarch64-builtins.c.
+	(aarch64_expand_builtin): Likewise.
+	(aarch64_load_tp): Remove static designation.
+	* config/aarch64/aarch64.h
+	(aarch64_builtins): Move to aarch64-builtins.c.
+
+	Backport arm-aarch64-4.7 r193939:
+	gcc/
+	
+	Backport from mainline.
+	2012-11-26  James Greenhalgh  <james.greenhalgh@arm.com>
+	
+	* config/aarch64/aarch64-builtins.c (aarch64_builtin_decls): New.
+	(aarch64_init_simd_builtins): Store declaration after builtin
+	initialisation.
+	(aarch64_init_builtins): Likewise.
+	(aarch64_builtin_decl): New.
+	* config/aarch64/aarch64-protos.h (aarch64_builtin_decl): New.
+	* config/aarch64/aarch64.c (TARGET_BUILTIN_DECL): Define.
+
+	Backport arm-aarch64-4.7 r194079:
+	[AARCH64-4.7] Refactor constant generation.
+	
+	2012-12-03  Sofiane Naci  <sofiane.naci@arm.com>
+	
+	* config/aarch64/aarch64.c (aarch64_build_constant): Update prototype.
+	Call emit_move_insn	instead of printing movi/movn/movz instructions.
+	Call gen_insv_immdi instead of printing movk instruction.
+	(aarch64_add_constant): Update prototype.
+	Generate RTL instead of printing add/sub instructions.
+	(aarch64_output_mi_thunk): Update calls to aarch64_build_constant
+	and aarch64_add_constant.
+
+	Backport arm-aarch64-4.7 r194089:
+	[AARCH64-4.7] Backport - Add vcond, vcondu support.
+	
+	Backport of revision 192985.
+	
+	gcc/
+	* config/aarch64/aarch64-simd.md
+	(aarch64_simd_bsl<mode>_internal): New pattern.
+	(aarch64_simd_bsl<mode>): Likewise.
+	(aarch64_vcond_internal<mode>): Likewise.
+	(vcondu<mode><mode>): Likewise.
+	(vcond<mode><mode>): Likewise.
+	* config/aarch64/iterators.md (UNSPEC_BSL): Add to define_constants.
+
+	Backport arm-aarch64-4.7 r194131:
+	
+	2012-12-04  Tejas Belagod  <tejas.belagod@arm.com>
+	
+	* config/aarch64/aarch64.c (aarch64_simd_vector_alignment,
+	aarch64_simd_vector_alignment_reachable): New.
+	(TARGET_VECTOR_ALIGNMENT, TARGET_VECTORIZE_VECTOR_ALIGNMENT_REACHABLE):
+	Define.
+
+	Backport arm-aarch64-4.7 r194148:
+	AArch64: Fix ICE due to	missing	TYPE_STUB_DECL on builtin va_list.
+	
+	2012-12-04  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+	
+	* config/aarch64/aarch64.c (aarch64_build_builtin_va_list): Set
+	TYPE_STUB_DECL.
+
+	Backport arm-aarch64-4.7 r194153:
+	AArch64-4.7: Backport refactor of sfp-machine.h
+
+	Backport arm-aarch64-4.7 r194154:
+	AArch64-4.7: Backport implement FP_TRAPPING_EXCEPTIONS.
+
+2012-12-05  Yvan Roux  <yvan.roux@linaro.org>
+
+	Merge from FSF GCC 4.7.2 (svn branches/gcc-4_7-branch 194184).
+
+2012-11-26  Michael Hope  <michael.hope@linaro.org>
+
+	Merge from FSF arm/aarch64-4.7-branch r193473..r193768.
+
+	Backport arm-aarch64-4.7 r193473:
+	Backport from mainline: Optimise comparison where intermediate result not used (AArch64)
+
+	Backport arm-aarch64-4.7 r193474:
+	Backport from mainline: Use CSINC instead of CSEL to return 1 (AArch64)
+
+	Backport arm-aarch64-4.7 r193496:
+	Fixed up changelogs
+
+	Backport arm-aarch64-4.7 r193533:
+	Update soft-fp from glibc.
+	
+	2012-11-15  Marcus Shawcroft <marcus.shawcroft@arm.com>
+	
+	* soft-fp: Updated from glibc upstream.
+
+	Backport arm-aarch64-4.7 r193541:
+	Move ChangeLog entry to ChangeLog.aarch64.
+	
+	The previous commit put the ChangeLog entry into the wrong file.
+
+	Backport arm-aarch64-4.7 r193572:
+	Fix commit of testcase which got truncated somehow.
+
+	Backport arm-aarch64-4.7 r193650:
+	Backport from mainline: r193630.
+	
+	gcc/
+	* config/aarch64/aarch64.c
+	(aarch64_output_mi_thunk): Refactor to generate RTL patterns.
+
+	Backport arm-aarch64-4.7 r193652:
+	Backport from trunk revision 193651.
+	
+	gcc/
+	* config/aarch64/aarch64.md
+	(define_attr "sync_*"): Remove.
+	(define_attr "length"): Update.
+	Include atomics.md.
+	* config/aarch64/aarch64-protos.h
+	(aarch64_expand_compare_and_swap): Add function prototype.
+	(aarch64_split_compare_and_swap): Likewise.
+	(aarch64_split_atomic_op): Likewise.
+	(aarch64_expand_sync): Remove function prototype.
+	(aarch64_output_sync_insn): Likewise.
+	(aarch64_output_sync_lock_release): Likewise.
+	(aarch64_sync_loop_insns): Likewise.
+	(struct aarch64_sync_generator): Remove.
+	(enum aarch64_sync_generator_tag): Likewise.
+	* config/aarch64/aarch64.c
+	(aarch64_legitimize_sync_memory): Remove function.
+	(aarch64_emit): Likewise.
+	(aarch64_insn_count): Likewise.
+	(aarch64_output_asm_insn): Likewise.
+	(aarch64_load_store_suffix): Likewise.
+	(aarch64_output_sync_load): Likewise.
+	(aarch64_output_sync_store): Likewise.
+	(aarch64_output_op2): Likewise.
+	(aarch64_output_op3): Likewise.
+	(aarch64_output_sync_loop): Likewise.
+	(aarch64_get_sync_operand): Likewise.
+	(aarch64_process_output_sync_insn): Likewise.
+	(aarch64_output_sync_insn): Likewise.
+	(aarch64_output_sync_lock_release): Likewise.
+	(aarch64_sync_loop_insns): Likewise.
+	(aarch64_call_generator): Likewise.
+	(aarch64_expand_sync): Likewise.
+	(* emit_f): Remove variable.
+	(aarch64_insn_count): Likewise.
+	(FETCH_SYNC_OPERAND): Likewise.
+	(aarch64_emit_load_exclusive): New function.
+	(aarch64_emit_store_exclusive): Likewise.
+	(aarch64_emit_unlikely_jump): Likewise.
+	(aarch64_expand_compare_and_swap): Likewise.
+	(aarch64_split_compare_and_swap): Likewise.
+	(aarch64_split_atomic_op): Likewise.
+	* config/aarch64/iterators.md
+	(atomic_sfx): New mode attribute.
+	(atomic_optab): New code attribute.
+	(atomic_op_operand): Likewise.
+	(atomic_op_str): Likewise.
+	(syncop): Rename to atomic_op.
+	* config/aarch64/sync.md: Delete.
+	* config/aarch64/atomics.md: New file.
+	
+	gcc/testsuite
+	* gcc.target/aarch64/atomic-comp-swap-release-acquire.c: New testcase.
+	* gcc.target/aarch64/atomic-op-acq_rel.c: Likewise.
+	* gcc.target/aarch64/atomic-op-acquire.c: Likewise.
+	* gcc.target/aarch64/atomic-op-char.c: Likewise.
+	* gcc.target/aarch64/atomic-op-consume.c: Likewise.
+	* gcc.target/aarch64/atomic-op-imm.c: Likewise.
+	* gcc.target/aarch64/atomic-op-int.c: Likewise.
+	* gcc.target/aarch64/atomic-op-long.c: Likewise.
+	* gcc.target/aarch64/atomic-op-relaxed.c: Likewise.
+	* gcc.target/aarch64/atomic-op-release.c: Likewise.
+	* gcc.target/aarch64/atomic-op-seq_cst.c: Likewise.
+	* gcc.target/aarch64/atomic-op-short.c: Likewise.
+
+	Backport arm-aarch64-4.7 r193655:
+	Fix to commit 193652.
+	
+	gcc/
+	* config/aarch64/atomics.md: Actually add this file.
+	
+	gcc/testsuite/
+	* gcc.target/aarch64/atomic-comp-swap-release-acquire.c:
+	Actually add this file.
+	* gcc.target/aarch64/atomic-op-acq_rel.c: Likewise.
+	* gcc.target/aarch64/atomic-op-acquire.c: Likewise.
+	* gcc.target/aarch64/atomic-op-char.c: Likewise.
+	* gcc.target/aarch64/atomic-op-consume.c: Likewise.
+	* gcc.target/aarch64/atomic-op-imm.c: Likewise.
+	* gcc.target/aarch64/atomic-op-int.c: Likewise.
+	* gcc.target/aarch64/atomic-op-long.c: Likewise.
+	* gcc.target/aarch64/atomic-op-relaxed.c: Likewise.
+	* gcc.target/aarch64/atomic-op-release.c: Likewise.
+	* gcc.target/aarch64/atomic-op-seq_cst.c: Likewise.
+	* gcc.target/aarch64/atomic-op-short.c: Likewise.
+
+	Backport arm-aarch64-4.7 r193689:
+	gcc/
+	* config/aarch64/aarch64.c
+	(aarch64_output_mi_thunk): Use 4.7 API for plus_constant.
+
+	Backport arm-aarch64-4.7 r193693:
+	Fix race in parallel build.
+	
+	The gengtype-lex.c is built twice, once for BUILD and once for HOST, but the
+	HOST flavour is missing a dependency on $(BCONFIG_H).
+	
+	2012-11-21  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+	
+	* Makefile.in (gengtype-lex.o): Add dependency on $(BCONFIG_H).
+
+	Backport arm-aarch64-4.7 r193696:
+	gcc/
+	* ChangeLog: Move recent entries to...
+	* ChangeLog.aarch64: ...Here.
+	
+	gcc/testsuite/
+	* ChangeLog: Move recent entries to...
+	* ChangeLog.aarch64: ...Here
+
+	Backport arm-aarch64-4.7 r193730:
+	Backport of Implement bswaphi2 with rev16 (AArch64)
+
+	Backport arm-aarch64-4.7 r193733:
+	[AARCH64-47] Backported removal of Utf documentation.
+	
+	2012-11-22  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+	
+	* doc/md.texi (AArch64 family): Remove Utf.
+
+	Backport arm-aarch64-4.7 r193765:
+	Backport of builtin_bswap16 support
+
+	Backport arm-aarch64-4.7 r193768:
+	[AARCH64-47] Reverting backport of builtin_bswap16.
+	
+	Reverted:
+	r193765 | ibolton | 2012-11-23 17:53:08 +0000 (Fri, 23 Nov 2012) | 1 line
+	
+	Backport of builtin_bswap16 support
+
+2012-11-19  Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	Backport from mainline
+
+	gcc/
+	2012-11-13  Andrew Stubbs  <ams@codesourcery.com>
+		    Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	* config/arm/arm.c (arm_emit_coreregs_64bit_shift): Fix comment.
+	* config/arm/arm.md (opt, opt_enabled): New attributes.
+	(enabled): Use opt_enabled.
+	(ashldi3, ashrdi3, lshrdi3): Add TARGET_NEON case.
+	(ashldi3): Allow general operands for TARGET_NEON case.
+	* config/arm/iterators.md (rshifts): New code iterator.
+	(shift, shifttype): New code attributes.
+	* config/arm/neon.md (UNSPEC_LOAD_COUNT): New unspec type.
+	(neon_load_count, ashldi3_neon_noclobber, ashldi3_neon,
+	signed_shift_di3_neon, unsigned_shift_di3_neon,
+	ashrdi3_neon_imm_noclobber, lshrdi3_neon_imm_noclobber,
+	<shift>di3_neon): New patterns.
+
+2012-11-13  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	gcc/
+	* LINARO-VERSION: Bump version.
+
 2012-11-13  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
 
 	GCC Linaro 4.7-2012.11 released.
