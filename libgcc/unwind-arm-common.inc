@@ -316,6 +316,11 @@ unwind_phase2 (_Unwind_Control_Block * ucbp, phase2_vrs * vrs)
   if (pr_result != _URC_INSTALL_CONTEXT)
     abort();
 
+#if __FDPIC__
+      /* r9 could have been lost due to plt jump. Restore correct value. */
+      vrs->core.r[9] = __gnu_Unwind_Find_got(VRS_PC(vrs));
+#endif
+
   uw_restore_core_regs (vrs, &vrs->core);
 }
 
@@ -401,6 +406,11 @@ unwind_phase2_forced (_Unwind_Control_Block *ucbp, phase2_vrs *entry_vrs,
 	 pr returned _URC_FAILURE.  */
       return _URC_FAILURE;
     }
+
+#if __FDPIC__
+  /* r9 could have been lost due to plt jump. Restore correct value. */
+  saved_vrs.core.r[9] = __gnu_Unwind_Find_got(VRS_PC (&saved_vrs));
+#endif
 
   uw_restore_core_regs (&saved_vrs, &saved_vrs.core);
 }
@@ -514,6 +524,10 @@ __gnu_Unwind_Resume (_Unwind_Control_Block * ucbp, phase2_vrs * entry_vrs)
     {
     case _URC_INSTALL_CONTEXT:
       /* Upload the registers to enter the landing pad.  */
+#if __FDPIC__
+      /* r9 could have been lost due to plt jump. Restore correct value. */
+      entry_vrs->core.r[9] = __gnu_Unwind_Find_got(VRS_PC (entry_vrs));
+#endif
       uw_restore_core_regs (entry_vrs, &entry_vrs->core);
 
     case _URC_CONTINUE_UNWIND:
