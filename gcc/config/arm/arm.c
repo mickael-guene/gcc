@@ -133,6 +133,7 @@ static void arm_output_function_prologue (FILE *, HOST_WIDE_INT);
 static int arm_comp_type_attributes (const_tree, const_tree);
 static void arm_set_default_type_attributes (tree);
 static int arm_adjust_cost (rtx, rtx, rtx, int);
+static int arm_sched_reorder (FILE *, int, rtx *, int *, int);
 static int optimal_immediate_sequence (enum rtx_code code,
 				       unsigned HOST_WIDE_INT val,
 				       struct four_ints *return_sequence);
@@ -172,7 +173,7 @@ static void cirrus_reorg (rtx);
 static void arm_init_builtins (void);
 static void arm_init_iwmmxt_builtins (void);
 static rtx safe_vector_operand (rtx, enum machine_mode);
-static rtx arm_expand_binop_builtin (enum insn_code, tree, rtx);
+static rtx arm_expand_binop_builtin (enum insn_code, tree, rtx, bool);
 static rtx arm_expand_unop_builtin (enum insn_code, tree, rtx, int);
 static rtx arm_expand_builtin (tree, rtx, rtx, enum machine_mode, int);
 static tree arm_builtin_decl (unsigned, bool);
@@ -368,6 +369,9 @@ static const struct attribute_spec arm_attribute_table[] =
 
 #undef  TARGET_SCHED_ADJUST_COST
 #define TARGET_SCHED_ADJUST_COST arm_adjust_cost
+
+#undef TARGET_SCHED_REORDER
+#define TARGET_SCHED_REORDER arm_sched_reorder
 
 #undef TARGET_REGISTER_MOVE_COST
 #define TARGET_REGISTER_MOVE_COST arm_register_move_cost
@@ -5568,7 +5572,9 @@ thumb_find_work_register (unsigned long pushed_regs_mask)
   if (! cfun->machine->uses_anonymous_args
       && crtl->args.size >= 0
       && crtl->args.size <= (LAST_ARG_REGNUM * UNITS_PER_WORD)
-      && crtl->args.info.nregs < 4)
+      && (TARGET_AAPCS_BASED
+	  ? crtl->args.info.aapcs_ncrn < 4
+	  : crtl->args.info.nregs < 4))
     return LAST_ARG_REGNUM;
 
   /* Otherwise look for a call-saved register that is going to be pushed.  */
@@ -8665,6 +8671,165 @@ arm_memory_move_cost (enum machine_mode mode, reg_class_t rclass,
       else
 	return ((2 * GET_MODE_SIZE (mode)) * (rclass == LO_REGS ? 1 : 2));
     }
+}
+
+
+/* Return true if and only if this insn can dual-issue only as older.  */
+static bool
+cortexa7_older_only (rtx insn)
+{
+  if (recog_memoized (insn) < 0)
+    return false;
+
+  if (get_attr_insn (insn) == INSN_MOV)
+    return false;
+
+  switch (get_attr_type (insn))
+    {
+    case TYPE_ALU_REG:
+    case TYPE_LOAD_BYTE:
+    case TYPE_LOAD1:
+    case TYPE_STORE1:
+    case TYPE_FFARITHS:
+    case TYPE_FADDS:
+    case TYPE_FFARITHD:
+    case TYPE_FADDD:
+    case TYPE_FCPYS:
+    case TYPE_F_CVT:
+    case TYPE_FCMPS:
+    case TYPE_FCMPD:
+    case TYPE_FCONSTS:
+    case TYPE_FCONSTD:
+    case TYPE_FMULS:
+    case TYPE_FMACS:
+    case TYPE_FMULD:
+    case TYPE_FMACD:
+    case TYPE_FDIVS:
+    case TYPE_FDIVD:
+    case TYPE_F_2_R:
+    case TYPE_F_FLAG:
+    case TYPE_F_LOADS:
+    case TYPE_F_STORES:
+      return true;
+    default:
+      return false;
+    }
+}
+
+/* Return true if and only if this insn can dual-issue as younger.  */
+static bool
+cortexa7_younger (FILE *file, int verbose, rtx insn)
+{
+  if (recog_memoized (insn) < 0)
+    {
+      if (verbose > 5)
+        fprintf (file, ";; not cortexa7_younger %d\n", INSN_UID (insn));
+      return false;
+    }
+
+  if (get_attr_insn (insn) == INSN_MOV)
+    return true;
+
+  switch (get_attr_type (insn))
+    {
+    case TYPE_SIMPLE_ALU_IMM:
+    case TYPE_SIMPLE_ALU_SHIFT:
+    case TYPE_BRANCH:
+    case TYPE_CALL:
+      return true;
+    default:
+      return false;
+    }
+}
+
+
+/* Look for an instruction that can dual issue only as an older
+   instruction, and move it in front of any instructions that can
+   dual-issue as younger, while preserving the relative order of all
+   other instructions in the ready list.  This is a hueuristic to help
+   dual-issue in later cycles, by postponing issue of more flexible
+   instructions.  This heuristic may affect dual issue opportunities
+   in the current cycle.  */
+static void
+cortexa7_sched_reorder (FILE *file, int verbose, rtx *ready, int *n_readyp,
+                        int clock)
+{
+  int i;
+  int first_older_only = -1, first_younger = -1;
+
+  if (verbose > 5)
+    fprintf (file,
+             ";; sched_reorder for cycle %d with %d insns in ready list\n",
+             clock,
+             *n_readyp);
+
+  /* Traverse the ready list from the head (the instruction to issue
+     first), and looking for the first instruction that can issue as
+     younger and the first instruction that can dual-issue only as
+     older.  */
+  for (i = *n_readyp - 1; i >= 0; i--)
+    {
+      rtx insn = ready[i];
+      if (cortexa7_older_only (insn))
+        {
+          first_older_only = i;
+          if (verbose > 5)
+            fprintf (file, ";; reorder older found %d\n", INSN_UID (insn));
+          break;
+        }
+      else if (cortexa7_younger (file, verbose, insn) && first_younger == -1)
+        first_younger = i;
+    }
+
+  /* Nothing to reorder because either no younger insn found or insn
+     that can dual-issue only as older appears before any insn that
+     can dual-issue as younger.  */
+  if (first_younger == -1)
+    {
+      if (verbose > 5)
+        fprintf (file, ";; sched_reorder nothing to reorder as no younger\n");
+      return;
+    }
+
+  /* Nothing to reorder because no older-only insn in the ready list.  */
+  if (first_older_only == -1)
+    {
+      if (verbose > 5)
+        fprintf (file, ";; sched_reorder nothing to reorder as no older_only\n");
+      return;
+    }
+
+  /* Move first_older_only insn before first_younger.  */
+  if (verbose > 5)
+    fprintf (file, ";; cortexa7_sched_reorder insn %d before %d\n",
+             INSN_UID(ready [first_older_only]),
+             INSN_UID(ready [first_younger]));
+  rtx first_older_only_insn = ready [first_older_only];
+  for (i = first_older_only; i < first_younger; i++)
+    {
+      ready[i] = ready[i+1];
+    }
+
+  ready[i] = first_older_only_insn;
+  return;
+}
+
+/* Implement TARGET_SCHED_REORDER. */
+static int
+arm_sched_reorder (FILE *file, int verbose, rtx *ready, int *n_readyp,
+                   int clock)
+{
+  switch (arm_tune)
+    {
+    case cortexa7:
+      cortexa7_sched_reorder (file, verbose, ready, n_readyp, clock);
+      break;
+    default:
+      /* Do nothing for other cores.  */
+      break;
+    }
+
+  return arm_issue_rate ();
 }
 
 /* This function implements the target macro TARGET_SCHED_ADJUST_COST.
@@ -20795,7 +20960,7 @@ safe_vector_operand (rtx x, enum machine_mode mode)
 
 static rtx
 arm_expand_binop_builtin (enum insn_code icode,
-			  tree exp, rtx target)
+			  tree exp, rtx target, bool allow_void)
 {
   rtx pat;
   tree arg0 = CALL_EXPR_ARG (exp, 0);
@@ -20816,7 +20981,32 @@ arm_expand_binop_builtin (enum insn_code icode,
       || ! (*insn_data[icode].operand[0].predicate) (target, tmode))
     target = gen_reg_rtx (tmode);
 
-  gcc_assert (GET_MODE (op0) == mode0 && GET_MODE (op1) == mode1);
+  if (GET_MODE (op0) != mode0)
+    {
+      error ("the first argument to the builtin has mode %s, expecting %s",
+	     mode_name[GET_MODE (op0)], mode_name[mode0]);
+      /* Do not return a NULL_RTX - it causes an ICE in store_expr()
+	 which does not expect builtin expansion to fail.  */
+      return const0_rtx;
+    }	  
+  
+  if (GET_MODE (op1) != mode1)
+    {
+      if (GET_MODE (op1) == VOIDmode)
+	{
+	  /* We are being passed a constant as our second parameter.
+	     If allow_void is true, assume that the pattern allows
+	     immediates.  Otherwise, copy the value into a register.  */
+	  if (! allow_void)
+	    op1 = copy_to_mode_reg (mode1, op1);
+	}
+      else
+	{
+	  error ("the second argument to the builtin has mode %s, expecting %s",
+		 mode_name[GET_MODE (op1)], mode_name[mode1]);
+	  return const0_rtx;
+	}
+    }
 
   if (! (*insn_data[icode].operand[1].predicate) (op0, mode0))
     op0 = copy_to_mode_reg (mode0, op0);
@@ -21449,13 +21639,13 @@ arm_expand_builtin (tree exp,
       return target;
 
     case ARM_BUILTIN_WSADB:
-      return arm_expand_binop_builtin (CODE_FOR_iwmmxt_wsadb, exp, target);
+      return arm_expand_binop_builtin (CODE_FOR_iwmmxt_wsadb, exp, target, false);
     case ARM_BUILTIN_WSADH:
-      return arm_expand_binop_builtin (CODE_FOR_iwmmxt_wsadh, exp, target);
+      return arm_expand_binop_builtin (CODE_FOR_iwmmxt_wsadh, exp, target, false);
     case ARM_BUILTIN_WSADBZ:
-      return arm_expand_binop_builtin (CODE_FOR_iwmmxt_wsadbz, exp, target);
+      return arm_expand_binop_builtin (CODE_FOR_iwmmxt_wsadbz, exp, target, false);
     case ARM_BUILTIN_WSADHZ:
-      return arm_expand_binop_builtin (CODE_FOR_iwmmxt_wsadhz, exp, target);
+      return arm_expand_binop_builtin (CODE_FOR_iwmmxt_wsadhz, exp, target, false);
 
       /* Several three-argument builtins.  */
     case ARM_BUILTIN_WMACS:
@@ -21503,6 +21693,32 @@ arm_expand_builtin (tree exp,
       emit_insn (pat);
       return target;
 
+    case ARM_BUILTIN_WSLLHI:
+    case ARM_BUILTIN_WSLLWI:
+    case ARM_BUILTIN_WSLLDI:
+    case ARM_BUILTIN_WSRAHI:
+    case ARM_BUILTIN_WSRAWI:
+    case ARM_BUILTIN_WSRADI:
+    case ARM_BUILTIN_WSRLHI:
+    case ARM_BUILTIN_WSRLWI:
+    case ARM_BUILTIN_WSRLDI:
+    case ARM_BUILTIN_WRORHI:
+    case ARM_BUILTIN_WRORWI:
+    case ARM_BUILTIN_WRORDI:
+      icode = (  fcode == ARM_BUILTIN_WSLLHI ? CODE_FOR_ashlv4hi3_iwmmxt
+	       : fcode == ARM_BUILTIN_WSLLWI ? CODE_FOR_ashlv2si3_iwmmxt
+	       : fcode == ARM_BUILTIN_WSLLDI ? CODE_FOR_ashldi3_iwmmxt
+	       : fcode == ARM_BUILTIN_WSRAHI ? CODE_FOR_ashrv4hi3_iwmmxt
+	       : fcode == ARM_BUILTIN_WSRAWI ? CODE_FOR_ashrv2si3_iwmmxt
+	       : fcode == ARM_BUILTIN_WSRADI ? CODE_FOR_ashrdi3_iwmmxt
+	       : fcode == ARM_BUILTIN_WSRLHI ? CODE_FOR_lshrv4hi3_iwmmxt
+	       : fcode == ARM_BUILTIN_WSRLWI ? CODE_FOR_lshrv2si3_iwmmxt
+	       : fcode == ARM_BUILTIN_WSRLDI ? CODE_FOR_lshrdi3_iwmmxt
+	       : fcode == ARM_BUILTIN_WRORHI ? CODE_FOR_rorv4hi3
+	       : fcode == ARM_BUILTIN_WRORWI ? CODE_FOR_rorv2si3
+	       :       /* ARM_BUILTIN_WRORDI */CODE_FOR_rordi3);
+      return arm_expand_binop_builtin (icode, exp, target, true);
+
     case ARM_BUILTIN_WZERO:
       target = gen_reg_rtx (DImode);
       emit_insn (gen_iwmmxt_clrdi (target));
@@ -21517,7 +21733,7 @@ arm_expand_builtin (tree exp,
 
   for (i = 0, d = bdesc_2arg; i < ARRAY_SIZE (bdesc_2arg); i++, d++)
     if (d->code == (const enum arm_builtins) fcode)
-      return arm_expand_binop_builtin (d->icode, exp, target);
+      return arm_expand_binop_builtin (d->icode, exp, target, false);
 
   for (i = 0, d = bdesc_1arg; i < ARRAY_SIZE (bdesc_1arg); i++, d++)
     if (d->code == (const enum arm_builtins) fcode)
@@ -23720,6 +23936,62 @@ arm_cxx_guard_type (void)
   return TARGET_AAPCS_BASED ? integer_type_node : long_long_integer_type_node;
 }
 
+/* Return non-zero iff the consumer (a multiply-accumulate or a
+   multiple-subtract instruction) has an accumulator dependency on the
+   result of the producer and no other dependency on that result.  It
+   does not check if the producer is multiply-accumulate instruction.  */
+int
+arm_mac_accumulator_is_result (rtx producer, rtx consumer)
+{
+  rtx result;
+  rtx op0, op1, acc;
+
+  producer = PATTERN (producer);
+  consumer = PATTERN (consumer);
+
+  if (GET_CODE (producer) == COND_EXEC)
+    producer = COND_EXEC_CODE (producer);
+  if (GET_CODE (consumer) == COND_EXEC)
+    consumer = COND_EXEC_CODE (consumer);
+
+  if (GET_CODE (producer) != SET)
+    return 0;
+
+  result = XEXP (producer, 0);
+
+  if (GET_CODE (consumer) != SET)
+    return 0;
+
+  /* Check that the consumer is of the form
+     (set (...) (plus (mult ...) (...)))
+     or
+     (set (...) (minus (...) (mult ...))).  */
+  if (GET_CODE (XEXP (consumer, 1)) == PLUS)
+    {
+      if (GET_CODE (XEXP (XEXP (consumer, 1), 0)) != MULT)
+        return 0;
+
+      op0 = XEXP (XEXP (XEXP (consumer, 1), 0), 0);
+      op1 = XEXP (XEXP (XEXP (consumer, 1), 0), 1);
+      acc = XEXP (XEXP (consumer, 1), 1);
+    }
+  else if (GET_CODE (XEXP (consumer, 1)) == MINUS)
+    {
+      if (GET_CODE (XEXP (XEXP (consumer, 1), 1)) != MULT)
+        return 0;
+
+      op0 = XEXP (XEXP (XEXP (consumer, 1), 1), 0);
+      op1 = XEXP (XEXP (XEXP (consumer, 1), 1), 1);
+      acc = XEXP (XEXP (consumer, 1), 0);
+    }
+  else
+    return 0;
+
+  return (reg_overlap_mentioned_p (result, acc)
+          && !reg_overlap_mentioned_p (result, op0)
+          && !reg_overlap_mentioned_p (result, op1));
+}
+
 /* Return non-zero if the consumer (a multiply-accumulate instruction)
    has an accumulator dependency on the result of the producer (a
    multiplication instruction) and no other dependency on that result.  */
@@ -24674,6 +24946,7 @@ arm_issue_rate (void)
     case cortexr5:
     case genericv7a:
     case cortexa5:
+    case cortexa7:
     case cortexa8:
     case cortexa9:
     case fa726te:

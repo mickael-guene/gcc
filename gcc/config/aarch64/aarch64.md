@@ -1,5 +1,5 @@
 ;; Machine description for AArch64 architecture.
-;; Copyright (C) 2009, 2010, 2011, 2012 Free Software Foundation, Inc.
+;; Copyright (C) 2009, 2010, 2011, 2012, 2013 Free Software Foundation, Inc.
 ;; Contributed by ARM Ltd.
 ;;
 ;; This file is part of GCC.
@@ -840,8 +840,8 @@
 (define_insn "insv_imm<mode>"
   [(set (zero_extract:GPI (match_operand:GPI 0 "register_operand" "+r")
 			  (const_int 16)
-			  (match_operand 1 "const_int_operand" "n"))
-	(match_operand 2 "const_int_operand" "n"))]
+			  (match_operand:GPI 1 "const_int_operand" "n"))
+	(match_operand:GPI 2 "const_int_operand" "n"))]
   "INTVAL (operands[1]) < GET_MODE_BITSIZE (<MODE>mode)
    && INTVAL (operands[1]) % 16 == 0
    && INTVAL (operands[2]) <= 0xffff"
@@ -915,38 +915,44 @@
 )
 
 (define_insn "*movsf_aarch64"
-  [(set (match_operand:SF 0 "nonimmediate_operand" "= w,?r,w,w,m,r,m ,r")
-	(match_operand:SF 1 "general_operand"      "?rY, w,w,m,w,m,rY,r"))]
+  [(set (match_operand:SF 0 "nonimmediate_operand" "=w, ?r,w,w  ,w,m,r,m ,r")
+	(match_operand:SF 1 "general_operand"      "?rY, w,w,Ufc,m,w,m,rY,r"))]
   "TARGET_FLOAT && (register_operand (operands[0], SFmode)
     || register_operand (operands[1], SFmode))"
   "@
    fmov\\t%s0, %w1
    fmov\\t%w0, %s1
    fmov\\t%s0, %s1
+   fmov\\t%s0, %1
    ldr\\t%s0, %1
    str\\t%s1, %0
    ldr\\t%w0, %1
    str\\t%w1, %0
    mov\\t%w0, %w1"
-  [(set_attr "v8type" "fmovi2f,fmovf2i,fmov,fpsimd_load,fpsimd_store,fpsimd_load,fpsimd_store,fmov")
+  [(set_attr "v8type" "fmovi2f,fmovf2i,\
+		       fmov,fconst,fpsimd_load,\
+		       fpsimd_store,fpsimd_load,fpsimd_store,fmov")
    (set_attr "mode" "SF")]
 )
 
 (define_insn "*movdf_aarch64"
-  [(set (match_operand:DF 0 "nonimmediate_operand" "= w,?r,w,w,m,r,m ,r")
-	(match_operand:DF 1 "general_operand"      "?rY, w,w,m,w,m,rY,r"))]
+  [(set (match_operand:DF 0 "nonimmediate_operand" "=w, ?r,w,w  ,w,m,r,m ,r")
+	(match_operand:DF 1 "general_operand"      "?rY, w,w,Ufc,m,w,m,rY,r"))]
   "TARGET_FLOAT && (register_operand (operands[0], DFmode)
     || register_operand (operands[1], DFmode))"
   "@
    fmov\\t%d0, %x1
    fmov\\t%x0, %d1
    fmov\\t%d0, %d1
+   fmov\\t%d0, %1
    ldr\\t%d0, %1
    str\\t%d1, %0
    ldr\\t%x0, %1
    str\\t%x1, %0
    mov\\t%x0, %x1"
-  [(set_attr "v8type" "fmovi2f,fmovf2i,fmov,fpsimd_load,fpsimd_store,fpsimd_load,fpsimd_store,move")
+  [(set_attr "v8type" "fmovi2f,fmovf2i,\
+		       fmov,fconst,fpsimd_load,\
+		       fpsimd_store,fpsimd_load,fpsimd_store,move")
    (set_attr "mode" "DF")]
 )
 
@@ -990,7 +996,6 @@
    (set_attr "fp" "*,*,yes,yes,*,yes,yes,yes,*,*")
    (set_attr "simd" "yes,*,*,*,yes,*,*,*,*,*")]
 )
-
 
 ;; Operands 1 and 3 are tied together by the final condition; so we allow
 ;; fairly lax checking on the second memory operation.

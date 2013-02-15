@@ -431,7 +431,7 @@
 
 ;; Mode attributes used for fused-multiply-accumulate VFP support
 (define_mode_attr F_constraint [(SF "t") (DF "w")])
-(define_mode_attr F_fma_type [(SF "fmacs") (DF "fmacd")])
+(define_mode_attr F_fma_type [(SF "s") (DF "d")])
 
 ;;----------------------------------------------------------------------------
 ;; Code attributes

@@ -38,6 +38,8 @@
 ;; fmuld	Double precision multiply.
 ;; fmacs	Single precision multiply-accumulate.
 ;; fmacd	Double precision multiply-accumulate.
+;; ffmas	Single precision fused multiply-accumulate.
+;; ffmad	Double precision fused multiply-accumulate.
 ;; fdivs	Single precision sqrt or division.
 ;; fdivd	Double precision sqrt or division.
 ;; f_flag	fmstat operation
@@ -82,7 +84,7 @@
     }
   "
   [(set_attr "predicable" "yes")
-   (set_attr "type" "*,*,*,*,load1,store1,r_2_f,f_2_r,fcpys,f_loads,f_stores")
+   (set_attr "type" "*,*,simple_alu_imm,simple_alu_imm,load1,store1,r_2_f,f_2_r,fcpys,f_loads,f_stores")
    (set_attr "neon_type" "*,*,*,*,*,*,neon_mcr,neon_mrc,neon_vmov,*,*")
    (set_attr "insn" "mov,mov,mvn,mov,*,*,*,*,*,*,*")
    (set_attr "pool_range"     "*,*,*,*,4096,*,*,*,*,1020,*")
@@ -910,7 +912,7 @@
   "TARGET_32BIT && TARGET_HARD_FLOAT && TARGET_FMA"
   "vfma%?.<V_if_elem>\\t%<V_reg>0, %<V_reg>1, %<V_reg>2"
   [(set_attr "predicable" "yes")
-   (set_attr "type" "<F_fma_type>")]
+   (set_attr "type" "ffma<F_fma_type>")]
 )
 
 (define_insn "*fmsub<SDF:mode>4"
@@ -922,7 +924,7 @@
   "TARGET_32BIT && TARGET_HARD_FLOAT && TARGET_FMA"
   "vfms%?.<V_if_elem>\\t%<V_reg>0, %<V_reg>1, %<V_reg>2"
   [(set_attr "predicable" "yes")
-   (set_attr "type" "<F_fma_type>")]
+   (set_attr "type" "ffma<F_fma_type>")]
 )
 
 (define_insn "*fnmsub<SDF:mode>4"
@@ -933,7 +935,7 @@
   "TARGET_32BIT && TARGET_HARD_FLOAT && TARGET_FMA"
   "vfnms%?.<V_if_elem>\\t%<V_reg>0, %<V_reg>1, %<V_reg>2"
   [(set_attr "predicable" "yes")
-   (set_attr "type" "<F_fma_type>")]
+   (set_attr "type" "ffma<F_fma_type>")]
 )
 
 (define_insn "*fnmadd<SDF:mode>4"
@@ -945,7 +947,7 @@
   "TARGET_32BIT && TARGET_HARD_FLOAT && TARGET_FMA"
   "vfnma%?.<V_if_elem>\\t%<V_reg>0, %<V_reg>1, %<V_reg>2"
   [(set_attr "predicable" "yes")
-   (set_attr "type" "<F_fma_type>")]
+   (set_attr "type" "ffma<F_fma_type>")]
 )
 
 

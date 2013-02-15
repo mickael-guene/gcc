@@ -1,3 +1,461 @@
+2013-02-11  Christophe Lyon  <christophe.lyon@linaro.org>
+
+	GCC Linaro 4.7-2013.02 released.
+
+	gcc/
+	* LINARO-VERSION: Update.
+
+2013-02-10  Yvan Roux  <yvan.roux@linaro.org>
+	    Matthias Klose  <doko@ubuntu.com>
+
+	* Makefile.in (s-mlib): Fix revno 115051 merge issues.
+	* configure.ac: Likewise.
+	* configure: Regenerate.
+
+2013-02-09  Yvan Roux  <yvan.roux@linaro.org>
+
+	Merge from FSF arm/aarch64-4.7-branch r194976..r195716.
+
+	Backport arm-aarch64-4.7 r194976:
+	2013-01-07  Tejas Belagod  <tejas.belagod@arm.com>
+	
+	* config/aarch64/arm_neon.h (vmovn_high_is16, vmovn_high_s32,
+	vmovn_high_s64, vmovn_high_u16, vmovn_high_u32, vmovn_high_u64,
+	vqmovn_high_s16, vqmovn_high_s32, vqmovn_high_s64, vqmovn_high_u16,
+	vqmovn_high_u32, vqmovn_high_u64, vqmovun_high_s16, vqmovun_high_s32,
+	vqmovun_high_s64): Fix source operand number and update copyright.
+
+	Backport arm-aarch64-4.7 r195010:
+	[AARCH64-4.7] Backport: Add support for vector and scalar floating-point immediate loads.
+	
+	gcc/
+	* config/aarch64/aarch64-protos.h
+	(aarch64_const_double_zero_rtx_p): Rename to...
+	(aarch64_float_const_zero_rtx_p): ...this.
+	(aarch64_float_const_representable_p): New.
+	(aarch64_output_simd_mov_immediate): Likewise.
+	* config/aarch64/aarch64-simd.md (*aarch64_simd_mov<mode>): Refactor
+	move immediate case.
+	* config/aarch64/aarch64.c
+	(aarch64_const_double_zero_rtx_p): Rename to...
+	(aarch64_float_const_zero_rtx_p): ...this.
+	(aarch64_print_operand): Allow printing of new constants.
+	(aarch64_valid_floating_const): New.
+	(aarch64_legitimate_constant_p): Check for valid floating-point
+	constants.
+	(aarch64_simd_valid_immediate): Likewise.
+	(aarch64_vect_float_const_representable_p): New.
+	(aarch64_float_const_representable_p): Likewise.
+	(aarch64_simd_imm_zero_p): Also allow for floating-point 0.0.
+	(aarch64_output_simd_mov_immediate): New.
+	* config/aarch64/aarch64.md (*movsf_aarch64): Add new alternative.
+	(*movdf_aarch64): Likewise.
+	* config/aarch64/constraints.md (Ufc): New.
+	(Y): call aarch64_float_const_zero_rtx.
+	* config/aarch64/predicates.md (aarch64_fp_compare_operand): New.
+	
+	gcc/testsuite/
+	* gcc.target/aarch64/fmovd.c: New.
+	* gcc.target/aarch64/fmovf.c: Likewise.
+	* gcc.target/aarch64/fmovd-zero.c: Likewise.
+	* gcc.target/aarch64/fmovf-zero.c: Likewise.
+	* gcc.target/aarch64/vect-fmovd.c: Likewise.
+	* gcc.target/aarch64/vect-fmovf.c: Likewise.
+	* gcc.target/aarch64/vect-fmovd-zero.c: Likewise.
+	* gcc.target/aarch64/vect-fmovf-zero.c: Likewise.
+
+	Backport arm-aarch64-4.7 r195011:
+	[AARCH64-4.7] Backport: Make argument of ld1 intrinsics const.
+	
+	gcc/
+	2013-01-08  James Greenhalgh  <james.greenhalgh@arm.com>
+	
+	Backport from mainline.
+	2013-01-07  James Greenhalgh  <james.greenhalgh@arm.com>
+	
+	* config/aarch64/arm_neon.h (vld1_dup_*): Make argument const.
+	(vld1q_dup_*): Likewise.
+	(vld1_*): Likewise.
+	(vld1q_*): Likewise.
+	(vld1_lane_*): Likewise.
+	(vld1q_lane_*): Likewise.
+
+	Backport arm-aarch64-4.7 r195021:
+	2013-01-08  Tejas Belagod  <tejas.belagod@arm.com>
+	
+	* config/aarch64/aarch64-simd.md (aarch64_simd_vec_<su>mult_lo_<mode>,
+	aarch64_simd_vec_<su>mult_hi_<mode>): Separate instruction and operand
+	with tab instead of space.
+
+	Backport arm-aarch64-4.7 r195022:
+	2013-01-08  Tejas Belagod  <tejas.belagod@arm.com>
+	
+	* gcc.target/aarch64/vect-mull-compile.c: Explicitly scan for
+	instructions generated instead of number of occurances.
+
+	Backport arm-aarch64-4.7 r195026:
+	2013-01-08  Tejas Belagod  <tejas.belagod@arm.com>
+	
+	* config/aarch64/aarch64-simd.md (vec_init<mode>): New.
+	* config/aarch64/aarch64-protos.h (aarch64_expand_vector_init): Declare.
+	* config/aarch64/aarch64.c (aarch64_simd_dup_constant,
+	aarch64_simd_make_constant, aarch64_expand_vector_init): New.
+
+	Backport arm-aarch64-4.7 r195079:
+	* config/aarch64/aarch64.c (aarch64_print_operand): Replace %r
+	in asm_fprintf with reg_names.
+	(aarch64_print_operand_address): Likewise.
+	(aarch64_return_addr): Likewise.
+	* config/aarch64/aarch64.h (ASM_FPRINTF_EXTENSIONS): Remove.
+
+	Backport arm-aarch64-4.7 r195090:
+	[AARCH64-4.7] Backport: Fix support for vectorization over sqrt (), sqrtf ().
+	
+	gcc/
+	* config/aarch64/aarch64-builtins.c
+	(aarch64_builtin_vectorized_function): Handle sqrt, sqrtf.
+	
+	gcc/testsuite/
+	* gcc.target/aarch64/vsqrt.c (test_square_root_v2sf): Use
+	endian-safe float pool loading.
+	(test_square_root_v4sf): Likewise.
+	(test_square_root_v2df): Likewise.
+	* lib/target-supports.exp
+	(check_effective_target_vect_call_sqrtf): Add AArch64.
+
+	Backport arm-aarch64-4.7 r195157:
+	2013-01-14  Tejas Belagod  <tejas.belagod@arm.com>
+	
+	gcc/
+	* config/aarch64/aarch64-simd.md (*aarch64_simd_ld1r<mode>): New.
+	* config/aarch64/iterators.md (VALLDI): New.
+	
+	testsuite/
+	* gcc.target/aarch64/aarch64/vect-ld1r-compile-fp.c: New.
+	* gcc.target/aarch64/vect-ld1r-compile.c: New.
+	* gcc.target/aarch64/vect-ld1r-fp.c: New.
+	* gcc.target/aarch64/vect-ld1r.c: New.
+	* gcc.target/aarch64/vect-ld1r.x: New.
+
+	Backport arm-aarch64-4.7 r195206:
+	[AARCH64] Fix __clear_cache.
+
+	Backport arm-aarch64-4.7 r195267:
+	2013-01-17  Yufeng Zhang  <yufeng.zhang@arm.com>
+	
+	* config/aarch64/sync-cache.c (__aarch64_sync_cache_range): Cast the
+	results of (dcache_lsize - 1) and (icache_lsize - 1) to the type
+	__UINTPTR_TYPE__; also cast 'base' to the same type before the
+	alignment operation.
+
+	Backport arm-aarch64-4.7 r195269:
+	Moved change logs of backported changes to ChangeLog.aarch64 in libgcc.
+
+	Backport arm-aarch64-4.7 r195294:
+	2013-01-18  Tejas Belagod  <tejas.belagod@arm.com>
+	
+	gcc/
+	* config/aarch64/arm_neon.h: Map scalar types to standard types.
+
+	Backport arm-aarch64-4.7 r195298:
+	[AArch64-4.7] Backport: Add support for floating-point vcond.
+	
+	gcc/
+	* config/aarch64/aarch64-simd.md
+	(aarch64_simd_bsl<mode>_internal): Add floating-point modes.
+	(aarch64_simd_bsl): Likewise.
+	(aarch64_vcond_internal<mode>): Likewise.
+	(vcond<mode><mode>): Likewise.
+	(aarch64_cm<cmp><mode>): Fix constraints, add new modes.
+	* config/aarch64/iterators.md (V_cmp_result): Add V2DF.
+	gcc/testsuite/
+	* gcc/testsuite/gcc.target/aarch64/vect-fcm-eq-d.c: New.
+	* gcc/testsuite/gcc.target/aarch64/vect-fcm-eq-f.c: Likewise.
+	* gcc/testsuite/gcc.target/aarch64/vect-fcm-ge-d.c: Likewise.
+	* gcc/testsuite/gcc.target/aarch64/vect-fcm-ge-f.c: Likewise.
+	* gcc/testsuite/gcc.target/aarch64/vect-fcm-gt-d.c: Likewise.
+	* gcc/testsuite/gcc.target/aarch64/vect-fcm-gt-f.c: Likewise.
+	* gcc/testsuite/gcc.target/aarch64/vect-fcm.x: Likewise.
+	* gcc/testsuite/lib/target-supports.exp
+	(check_effective_target_vect_cond): Enable for AArch64.
+
+	Backport arm-aarch64-4.7 r195300:
+	[AArch64-4.7] Backport: Fix unordered comparisons to floating-point vcond.
+	
+	gcc/
+	* config/aarch64/aarch64-simd.md
+	(aarch64_vcond_internal<mode>): Handle unordered cases.
+	* config/aarch64/iterators.md (v_cmp_result): New.
+	gcc/testsuite/
+	* gcc.target/aarch64/vect-fcm-gt-f.c: Change expected output.
+	* gcc.target/aarch64/vect-fcm-gt-d.c: Likewise.
+	* gcc.target/aarch64/vect-fcm-ge-f.c: Likewise.
+	* gcc.target/aarch64/vect-fcm-ge-d.c: Likewise.
+	* gcc.target/aarch64/vect-fcm-eq-f.c: Likewise.
+
+	Backport arm-aarch64-4.7 r195466:
+	2013-01-25  Tejas Belagod  <tejas.belagod@arm.com>
+	
+	* config/aarch64/aarch64-simd-builtins.def: Separate sq<r>dmulh_lane
+	entries into lane and laneq entries.
+	* config/aarch64/aarch64-simd.md (aarch64_sq<r>dmulh_lane<mode>): Remove
+	AdvSIMD scalar modes.
+	(aarch64_sq<r>dmulh_laneq<mode>): New.
+	(aarch64_sq<r>dmulh_lane<mode>): New RTL pattern for Scalar AdvSIMD
+	modes.
+	* config/aarch64/arm_neon.h: Fix all the vq<r>dmulh_lane* intrinsics'
+	builtin implementations to relfect changes in RTL in aarch64-simd.md.
+	* config/aarch64/iterators.md (VCOND): New.
+	(VCONQ): New.
+
+	Backport arm-aarch64-4.7 r195670:
+	Back port from mainline implementaion of target hook TARGET_FIXED_CONDITION_CODE_REGS to optimize cmp for some cases
+
+	Backport arm-aarch64-4.7 r195671:
+	Added test case that tests the implementation of TARGET_FIXED_CONDITION_CODE_REGS
+
+	Backport arm-aarch64-4.7 r195710:
+	[AARCH64-4.7] Fix warning - Initialise generic_tunings.
+	
+	gcc/
+	* config/aarch64/aarch64.c (generic_tunings): Initialise.
+
+	Backport arm-aarch64-4.7 r195711:
+	[AARCH64-4.7] Fix warning - aarch64_add_constant mixed code and declarations.
+	
+	gcc/
+	* config/aarch64/aarch64.c
+	(aarch64_add_constant): Move declaration of 'shift' above code.
+
+	Backport arm-aarch64-4.7 r195712:
+	[AARCH64-4.7] Fix warning - aarch64_legitimize_reload_address passes the
+	wrong type to push_reload.
+	
+	gcc/
+	* config/aarch64/aarch64.c
+	(aarch64_legitimize_reload_address): Cast 'type' before
+	passing to push_reload.
+
+	Backport arm-aarch64-4.7 r195714:
+	[AARCH64-4.7] Fix warning - aarch64_trampoline_init passes the wrong type to emit_library_call.
+	
+	gcc/
+	* config/aarch64/aarch64.c
+	(aarch64_trampoline_init): Pass 'LCT_NORMAL' rather than '0'
+	to emit_library_call.
+
+	Backport arm-aarch64-4.7 r195715:
+	[AARCH64-4.7] Fix warning - Mixed code and declarations in aarch64_simd_const_bounds.
+	
+	gcc/
+	* config/aarch64/aarch64.c
+	(aarch64_simd_const_bounds): Move declaration of 'lane' above code.
+
+	Backport arm-aarch64-4.7 r195716:
+	[AARCH64-4.7] Backport: Fix warning in aarch64.md
+	
+	gcc/
+	* config/aarch64/aarch64.md (insv_imm<mode>): Add modes
+	for source operands.
+
+2013-02-05  Yvan Roux  <yvan.roux@linaro.org>
+
+	Merge from FSF GCC 4.7.3 (svn branches/gcc-4_7-branch 195745).
+
+2013-02-05  Yvan Roux  <yvan.roux@linaro.org>
+
+	Backport from mainline r193508
+
+	2012-11-14  Matthias Klose  <doko@ubuntu.com>
+
+	* doc/invoke.texi: Document -print-multiarch.
+	* doc/install.texi: Document --enable-multiarch.
+	* doc/fragments.texi: Document MULTILIB_OSDIRNAMES, MULTIARCH_DIRNAME.
+	* configure.ac: Add --enable-multiarch option.
+	* configure: Regenerate.
+	* Makefile.in (s-mlib): Pass MULTIARCH_DIRNAME to genmultilib.
+	enable_multiarch, with_float: New macros.
+	if_multiarch: New macro, define in terms of enable_multiarch.
+	* genmultilib: Add new argument for the multiarch name.
+	* gcc.c (multiarch_dir): Define.
+	(for_each_path): Search for multiarch suffixes.
+	(driver_handle_option): Handle multiarch option.
+	(do_spec_1): Pass -imultiarch if defined.
+	(main): Print multiarch.
+	(set_multilib_dir): Separate multilib and multiarch names
+	from multilib_select.
+	(print_multilib_info): Ignore multiarch names in multilib_select.
+	* incpath.c (add_standard_paths): Search the multiarch include dirs.
+	* cppdefault.h (default_include): Document multiarch in multilib
+	member.
+	* cppdefault.c: [LOCAL_INCLUDE_DIR, STANDARD_INCLUDE_DIR] Add an
+	include directory for multiarch directories.
+	* common.opt: New options --print-multiarch and -imultilib.
+	* config.gcc <i[34567]86-*-linux* | x86_64-*-linux*> (tmake_file):
+	Include i386/t-linux.
+	<i[34567]86-*-kfreebsd*-gnu | x86_64-*-kfreebsd*-gnu> (tmake_file):
+	Include i386/t-kfreebsd.
+	<i[34567]86-*-gnu*> (tmake_file): Include i386/t-gnu.
+	* config/i386/t-linux64: Add multiarch names in
+	MULTILIB_OSDIRNAMES, define MULTIARCH_DIRNAME.
+	* config/i386/t-gnu: New file.
+	* config/i386/t-kfreebsd: Likewise.
+	* config/i386/t-linux: Likewise.
+
+2013-02-05  Kugan Vivekanandarajah  <kuganv@linaro.org>
+
+	Backport from mainline r195555:
+	2013-01-29  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/cortex-a7.md (cortex_a7_neon, cortex_a7_all): Remove.
+	(cortex_a7_idiv): Use cortex_a7_both instead of cortex_a7_all.
+
+	Backport from mainline r195554:
+	2013-01-29  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/arm.c (cortexa7_younger): Return true for TYPE_CALL.
+	* config/arm/cortex-a7.md (cortex_a7_call): Update required units.
+
+	Backport from mainline r195553:
+	2013-01-29  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/arm-protos.h (arm_mac_accumulator_is_result): New
+	declaration.
+	* config/arm/arm.c (arm_mac_accumulator_is_result): New function.
+	* config/arm/cortex-a7.md: New bypasses using
+	arm_mac_accumulator_is_result.
+
+	Backport from mainline r195552:
+	2013-01-29  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/cortex-a7.md (cortex_a7_neon_mul):  New reservation.
+	(cortex_a7_neon_mla): Likewise.
+	(cortex_a7_fpfmad): New reservation.
+	(cortex_a7_fpmacs): Use ffmas and update required units.
+	(cortex_a7_fpmuld): Update required units and latency.
+	(cortex_a7_fpmacd): Likewise.
+	(cortex_a7_fdivs, cortex_a7_fdivd): Likewise.
+	(cortex_a7_neon). Likewise.
+	(bypass) Update participating units.
+
+	Backport from mainline r195551:
+	2013-01-29  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/arm.md (type): Add ffmas and ffmad to "type" attribute.
+	* config/arm/vfp.md (fma,fmsub,fnmsub,fnmadd): Change type
+	from fmac to ffma.
+	* config/arm/vfp11.md (vfp_farith): Use ffmas.
+	(vfp_fmul): Use ffmad.
+	* config/arm/cortex-r4f.md (cortex_r4_fmacs): Use ffmas.
+	(cortex_r4_fmacd): Use ffmad.
+	* config/arm/cortex-m4-fpu.md (cortex_m4_fmacs): Use ffmas.
+	* config/arm/cortex-a9.md (cortex_a9_fmacs):  Use ffmas.
+	(cortex_a9_fmacd): Use ffmad.
+	* config/arm/cortex-a8-neon.md (cortex_a8_vfp_macs): Use ffmas.
+	(cortex_a8_vfp_macd): Use ffmad.
+	* config/arm/cortex-a5.md (cortex_a5_fpmacs): Use ffmas.
+	(cortex_a5_fpmacd): Use ffmad.
+	* config/arm/cortex-a15-neon.md (cortex_a15_vfp_macs) Use ffmas.
+	(cortex_a15_vfp_macd): Use ffmad.
+	* config/arm/arm1020e.md (v10_fmul): Use ffmas and ffmad.
+
+	Backport from mainline r194656:
+	2012-12-21  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/cortex-a7.md: New file.
+	* config/arm/t-arm (MD_INCLUDES): Add cortex-a7.md.
+	* config/arm/arm.md: Include cortex-a7.md.
+	(generic_sched): Don't use generic scheduler for Cortex-A7.
+	(generic_vfp): Likewise.
+	* config/arm/arm.c: (TARGET_SCHED_REORDER): Use arm_sched_reorder.
+	(arm_sched_reorder,cortexa7_sched_reorder): New function.
+	(cortexa7_older_only,cortexa7_younger): Likewise.
+	(arm_issue_rate): Add Cortex-A7.
+
+
+	Backport from mainline r194557:
+	2012-12-17  Greta Yorsh  <Greta.Yorsh@arm.com>
+	
+	* config/arm/arm.md (type): Add "simple_alu_shift" to attribute "type".
+	(core_cycles): Update for simple_alu_shift.
+	(thumb1_zero_extendhisi2,arm_zero_extendhisi2_v6): Use simple_alu_shift
+	instead of a CPU-speicific condition for "type" attribute.
+	(thumb1_zero_extendqisi2_v6,arm_zero_extendqisi2_v6): Likewise.
+	(thumb1_extendhisi2,arm_extendhisi2_v6,arm_extendqisi_v6): Likewise.
+	(thumb1_extendqisi2): Likewise.
+	* config/arm/thumb2.md (thumb2_extendqisi_v6): Likewise.
+	(thumb2_zero_extendhisi2_v6,thumb2_zero_extendqisi2_v6) Likewise.
+	* config/arm/arm1020e.md (alu_shift_op): Use simple_alu_shift.
+	* config/arm/arm1026ejs.md (alu_shift_op): Likewise.
+	* config/arm/arm1136jfs.md (11_alu_shift_op): Likewise.
+	* config/arm/arm926ejs.md (9_alu_op): Likewise.
+	* config/arm/cortex-a15.md (cortex_a15_alu_shift): Likewise.
+	* config/arm/cortex-a5.md (cortex_a5_alu_shift): Likewise.
+	* config/arm/cortex-a8.md (cortex_a8_alu_shift,cortex_a8_mov): Likewise.
+	* config/arm/cortex-a9.md (cortex_a9_dp,cortex_a9_dp_shift): Likewise.
+	* config/arm/cortex-m4.md (cortex_m4_alu): Likewise.
+	* config/arm/cortex-r4.md (cortex_r4_alu_shift): Likewise.
+	* config/arm/fa526.md (526_alu_shift_op): Likewise.
+	* config/arm/fa606te.md (fa606te_core): Likewise.
+	* config/arm/fa626te.md (626te_alu_shift_op): Likewise.
+	* config/arm/fa726te.md (726te_alu_shift_op): Likewise.
+	* config/arm/fmp626.md (mp626_alu_shift_op): Likewise.
+
+
+	Backport from mainline r193996:
+	2012-11-30  Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>
+	Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/arm.md (type): Subdivide "alu" into "alu_reg"
+	and "simple_alu_imm".
+	(core_cycles): Use new names.
+	(arm_addsi3): Set type of patterns to use to alu_reg and simple_alu_imm.
+	(addsi3_compare0, addsi3_compare0_scratch): Likewise.
+	(addsi3_compare_op1, addsi3_compare_op2, compare_addsi2_op0): Likewise.
+	(compare_addsi2_op1, arm_subsi3_insn, subsi3_compare0): Likewise.
+	(subsi3_compare, arm_decscc,arm_andsi3_insn): Likewise.
+	(thumb1_andsi3_insn, andsi3_compare0_scratch): Likewise.
+	(zeroextractsi_compare0_scratch,iorsi3_insn,iorsi3_compare0): Likewise.
+	(iorsi3_compare0_scratch, arm_xorsi3, thumb1_xorsi3_insn): Likewise.
+	(xorsi3_compare0, xorsi3_compare0_scratch): Likewise.
+	(thumb1_zero_extendhisi2,arm_zero_extendhisi2_v6): Likewise.
+	(thumb1_zero_extendqisi2_v, arm_zero_extendqisi2_v6): Likewise.
+	(thumb1_extendhisi2, arm_extendqisi_v6): Likewise.
+	(thumb1_extendqisi2, arm_movsi_insn): Likewise.
+	(movsi_compare0, movhi_insn_arch4, movhi_bytes): Likewise.
+	(arm_movqi_insn, thumb1_movqi_insn, arm_cmpsi_insn): Likewise.
+	(movsicc_insn, if_plus_move, if_move_plus): Likewise.
+	* config/arm/neon.md (neon_mov<mode>/VDX): Likewise.
+	(neon_mov<mode>/VQXMOV): Likewise.
+	* config/arm/arm1020e.md (1020alu_op): Likewise.
+	* config/arm/fmp626.md (mp626_alu_op): Likewise.
+	* config/arm/fa726te.md (726te_alu_op): Likewise.
+	* config/arm/fa626te.md (626te_alu_op): Likewise.
+	* config/arm/fa606te.md (606te_alu_op): Likewise.
+	* config/arm/fa526.md (526_alu_op): Likewise.
+	* config/arm/cortex-r4.md (cortex_r4_alu, cortex_r4_mov): Likewise.
+	* config/arm/cortex-m4.md (cortex_m4_alu): Likewise.
+	* config/arm/cortex-a9.md (cprtex_a9_dp): Likewise.
+	* config/arm/cortex-a8.md (cortex_a8_alu, cortex_a8_mov): Likewise.
+	* config/arm/cortex-a5.md (cortex_a5_alu): Likewise.
+	* config/arm/cortex-a15.md (cortex_a15_alu): Likewise.
+	* config/arm/arm926ejs.md (9_alu_op): Likewise.
+	* config/arm/arm1136jfs.md (11_alu_op): Likewise.
+	* config/arm/arm1026ejs.md (alu_op): Likewise.
+
+2013-02-05  Kugan Vivekanandarajah  <kuganv@linaro.org>
+
+	Backport from mainline r194587:
+	2012-12-18  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/driver-arm.c (arm_cpu_table):
+	Add Cortex-A7.
+
+2013-01-15  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	gcc/
+	* LINARO-VERSION: Bump version.
+
 2013-01-15  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
 
 	GCC Linaro 4.7-2013.01 released.

@@ -951,7 +951,7 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 1 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 /* -*- indented-text -*- */
 /* Process source files and output type information.
    Copyright (C) 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2010
@@ -973,7 +973,7 @@ You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 #define YY_NO_INPUT 1
-#line 25 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 25 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 #ifdef GENERATOR_FILE
 #include "bconfig.h"
 #else
@@ -1192,7 +1192,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 63 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 63 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 
   /* Do this on entry to yylex():  */
   *yylval = 0;
@@ -1289,7 +1289,7 @@ case 1:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 74 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 74 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   BEGIN(in_struct);
   return TYPEDEF;
@@ -1301,7 +1301,7 @@ case 2:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 78 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 78 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   BEGIN(in_struct);
   return STRUCT;
@@ -1313,7 +1313,7 @@ case 3:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 82 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 82 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   BEGIN(in_struct);
   return UNION;
@@ -1325,7 +1325,7 @@ case 4:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 86 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 86 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   BEGIN(in_struct);
   return EXTERN;
@@ -1337,7 +1337,7 @@ case 5:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 90 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 90 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   BEGIN(in_struct);
   return STATIC;
@@ -1349,7 +1349,7 @@ case 6:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 95 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 95 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   BEGIN(in_struct);
   return DEFVEC_OP;
@@ -1361,7 +1361,7 @@ case 7:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 99 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 99 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   BEGIN(in_struct);
   return DEFVEC_I;
@@ -1373,7 +1373,7 @@ case 8:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 103 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 103 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   BEGIN(in_struct);
   return DEFVEC_ALLOC;
@@ -1383,19 +1383,19 @@ YY_RULE_SETUP
 
 case 9:
 YY_RULE_SETUP
-#line 111 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 111 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { BEGIN(in_struct_comment); }
 	YY_BREAK
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 113 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 113 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { update_lineno (yytext, yyleng); }
 	YY_BREAK
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 114 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 114 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { lexer_line.line++; }
 	YY_BREAK
 case 12:
@@ -1404,7 +1404,7 @@ case 12:
 (yy_c_buf_p) = yy_cp = yy_bp + 5;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 116 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 116 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 /* don't care */
 	YY_BREAK
 case 13:
@@ -1413,7 +1413,7 @@ case 13:
 (yy_c_buf_p) = yy_cp = yy_bp + 3;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 117 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 117 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { return GTY_TOKEN; }
 	YY_BREAK
 case 14:
@@ -1422,7 +1422,7 @@ case 14:
 (yy_c_buf_p) = yy_cp = yy_bp + 3;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 118 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 118 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { return VEC_TOKEN; }
 	YY_BREAK
 case 15:
@@ -1431,7 +1431,7 @@ case 15:
 (yy_c_buf_p) = yy_cp = yy_bp + 5;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 119 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 119 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { return UNION; }
 	YY_BREAK
 case 16:
@@ -1440,7 +1440,7 @@ case 16:
 (yy_c_buf_p) = yy_cp = yy_bp + 6;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 120 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 120 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { return STRUCT; }
 	YY_BREAK
 case 17:
@@ -1449,7 +1449,7 @@ case 17:
 (yy_c_buf_p) = yy_cp = yy_bp + 4;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 121 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 121 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { return ENUM; }
 	YY_BREAK
 case 18:
@@ -1458,7 +1458,7 @@ case 18:
 (yy_c_buf_p) = yy_cp = yy_bp + 9;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 122 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 122 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { return PTR_ALIAS; }
 	YY_BREAK
 case 19:
@@ -1467,12 +1467,12 @@ case 19:
 (yy_c_buf_p) = yy_cp = yy_bp + 10;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 123 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 123 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { return NESTED_PTR; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 124 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 124 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { return NUM; }
 	YY_BREAK
 case 21:
@@ -1481,7 +1481,7 @@ case 21:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 125 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 125 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   *yylval = XDUPVAR (const char, yytext, yyleng, yyleng+1);
   return PARAM_IS;
@@ -1492,11 +1492,11 @@ case 22:
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 131 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 131 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 case 23:
 /* rule 23 can match eol */
 YY_RULE_SETUP
-#line 131 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 131 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   size_t len;
 
@@ -1514,7 +1514,7 @@ case 24:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 143 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 143 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   *yylval = XDUPVAR (const char, yytext, yyleng, yyleng+1);
   return ID;
@@ -1523,7 +1523,7 @@ YY_RULE_SETUP
 case 25:
 /* rule 25 can match eol */
 YY_RULE_SETUP
-#line 148 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 148 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   *yylval = XDUPVAR (const char, yytext+1, yyleng-2, yyleng-1);
   return STRING;
@@ -1533,7 +1533,7 @@ YY_RULE_SETUP
 case 26:
 /* rule 26 can match eol */
 YY_RULE_SETUP
-#line 153 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 153 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   *yylval = XDUPVAR (const char, yytext+1, yyleng-2, yyleng-1);
   return ARRAY;
@@ -1542,7 +1542,7 @@ YY_RULE_SETUP
 case 27:
 /* rule 27 can match eol */
 YY_RULE_SETUP
-#line 157 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 157 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   *yylval = XDUPVAR (const char, yytext+1, yyleng-2, yyleng);
   return CHAR;
@@ -1550,24 +1550,24 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 162 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 162 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { return ELLIPSIS; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 163 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 163 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { return yytext[0]; }
 	YY_BREAK
 /* ignore pp-directives */
 case 30:
 /* rule 30 can match eol */
 YY_RULE_SETUP
-#line 166 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 166 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {lexer_line.line++;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 168 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 168 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   error_at_line (&lexer_line, "unexpected character `%s'", yytext);
 }
@@ -1575,30 +1575,30 @@ YY_RULE_SETUP
 
 case 32:
 YY_RULE_SETUP
-#line 173 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 173 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { BEGIN(in_comment); }
 	YY_BREAK
 case 33:
 /* rule 33 can match eol */
 YY_RULE_SETUP
-#line 174 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 174 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { lexer_line.line++; }
 	YY_BREAK
 case 34:
-#line 176 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 176 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 case 35:
 /* rule 35 can match eol */
-#line 177 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 177 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 case 36:
 /* rule 36 can match eol */
 YY_RULE_SETUP
-#line 177 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 177 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 /* do nothing */
 	YY_BREAK
 case 37:
 /* rule 37 can match eol */
 YY_RULE_SETUP
-#line 178 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 178 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { update_lineno (yytext, yyleng); }
 	YY_BREAK
 case 38:
@@ -1607,21 +1607,21 @@ case 38:
 (yy_c_buf_p) = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 179 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 179 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 /* do nothing */
 	YY_BREAK
 
 case 39:
 /* rule 39 can match eol */
 YY_RULE_SETUP
-#line 182 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 182 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { lexer_line.line++; }
 	YY_BREAK
 case 40:
-#line 184 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 184 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 case 41:
 YY_RULE_SETUP
-#line 184 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 184 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 /* do nothing */
 	YY_BREAK
 case 42:
@@ -1630,25 +1630,25 @@ case 42:
 (yy_c_buf_p) = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 185 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 185 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 /* do nothing */
 	YY_BREAK
 
 case 43:
 YY_RULE_SETUP
-#line 187 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 187 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { BEGIN(INITIAL); } 
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 188 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 188 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 { BEGIN(in_struct); }
 	YY_BREAK
 case 45:
-#line 191 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 191 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 case 46:
 YY_RULE_SETUP
-#line 191 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 191 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 {
   error_at_line (&lexer_line, 
 		 "unterminated comment or string; unexpected EOF");
@@ -1657,12 +1657,12 @@ YY_RULE_SETUP
 case 47:
 /* rule 47 can match eol */
 YY_RULE_SETUP
-#line 196 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 196 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 /* do nothing */
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 198 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 198 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
 #line 1668 "gengtype-lex.c"
@@ -2629,7 +2629,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 198 "/work/release/4.7-2013.01/gcc-linaro-4.7-2013.01/gcc/gengtype-lex.l"
+#line 198 "/home/lyon/src/release-2013.02/release/4.7-2013.02/gcc-linaro-4.7-2013.02/gcc/gengtype-lex.l"
 
 
 
