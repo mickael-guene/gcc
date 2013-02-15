@@ -37,6 +37,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+  _Unwind_Ptr __attribute__((weak)) __gnu_Unwind_Find_got (_Unwind_Ptr);
+
   /* Decode an R_ARM_TARGET2 relocation.  */
   static inline _Unwind_Word
   _Unwind_decode_typeinfo_ptr (_Unwind_Word base __attribute__ ((unused)),
@@ -49,6 +51,14 @@ extern "C" {
       if (!tmp)
 	return 0;
 
+#if __FDPIC__
+      /* for fdpic target we store offset of got entry */
+      /* so first get got from dl and then use indirect access */
+      if (__gnu_Unwind_Find_got) {
+        tmp += __gnu_Unwind_Find_got(ptr);
+        tmp = *(_Unwind_Word *) tmp;
+      } else
+        tmp = 0;
 #if (defined(linux) && !defined(__uClinux__)) || defined(__NetBSD__)
       /* Pc-relative indirect.  */
 #define _GLIBCXX_OVERRIDE_TTYPE_ENCODING (DW_EH_PE_pcrel | DW_EH_PE_indirect)

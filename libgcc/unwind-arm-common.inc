@@ -85,6 +85,12 @@ typedef struct __EIT_entry
   _uw content;
 } __EIT_entry;
 
+/* only use in fdpic case */
+struct funcdesc_t {
+    unsigned int ptr;
+    unsigned int got;
+};
+
 /* Assembly helper functions.  */
 
 /* Restore core register state.  Never returns.  */
@@ -193,7 +199,7 @@ search_EIT_table (const __EIT_entry * table, int nrec, _uw return_address)
    Returns _URC_FAILURE if an error occurred, _URC_OK on success.  */
 
 static _Unwind_Reason_Code
-get_eit_entry (_Unwind_Control_Block *ucbp, _uw return_address)
+get_eit_entry (_Unwind_Control_Block *ucbp, _uw return_address, struct funcdesc_t *personnality_fdpic)
 {
   const __EIT_entry * eitp;
   int nrec;
@@ -269,7 +275,17 @@ get_eit_entry (_Unwind_Control_Block *ucbp, _uw return_address)
   else
     {
       /* Execute region offset to PR */
+#if __FDPIC__
+      /* in that case UCB_PR_ADDR (ucbp) need to be a function descriptor
+       * For that we use personnality_fdpic parameter. We just fill it
+       * with function address and corresponding got module */
+      personnality_fdpic->ptr = selfrel_offset31 (ucbp->pr_cache.ehtp);
+      personnality_fdpic->got = (unsigned int *) __gnu_Unwind_Find_got((_Unwind_Ptr) personnality_fdpic->ptr);
+
+      UCB_PR_ADDR (ucbp) = (_uw) personnality_fdpic;
+#else
       UCB_PR_ADDR (ucbp) = selfrel_offset31 (ucbp->pr_cache.ehtp);
+#endif
     }
   return _URC_OK;
 }
@@ -281,11 +297,12 @@ static void __attribute__((noreturn))
 unwind_phase2 (_Unwind_Control_Block * ucbp, phase2_vrs * vrs)
 {
   _Unwind_Reason_Code pr_result;
+  struct funcdesc_t personnality_fdpic;
 
   do
     {
       /* Find the entry for this routine.  */
-      if (get_eit_entry (ucbp, VRS_PC(vrs)) != _URC_OK)
+      if (get_eit_entry (ucbp, VRS_PC(vrs), &personnality_fdpic) != _URC_OK)
 	abort ();
 
       UCB_SAVED_CALLSITE_ADDR (ucbp) = VRS_PC(vrs);
@@ -308,6 +325,7 @@ static _Unwind_Reason_Code
 unwind_phase2_forced (_Unwind_Control_Block *ucbp, phase2_vrs *entry_vrs,
 		      int resuming)
 {
+  struct funcdesc_t personnality_fdpic;
   _Unwind_Stop_Fn stop_fn = (_Unwind_Stop_Fn) UCB_FORCED_STOP_FN (ucbp);
   void *stop_arg = (void *)UCB_FORCED_STOP_ARG (ucbp);
   _Unwind_Reason_Code pr_result = 0;
@@ -329,7 +347,7 @@ unwind_phase2_forced (_Unwind_Control_Block *ucbp, phase2_vrs *entry_vrs,
       _Unwind_Reason_Code stop_code;
 
       /* Find the entry for this routine.  */
-      entry_code = get_eit_entry (ucbp, VRS_PC (&saved_vrs));
+      entry_code = get_eit_entry (ucbp, VRS_PC (&saved_vrs), &personnality_fdpic);
 
       if (resuming)
 	{
@@ -412,6 +430,7 @@ __gnu_Unwind_RaiseException (_Unwind_Control_Block * ucbp,
 {
   phase1_vrs saved_vrs;
   _Unwind_Reason_Code pr_result;
+  struct funcdesc_t personnality_fdpic;
 
   /* Set the pc to the call site.  */
   VRS_PC (entry_vrs) = VRS_RETURN(entry_vrs);
@@ -425,7 +444,7 @@ __gnu_Unwind_RaiseException (_Unwind_Control_Block * ucbp,
   do
     {
       /* Find the entry for this routine.  */
-      if (get_eit_entry (ucbp, VRS_PC (&saved_vrs)) != _URC_OK)
+      if (get_eit_entry (ucbp, VRS_PC (&saved_vrs), &personnality_fdpic) != _URC_OK)
 	return _URC_FAILURE;
 
       /* Call the pr to decide what to do.  */
@@ -549,6 +568,7 @@ __gnu_Unwind_Backtrace(_Unwind_Trace_Fn trace, void * trace_argument,
 {
   phase1_vrs saved_vrs;
   _Unwind_Reason_Code code;
+  struct funcdesc_t personnality_fdpic;
 
   _Unwind_Control_Block ucb;
   _Unwind_Control_Block *ucbp = &ucb;
@@ -564,7 +584,7 @@ __gnu_Unwind_Backtrace(_Unwind_Trace_Fn trace, void * trace_argument,
   do
     {
       /* Find the entry for this routine.  */
-      if (get_eit_entry (ucbp, VRS_PC (&saved_vrs)) != _URC_OK)
+      if (get_eit_entry (ucbp, VRS_PC (&saved_vrs), &personnality_fdpic) != _URC_OK)
 	{
 	  code = _URC_FAILURE;
 	  break;

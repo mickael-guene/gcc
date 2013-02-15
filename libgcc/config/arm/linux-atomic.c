@@ -23,13 +23,97 @@ a copy of the GCC Runtime Library Exception along with this program;
 see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 <http://www.gnu.org/licenses/>.  */
 
+#if defined(__ARM_ARCH_2__)
+# define __ARM_ARCH__ 2
+#endif
+
+#if defined(__ARM_ARCH_3__)
+# define __ARM_ARCH__ 3
+#endif
+
+#if defined(__ARM_ARCH_3M__) || defined(__ARM_ARCH_4__) \
+  || defined(__ARM_ARCH_4T__)
+/* We use __ARM_ARCH__ set to 4 here, but in reality it's any processor with
+   long multiply instructions.  That includes v3M.  */
+# define __ARM_ARCH__ 4
+#endif
+
+#if defined(__ARM_ARCH_5__) || defined(__ARM_ARCH_5T__) \
+  || defined(__ARM_ARCH_5E__) || defined(__ARM_ARCH_5TE__) \
+  || defined(__ARM_ARCH_5TEJ__)
+# define __ARM_ARCH__ 5
+#endif
+
+#if defined(__ARM_ARCH_6__) || defined(__ARM_ARCH_6J__) \
+  || defined(__ARM_ARCH_6K__) || defined(__ARM_ARCH_6Z__) \
+  || defined(__ARM_ARCH_6ZK__) || defined(__ARM_ARCH_6T2__) \
+  || defined(__ARM_ARCH_6M__)
+# define __ARM_ARCH__ 6
+#endif
+
+#if defined(__ARM_ARCH_7__) || defined(__ARM_ARCH_7A__) \
+  || defined(__ARM_ARCH_7R__) || defined(__ARM_ARCH_7M__) \
+  || defined(__ARM_ARCH_7EM__)
+# define __ARM_ARCH__ 7
+#endif
+
+#ifndef __ARM_ARCH__
+#error Unable to determine architecture.
+#endif
+
 /* Kernel helper for compare-and-exchange.  */
 typedef int (__kernel_cmpxchg_t) (int oldval, int newval, int *ptr);
+#if __FDPIC__
+#define __kernel_cmpxchg __fdpic_cmpxchg
+#else
 #define __kernel_cmpxchg (*(__kernel_cmpxchg_t *) 0xffff0fc0)
+#endif
 
 /* Kernel helper for memory barrier.  */
 typedef void (__kernel_dmb_t) (void);
+#if __FDPIC__
+#define __kernel_dmb __fdpic_dmb
+#else
 #define __kernel_dmb (*(__kernel_dmb_t *) 0xffff0fa0)
+#endif
+
+#if __FDPIC__
+static int __fdpic_cmpxchg(int oldval, int newval, int *ptr)
+{
+#if __ARM_ARCH__ < 6
+  #error architecture support not yet implemented
+  /* use swap instruction (but is it always safe ? (interrupt?)) */
+#else
+  int result;
+
+  asm volatile("1: ldrex r3, [%[ptr]]\n\t"
+               "subs  r3, r3, %[oldval]\n\t"
+               "strexeq r3, %[newval], [%[ptr]]\n\t"
+               "teqeq r3, #1\n\t"
+               "beq 1b\n\t"
+               "rsbs  %[result], r3, #0\n\t"
+               : [result] "=r" (result)
+               : [oldval] "r" (oldval) , [newval] "r" (newval), [ptr] "r" (ptr)
+                : "r3");
+    return result;
+#endif
+}
+
+static void __fdpic_dmb()
+{
+#if __ARM_ARCH__ < 6
+  /* no op ?. perhaps flush write buffer ? */
+  return ;
+#else
+ #if __ARM_ARCH__ >= 7
+  asm volatile("dmb\n\t");
+ #elif __ARM_ARCH__ == 6
+  asm volatile("mcr p15, 0, r0, c7, c10, 5\n\t");
+ #endif
+#endif
+}
+
+#endif
 
 /* Note: we implement byte, short and int versions of atomic operations using
    the above kernel helpers; see linux-atomic-64bit.c for "long long" (64-bit)
