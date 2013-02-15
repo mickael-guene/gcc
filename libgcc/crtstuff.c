@@ -411,9 +411,17 @@ __do_global_dtors_aux (void)
 #ifdef FINI_SECTION_ASM_OP
 CRT_CALL_STATIC_FUNCTION (FINI_SECTION_ASM_OP, __do_global_dtors_aux)
 #elif defined (FINI_ARRAY_SECTION_ASM_OP)
+#if defined(__FDPIC__)
+__asm__(
+    "   .section .fini_array\n"
+    "   .word __do_global_dtors_aux\n"
+);
+asm (TEXT_SECTION_ASM_OP);
+#else /* defined(__FDPIC__) */
 static func_ptr __do_global_dtors_aux_fini_array_entry[]
   __attribute__ ((__used__, section(".fini_array"), aligned(sizeof(func_ptr))))
   = { __do_global_dtors_aux };
+#endif /* defined(__FDPIC__) */
 #else /* !FINI_SECTION_ASM_OP && !FINI_ARRAY_SECTION_ASM_OP */
 static void __attribute__((used))
 __do_global_dtors_aux_1 (void)
@@ -465,9 +473,17 @@ frame_dummy (void)
 #ifdef INIT_SECTION_ASM_OP
 CRT_CALL_STATIC_FUNCTION (INIT_SECTION_ASM_OP, frame_dummy)
 #else /* defined(INIT_SECTION_ASM_OP) */
+#if defined(__FDPIC__)
+__asm__(
+    "   .section .init_array\n"
+    "   .word frame_dummy\n"
+);
+asm (TEXT_SECTION_ASM_OP);
+#else /* defined(__FDPIC__) */
 static func_ptr __frame_dummy_init_array_entry[]
   __attribute__ ((__used__, section(".init_array"), aligned(sizeof(func_ptr))))
   = { frame_dummy };
+#endif /* defined(__FDPIC__) */
 #endif /* !defined(INIT_SECTION_ASM_OP) */
 #endif /* USE_EH_FRAME_REGISTRY || JCR_SECTION_NAME || USE_TM_CLONE_REGISTRY */
 
