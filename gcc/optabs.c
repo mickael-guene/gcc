@@ -3028,6 +3028,47 @@ expand_unop (enum machine_mode mode, optab unoptab, rtx op0, rtx target,
   /* Widening (or narrowing) bswap needs special treatment.  */
   if (unoptab == bswap_optab)
     {
+      /* HImode is special because in this mode BSWAP is equivalent to ROTATE
+	 or ROTATERT.  First try these directly; if this fails, then try the
+	 obvious pair of shifts with allowed widening, as this will probably
+	 be always more efficient than the other fallback methods.  */
+      if (mode == HImode)
+	{
+	  rtx last, temp1, temp2;
+
+	  if (optab_handler (rotl_optab, mode) != CODE_FOR_nothing)
+	    {
+	      temp = expand_binop (mode, rotl_optab, op0, GEN_INT (8), target,
+				   unsignedp, OPTAB_DIRECT);
+	      if (temp)
+		return temp;
+	     }
+
+	  if (optab_handler (rotr_optab, mode) != CODE_FOR_nothing)
+	    {
+	      temp = expand_binop (mode, rotr_optab, op0, GEN_INT (8), target,
+				   unsignedp, OPTAB_DIRECT);
+	      if (temp)
+		return temp;
+	    }
+
+	  last = get_last_insn ();
+
+	  temp1 = expand_binop (mode, ashl_optab, op0, GEN_INT (8), NULL_RTX,
+			        unsignedp, OPTAB_WIDEN);
+	  temp2 = expand_binop (mode, lshr_optab, op0, GEN_INT (8), NULL_RTX,
+			        unsignedp, OPTAB_WIDEN);
+	  if (temp1 && temp2)
+	    {
+	      temp = expand_binop (mode, ior_optab, temp1, temp2, target,
+				   unsignedp, OPTAB_WIDEN);
+	      if (temp)
+		return temp;
+	    }
+
+	  delete_insns_since (last);
+	}
+
       temp = widen_bswap (mode, op0, target);
       if (temp)
 	return temp;
@@ -3219,10 +3260,10 @@ expand_unop (enum machine_mode mode, optab unoptab, rtx op0, rtx target,
 	      /* For certain operations, we need not actually extend
 		 the narrow operand, as long as we will truncate the
 		 results to the same narrowness.  */
-
 	      xop0 = widen_operand (xop0, wider_mode, mode, unsignedp,
 				    (unoptab == neg_optab
-				     || unoptab == one_cmpl_optab)
+				     || unoptab == one_cmpl_optab
+				     || unoptab == bswap_optab)
 				    && mclass == MODE_INT);
 
 	      temp = expand_unop (wider_mode, unoptab, xop0, NULL_RTX,
@@ -3236,6 +3277,20 @@ expand_unop (enum machine_mode mode, optab unoptab, rtx op0, rtx target,
 				     GEN_INT (GET_MODE_PRECISION (wider_mode)
 					      - GET_MODE_PRECISION (mode)),
 				     target, true, OPTAB_DIRECT);
+
+	      /* Likewise for bswap.  */
+	      if (unoptab == bswap_optab && temp != 0)
+		{
+		  gcc_assert (GET_MODE_PRECISION (wider_mode)
+			      == GET_MODE_BITSIZE (wider_mode)
+			      && GET_MODE_PRECISION (mode)
+				 == GET_MODE_BITSIZE (mode));
+
+		  temp = expand_shift (RSHIFT_EXPR, wider_mode, temp,
+				       GET_MODE_BITSIZE (wider_mode)
+				       - GET_MODE_BITSIZE (mode),
+				       NULL_RTX, true);
+		}
 
 	      if (temp)
 		{
@@ -7700,14 +7755,14 @@ expand_atomic_load (rtx target, rtx mem, enum memmodel model)
   if (!target || target == const0_rtx)
     target = gen_reg_rtx (mode);
 
-  /* Emit the appropriate barrier before the load.  */
-  expand_mem_thread_fence (model);
+  /* For SEQ_CST, emit a barrier before the load.  */
+  if (model == MEMMODEL_SEQ_CST)
+    expand_mem_thread_fence (model);
 
   emit_move_insn (target, mem);
 
-  /* For SEQ_CST, also emit a barrier after the load.  */
-  if (model == MEMMODEL_SEQ_CST)
-    expand_mem_thread_fence (model);
+  /* Emit the appropriate barrier after the load.  */
+  expand_mem_thread_fence (model);
 
   return target;
 }
@@ -7768,13 +7823,12 @@ expand_atomic_store (rtx mem, rtx val, enum memmodel model, bool use_release)
         return NULL_RTX;
     }
 
-  /* If there is no mem_store, default to a move with barriers */
-  if (model == MEMMODEL_SEQ_CST || model == MEMMODEL_RELEASE)
-    expand_mem_thread_fence (model);
+  /* Otherwise assume stores are atomic, and emit the proper barriers.  */
+  expand_mem_thread_fence (model);
 
   emit_move_insn (mem, val);
 
-  /* For SEQ_CST, also emit a barrier after the load.  */
+  /* For SEQ_CST, also emit a barrier after the store.  */
   if (model == MEMMODEL_SEQ_CST)
     expand_mem_thread_fence (model);
 

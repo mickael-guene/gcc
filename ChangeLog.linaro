@@ -1,3 +1,506 @@
+2013-01-15  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	GCC Linaro 4.7-2013.01 released.
+
+	gcc/
+	* LINARO-VERSION: Update.
+
+2013-01-10  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	Merge from FSF GCC 4.7.3 (svn branches/gcc-4_7-branch 194772).
+
+2013-01-10  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	Merge from FSF arm/aarch64-4.7-branch r194220..r194808.
+
+	Backport arm-aarch64-4.7 r194220:
+	gcc/
+	
+	2012-12-05  Yufeng Zhang  <yufeng.zhang@arm.com>
+	
+	* config/aarch64/aarch64.c (aarch64_mangle_type): New function.
+	(TARGET_MANGLE_TYPE): Define.
+	
+	gcc/testsuite/
+	
+	2012-12-05  Yufeng Zhang  <yufeng.zhang@arm.com>
+	
+	* g++.dg/abi/arm_va_list.C: Also test on aarch64*-*-*.
+
+	Backport arm-aarch64-4.7 r194222:
+	[AARCH64-4.7] Backport vectorize standard math patterns.
+	
+	gcc/
+	
+	* config/aarch64/aarch64-builtins.c
+	(aarch64_builtin_vectorized_function): New.
+	* config/aarch64/aarch64-protos.h
+	(aarch64_builtin_vectorized_function): Declare.
+	* config/aarch64/aarch64-simd-builtins.def (frintz, frintp): Add.
+	(frintm, frinti, frintx, frinta, fcvtzs, fcvtzu): Likewise.
+	(fcvtas, fcvtau, fcvtps, fcvtpu, fcvtms, fcvtmu): Likewise.
+	* config/aarch64/aarch64-simd.md
+	(aarch64_frint_<frint_suffix><mode>): New.
+	(<frint_pattern><mode>2): Likewise.
+	(aarch64_fcvt<frint_suffix><su><mode>): Likewise.
+	(l<fcvt_pattern><su_optab><fcvt_target><VDQF:mode>2): Likewise.
+	* config/aarch64/aarch64.c (TARGET_VECTORIZE_BUILTINS): Define.
+	(TARGET_VECTORIZE_BUILTIN_VECTORIZED_FUNCTION): Likewise.
+	* config/aarch64/aarch64.md
+	(btrunc<mode>2, ceil<mode>2, floor<mode>2)
+	(round<mode>2, rint<mode>2, nearbyint<mode>2): Consolidate as...
+	(<frint_pattern><mode>2): ...this.
+	(lceil<su_optab><mode><mode>2, lfloor<su_optab><mode><mode>2)
+	(lround<su_optab><mode><mode>2)
+	(lrint<su_optab><mode><mode>2): Consolidate as...
+	(l<fcvt_pattern><su_optab><GPF:mode><GPI:mode>2): ... this.
+	* config/aarch64/iterators.md (fcvt_target): New.
+	(FCVT_TARGET): Likewise.
+	(FRINT): Likewise.
+	(FCVT): Likewise.
+	(frint_pattern): Likewise.
+	(frint_suffix): Likewise.
+	(fcvt_pattern): Likewise.
+	
+	gcc/testsuite/
+	
+	* gcc.dg/vect/vect-rounding-btrunc.c: New test.
+	* gcc.dg/vect/vect-rounding-btruncf.c: Likewise.
+	* gcc.dg/vect/vect-rounding-ceil.c: Likewise.
+	* gcc.dg/vect/vect-rounding-ceilf.c: Likewise.
+	* gcc.dg/vect/vect-rounding-floor.c: Likewise.
+	* gcc.dg/vect/vect-rounding-floorf.c: Likewise.
+	* gcc.dg/vect/vect-rounding-lceil.c: Likewise.
+	* gcc.dg/vect/vect-rounding-lfloor.c: Likewise.
+	* gcc.dg/vect/vect-rounding-nearbyint.c: Likewise.
+	* gcc.dg/vect/vect-rounding-nearbyintf.c: Likewise.
+	* gcc.dg/vect/vect-rounding-round.c: Likewise.
+	* gcc.dg/vect/vect-rounding-roundf.c: Likewise.
+	* target-supports.exp
+	(check_effective_target_vect_call_btrunc): New.
+	(check_effective_target_vect_call_btruncf): Likewise.
+	(check_effective_target_vect_call_ceil): Likewise.
+	(check_effective_target_vect_call_ceilf): Likewise.
+	(check_effective_target_vect_call_floor): Likewise.
+	(check_effective_target_vect_call_floorf): Likewise.
+	(check_effective_target_vect_call_lceil): Likewise.
+	(check_effective_target_vect_call_lfloor): Likewise.
+	(check_effective_target_vect_call_nearbyint): Likewise.
+	(check_effective_target_vect_call_nearbyintf): Likewise.
+	(check_effective_target_vect_call_round): Likewise.
+	(check_effective_target_vect_call_roundf): Likewise.
+
+	Backport arm-aarch64-4.7 r194246:
+	gcc/
+	
+	2012-12-05  Yufeng Zhang  <yufeng.zhang@arm.com>
+	
+	* config/aarch64/aarch64.c (aarch64_simd_mangle_map_entry): New
+	typedef.
+	(aarch64_simd_mangle_map): New table.
+	(aarch64_mangle_type): Locate and return the mangled name for
+	a given AdvSIMD vector type.
+	
+	gcc/testsuite/
+	
+	2012-12-05  Yufeng Zhang  <yufeng.zhang@arm.com>
+	
+	* g++.dg/abi/mangle-neon-aarch64.C: New test.
+
+	Backport arm-aarch64-4.7 r194259:
+	[AARCH64-4.7] Backport fix to slp-perm-8.c
+	
+	gcc/testsuite/
+	
+	Backport from mainline.
+	2012-05-31  Greta Yorsh  <Greta.Yorsh@arm.com>
+	
+	* lib/target-supports.exp (check_effective_target_vect_char_mult): Add
+	arm32 to targets.
+	* gcc.dg/vect/slp-perm-8.c (main): Prevent vectorization
+	of the initialization loop.
+	(dg-final): Adjust the expected number of vectorized loops depending
+	on vect_char_mult target selector.
+
+	Backport arm-aarch64-4.7 r194260:
+	[AARCH64] Implement Vector Permute Support.
+	
+	gcc/
+	Backport from mainline.
+	2012-12-05  James Greenhalgh  <james.greenhalgh@arm.com>
+	
+	* config/aarch64/aarch64-protos.h
+	(aarch64_split_combinev16qi): New.
+	(aarch64_expand_vec_perm): Likewise.
+	(aarch64_expand_vec_perm_const): Likewise.
+	* config/aarch64/aarch64-simd.md (vec_perm_const<mode>): New.
+	(vec_perm<mode>): Likewise.
+	(aarch64_tbl1<mode>): Likewise.
+	(aarch64_tbl2v16qi): Likewise.
+	(aarch64_combinev16qi): New.
+	* config/aarch64/aarch64.c
+	(aarch64_vectorize_vec_perm_const_ok): New.
+	(aarch64_split_combinev16qi): Likewise.
+	(MAX_VECT_LEN): Define.
+	(expand_vec_perm_d): New.
+	(aarch64_expand_vec_perm_1): Likewise.
+	(aarch64_expand_vec_perm): Likewise.
+	(aarch64_evpc_tbl): Likewise.
+	(aarch64_expand_vec_perm_const_1): Likewise.
+	(aarch64_expand_vec_perm_const): Likewise.
+	(aarch64_vectorize_vec_perm_const_ok): Likewise.
+	(TARGET_VECTORIZE_VEC_PERM_CONST_OK): Likewise.
+	* config/aarch64/iterators.md
+	(unspec): Add UNSPEC_TBL, UNSPEC_CONCAT.
+	(V_cmp_result): Add mapping for V2DF.
+	
+	gcc/testsuite/
+	
+	Backport from mainline.
+	2012-12-05  James Greenhalgh  <james.greenhalgh@arm.com>
+	
+	* lib/target-supports.exp
+	(check_effective_target_vect_perm): Allow aarch64*-*-*.
+	(check_effective_target_vect_perm_byte): Likewise.
+	(check_effective_target_vect_perm_short): Likewise.
+	(check_effective_target_vect_char_mult): Likewise.
+	(check_effective_target_vect_extract_even_odd): Likewise.
+	(check_effective_target_vect_interleave): Likewise.
+
+	Backport arm-aarch64-4.7 r194261:
+	[AARCH64-4.7] Add zip{1, 2}, uzp{1, 2}, trn{1, 2} support for vector permute.
+	
+	gcc/
+	Backport from mainline.
+	2012-12-05  James Greenhalgh  <james.greenhalgh@arm.com>
+	
+	* config/aarch64/aarch64-simd-builtins.def: Add new builtins.
+	* config/aarch64/aarch64-simd.md (simd_type): Add uzp.
+	(aarch64_<PERMUTE:perm_insn><PERMUTE:perm_hilo><mode>): New.
+	* config/aarch64/aarch64.c (aarch64_evpc_trn): New.
+	(aarch64_evpc_uzp): Likewise.
+	(aarch64_evpc_zip): Likewise.
+	(aarch64_expand_vec_perm_const_1): Check for trn, zip, uzp patterns.
+	* config/aarch64/iterators.md (unspec): Add neccessary unspecs.
+	(PERMUTE): New.
+	(perm_insn): Likewise.
+	(perm_hilo): Likewise.
+
+	Backport arm-aarch64-4.7 r194553:
+	[AARCH64] Backport support for TARGET_VECTORIZE_AUTOVECTORIZE_VECTOR_SIZES.
+	
+	gcc/
+	
+	* config/aarch64/aarch64.c
+	(aarch64_autovectorize_vector_sizes): New.
+	(TARGET_VECTORIZE_AUTOVECTORIZE_VECTOR_SIZES): Define.
+	
+	gcc/testsuite/
+	
+	* lib/target-supports.exp
+	(check_effective_target_vect_multiple_sizes): Enable for AArch64.
+
+	Backport arm-aarch64-4.7 r194673:
+	Make zero_extends explicit for common AArch64 SI mode patterns
+
+	Backport arm-aarch64-4.7 r194808:
+	[AArch64] Backport: Fix some warnings about unused variables.
+	
+	gcc/
+	* config/aarch64/aarch64.c (aarch64_simd_attr_length_move):
+	Remove unused variables.
+	(aarch64_split_compare_and_swap): Likewise.
+
+2012-12-20  Brice Dobry  <brice.dobry@linaro.org>
+
+	Backport from mainline r191181
+
+	2012-09-11  Tobias Burnus  <burnus@net-b.de>
+
+	* doc/sourcebuild.texi (arm_neon_v2_ok): Fix @anchor.
+
+2012-12-20  Brice Dobry  <brice.dobry@linaro.org>
+
+	Blueprints: backport-the-fma-intrinsic, fused-multiply-add-support
+
+	Backport from mainline r192560
+
+	2012-10-18  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+	            Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+
+	* config/arm/arm.c (neon_builtin_data): Add vfma and vfms
+	builtins.
+	* config/arm/neon-docgen.ml (intrinsic_groups): Add
+	fused-multiply-* groups.
+	* config/neon-gen.ml (print_feature_test_start): New function.
+	(print_feature_test_end): Likewise.
+	(print_variant): Print feature test macros.
+	* config/arm/neon-testgen.ml (emit_prologue): Allow different
+	tests to require different effective targets.
+	(effective_target): New function.
+	(test_intrinsic): Specify correct effective targets.
+	* gcc/config/arm/neon.md (fma<VCVTF:mode>4_intrinsic): New pattern.
+	(fmsub<VCVTF:mode>4_intrinsic): Likewise.
+	(neon_vfma<VCVFT:mode>): New expand.
+	(neon_vfms<VCVFT:mode>): Likewise.
+	* config/neon.ml (opcode): Add Vfma and Vfms.
+	(features): Add Requires_feature.
+	(ops): Add VFMA and VFMS intrinsics.
+	* config/arm/arm_neon.h: Regenerate.
+	* doc/arm-neon-intrinsics.texi: Likewise.
+
+
+2012-12-20  Brice Dobry  <brice.dobry@linaro.org>
+
+	Blueprints: backport-the-fma-intrinsic, fused-multiply-add-support
+
+	Backport from mainline r191180
+
+	2012-09-11  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+	Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
+	* config/arm/neon.md (fma<VCVTF:mode>4): New pattern.
+	(*fmsub<VCVTF:mode>4): Likewise.
+	* doc/sourcebuild.texi (arm_neon_v2_ok, arm_neon_v2_hw):  Document it.
+
+2012-12-20  Brice Dobry  <brice.dobry@linaro.org>
+
+	Blueprints: backport-the-fma-intrinsic, fused-multiply-add-support
+
+	Backport from mainline r189283
+
+	2012-07-05  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+	
+	* config/arm/iterators.md (SDF): New mode iterator.
+	(V_if_elem): Add support for SF and DF modes.
+	(V_reg): Likewise.
+	(F_constraint): New mode iterator attribute.
+	(F_fma_type): Likewise.
+	config/arm/vfp.md (fma<SDF:mode>4): New pattern.
+	(*fmsub<SDF:mode>4): Likewise.
+	(*fmnsub<SDF:mode>4): Likewise.
+	(*fmnadd<SDF:mode>4): Likewise.
+
+2012-12-20  Brice Dobry  <brice.dobry@linaro.org>
+
+	Blueprints: backport-the-fma-intrinsic, fused-multiply-add-support
+
+	Partial backport from mainline r188946
+
+	2012-06-25  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+	            James Greenhalgh  <james.greenhalgh@arm.com>
+	* config/arm/arm.h (TARGET_CPU_CPP_BUILTINS): Add new built-ins.
+	(TARGET_FMA): New macro.
+
+2012-12-20  Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	Backport from mainline
+
+	gcc/
+	2012-12-17  Andrew Stubbs  <ams@codesourcery.com>
+		    Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	* config/arm/arm.md (zero_extend<mode>di2): Add extra alternatives
+	for NEON registers.
+	Add alternative for one-instruction extend-in-place.
+	(extend<mode>di2): Likewise.
+	Add constraints for Thumb-mode memory loads.
+	Prevent extend splitters doing NEON alternatives.
+	* config/arm/iterators.md (qhs_extenddi_cstr, qhs_zextenddi_cstr):
+	Adjust constraints to add new alternatives.
+	* config/arm/neon.md: Add splitters for zero- and sign-extend.
+
+	gcc/testsuite/
+	2012-12-17  Andrew Stubbs  <ams@codesourcery.com>
+		    Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	* gcc.target/arm/neon-extend-1.c: New file.
+	* gcc.target/arm/neon-extend-2.c: New file.
+
+	gcc/testsuite/
+	2012-10-01  Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	* gcc.dg/lower-subreg-1.c: Disable on arm*-*-* targets.
+
+	gcc/
+	2012-09-27  Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	* lower-subreg.c (enum classify_move_insn): Rename
+	SIMPLE_PSEUDO_REG_MOVE to DECOMPOSABLE_SIMPLE_MOVE.
+	(find_decomposable_subregs): Update.
+	(decompose_multiword_subregs): Add DECOMPOSE_COPIES parameter.
+	Only mark pseudo-to-pseudo copies as DECOMPOSABLE_SIMPLE_MOVE
+	if that parameter is true.
+	(rest_of_handle_lower_subreg): Call decompose_multiword_subregs
+	with DECOMPOSE_COPIES false.
+	(rest_of_handle_lower_subreg2): Call decompose_multiword_subregs
+	with DECOMPOSE_COPIES true.
+
+	gcc/testsuite/
+	2012-09-27  Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	* gcc.dg/lower-subreg-1.c: Disable on arm-*-* targets.
+
+2012-12-19  Christophe Lyon  <christophe.lyon@linaro.org>
+
+	gcc/testsuite/
+	* gcc.target/arm/builtin-bswap16-1.c: Replace armv6 by armv7a to
+	avoid failure when testing on hard-float+thumb target.
+	* gcc.target/arm/builtin-bswap-1.c: Likewise.
+
+
+	Backport from mainline r191760:
+
+	2012-09-21  Christophe Lyon <christophe.lyon@linaro.org>
+
+	gcc/
+	* tree-ssa-math-opts.c (bswap_stats): Add found_16bit field.
+	(execute_optimize_bswap): Add support for builtin_bswap16.
+
+	gcc/testsuite/
+	* gcc.target/arm/builtin-bswap16-1.c: New testcase.
+
+
+	Backport from mainline r188526:
+
+	2012-06-13  Alexandre Oliva  <aoliva@redhat.com>
+
+	gcc/
+	* common.opt (ftree-coalesce-inlined-vars): New.
+	(ftree-coalesce-vars): New.
+	* doc/invoke.texi: Document them.
+	* tree-ssa-copyrename.c (copy_rename_partition_coalesce):
+	Implement them.
+
+	gcc/testsuite/
+	* g++.dg/tree-ssa/ivopts-2.C: Adjust for coalescing.
+	* gcc.dg/tree-ssa/forwprop-11.c: Likewise.
+	* gcc.dg/tree-ssa/ssa-fre-1.c: Likewise.
+
+
+	Backport from mainline r191243:
+
+	2012-09-13  Christophe Lyon  <christophe.lyon@linaro.org>
+	    Richard Earnshaw  <rearnsha@arm.com>
+
+	gcc/
+	* config/arm/arm.md (arm_rev): Factorize thumb1, thumb2 and arm
+	variants for rev instruction..
+	(thumb1_rev): Delete pattern.
+	(arm_revsh): New pattern to support builtin_bswap16.
+	(arm_rev16, bswaphi2): Likewise.
+
+	gcc/testsuite/
+	* gcc.target/arm/builtin-bswap-1.c: New testcase.
+
+
+	Backport from mainline r186308:
+
+	PR target/52624
+	gcc/
+	* doc/extend.texi (Other Builtins): Document __builtin_bswap16.
+	(PowerPC AltiVec/VSX Built-in Functions): Remove it.
+	* doc/md.texi (Standard Names): Add bswap.
+	* builtin-types.def (BT_UINT16): New primitive type.
+	(BT_FN_UINT16_UINT16): New function type.
+	* builtins.def (BUILT_IN_BSWAP16): New.
+	* builtins.c (expand_builtin_bswap): Add TARGET_MODE argument.
+	(expand_builtin) <BUILT_IN_BSWAP16>: New case.  Pass TARGET_MODE to
+	expand_builtin_bswap.
+	(fold_builtin_bswap): Add BUILT_IN_BSWAP16 case.
+	(fold_builtin_1): Likewise.
+	(is_inexpensive_builtin): Likewise.
+	* optabs.c (expand_unop): Deal with bswap in HImode specially.  Add
+	missing bits for bswap to libcall code.
+	* tree.c (build_common_tree_nodes): Build uint16_type_node.
+	* tree.h (enum tree_index): Add TI_UINT16_TYPE.
+	(uint16_type_node): New define.
+	* config/rs6000/rs6000-builtin.def (RS6000_BUILTIN_BSWAP_HI): Delete.
+	* config/rs6000/rs6000.c (rs6000_expand_builtin): Remove handling of
+	above builtin.
+	(rs6000_init_builtins): Likewise.
+	* config/rs6000/rs6000.md (bswaphi2): Add TARGET_POWERPC predicate.
+
+	gcc/c-family/
+	* c-common.h (uint16_type_node): Rename into...
+	(c_uint16_type_node): ...this.
+	* c-common.c (c_common_nodes_and_builtins): Adjust for above renaming.
+	* c-cppbuiltin.c (builtin_define_stdint_macros): Likewise.
+
+	gcc/testsuite/
+	* gcc.dg/builtin-bswap-1.c: Test __builtin_bswap16 & __builtin_bswap64.
+	* gcc.dg/builtin-bswap-4.c: Test __builtin_bswap16.
+	* gcc.dg/builtin-bswap-5.c: Likewise.
+	* gcc.target/i386/builtin-bswap-4.c: New test.
+
+2012-12-17  Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	LP 1088898
+
+	Backport from mainline
+
+	gcc/
+	2012-09-24  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/54684
+	* tree-ssa-ccp.c (optimize_unreachable): Properly update stmts.
+
+	gcc/testsuite/ 
+	2012-09-24  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/54684
+	* g++.dg/torture/pr54684.C: New testcase.
+
+2012-12-14  Michael Hope  <michael.hope@linaro.org>
+
+	Backport from mainline r192569:
+
+	gcc/
+	2012-10-18  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+	    Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+	    Sameera Deshpande  <sameera.deshpande@arm.com>
+
+	* config/arm/cortex-a15-neon.md: New file.
+	* config/arm/cortex-a15.md (cortex_a15_call): Adjust reservation.
+	(cortex_a15_load1): Likewise.
+	(cortex_a15_load3): Likewise.
+	(cortex_a15_store1): Likewise.
+	(cortex_a15_store3): Likewise.
+	(cortex-a15-neon.md): Include.
+
+2012-12-14  Michael Hope  <michael.hope@linaro.org>
+
+	Backport from mainline r193724:
+
+	gcc/
+	2012-11-20  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm.md (*arm_abssi2): Define predicable attribute.
+	(*arm_neg_abssi2): Likewise.
+	* config/arm/thumb2.md (*thumb2_abssi2): Likewise.
+	(*thumb2_neg_abssi2): Likewise.
+
+	Backport from mainline r194398:
+
+	gcc/
+	2012-12-11  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	PR target/55642
+	* config/arm/thumb2.md (*thumb2_abssi2):
+	Set ce_count attribute to 2.
+	(*thumb2_neg_abssi2): Likewise.
+
+	gcc/testsuite/
+	2012-12-11  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	PR target/55642
+	* gcc.target/arm/pr55642.c: New testcase.
+
+2012-12-11  Yvan Roux  <yvan.roux@linaro.org>
+
+	gcc/
+	* LINARO-VERSION: Bump version.
+
 2012-12-11  Yvan Roux  <yvan.roux@linaro.org>
 
 	GCC Linaro 4.7-2012.12 released.

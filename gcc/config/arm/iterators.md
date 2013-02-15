@@ -42,6 +42,9 @@
 ;; A list of the 32bit and 64bit integer modes
 (define_mode_iterator SIDI [SI DI])
 
+;; A list of modes which the VFP unit can handle
+(define_mode_iterator SDF [(SF "TARGET_VFP") (DF "TARGET_VFP_DOUBLE")])
+
 ;; Integer element sizes implemented by IWMMXT.
 (define_mode_iterator VMMX [V2SI V4HI V8QI])
 
@@ -246,7 +249,8 @@
                          (V4HI "P") (V8HI  "q")
                          (V2SI "P") (V4SI  "q")
                          (V2SF "P") (V4SF  "q")
-                         (DI   "P") (V2DI  "q")])
+                         (DI   "P") (V2DI  "q")
+                         (SF   "")  (DF    "P")])
 
 ;; Wider modes with the same number of elements.
 (define_mode_attr V_widen [(V8QI "V8HI") (V4HI "V4SI") (V2SI "V2DI")])
@@ -304,7 +308,8 @@
                  (V4HI "i16") (V8HI  "i16")
                              (V2SI "i32") (V4SI  "i32")
                              (DI   "i64") (V2DI  "i64")
-                 (V2SF "f32") (V4SF  "f32")])
+                 (V2SF "f32") (V4SF  "f32")
+                 (SF "f32") (DF "f64")])
 
 ;; Same, but for operations which work on signed values.
 (define_mode_attr V_s_elem [(V8QI "s8")  (V16QI "s8")
@@ -412,8 +417,8 @@
 (define_mode_attr qhs_extenddi_op [(SI "s_register_operand")
 				   (HI "nonimmediate_operand")
 				   (QI "arm_reg_or_extendqisi_mem_op")])
-(define_mode_attr qhs_extenddi_cstr [(SI "r") (HI "rm") (QI "rUq")])
-(define_mode_attr qhs_zextenddi_cstr [(SI "r") (HI "rm") (QI "rm")])
+(define_mode_attr qhs_extenddi_cstr [(SI "r,0,r,r") (HI "r,0,rm,rm") (QI "r,0,rUq,rm")])
+(define_mode_attr qhs_zextenddi_cstr [(SI "r,0,r") (HI "r,0,rm") (QI "r,0,rm")])
 
 ;; Mode attributes used for fixed-point support.
 (define_mode_attr qaddsub_suf [(V4UQQ "8") (V2UHQ "16") (UQQ "8") (UHQ "16")
@@ -423,6 +428,10 @@
 
 ;; Mode attribute for vshll.
 (define_mode_attr V_innermode [(V8QI "QI") (V4HI "HI") (V2SI "SI")])
+
+;; Mode attributes used for fused-multiply-accumulate VFP support
+(define_mode_attr F_constraint [(SF "t") (DF "w")])
+(define_mode_attr F_fma_type [(SF "fmacs") (DF "fmacd")])
 
 ;;----------------------------------------------------------------------------
 ;; Code attributes

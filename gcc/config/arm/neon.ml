@@ -102,6 +102,8 @@ type opcode =
   | Vmul
   | Vmla
   | Vmls
+  | Vfma
+  | Vfms
   | Vsub
   | Vceq
   | Vcge
@@ -236,6 +238,8 @@ type features =
   | Const_valuator of (int -> int)
   | Fixed_vector_reg
   | Fixed_core_reg
+    (* Mark that the intrinsic requires __ARM_FEATURE_string to be defined.  *)
+  | Requires_feature of string
 
 exception MixedMode of elts * elts
 
@@ -760,6 +764,12 @@ let ops =
     Vmls, [], All (3, Qreg), "vmlsQ", sign_invar_io, F32 :: su_8_32;
     Vmls, [], Long, "vmlsl", elts_same_io, su_8_32;
     Vmls, [Saturating; Doubling], Long, "vqdmlsl", elts_same_io, [S16; S32];
+
+    (* Fused-multiply-accumulate. *)
+    Vfma, [Requires_feature "FMA"], All (3, Dreg), "vfma", elts_same_io, [F32];
+    Vfma, [Requires_feature "FMA"], All (3, Qreg), "vfmaQ", elts_same_io, [F32];
+    Vfms, [Requires_feature "FMA"], All (3, Dreg), "vfms", elts_same_io, [F32];
+    Vfms, [Requires_feature "FMA"], All (3, Qreg), "vfmsQ", elts_same_io, [F32];
 
     (* Subtraction.  *)
     Vsub, [], All (3, Dreg), "vsub", sign_invar_2, F32 :: su_8_32;

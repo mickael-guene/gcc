@@ -239,6 +239,24 @@ let rec mode_suffix elttype shape =
     and srcmode = mode_of_elt src shape in
     string_of_mode dstmode ^ string_of_mode srcmode
 
+let print_feature_test_start features =
+  try
+    match List.find (fun feature ->
+                       match feature with Requires_feature _ -> true
+                                        | _ -> false)
+                     features with
+      Requires_feature feature -> 
+        Format.printf "#ifdef __ARM_FEATURE_%s@\n" feature
+    | _ -> assert false
+  with Not_found -> assert true
+
+let print_feature_test_end features =
+  let feature =
+    List.exists (function Requires_feature x -> true
+                                        |  _ -> false) features in
+  if feature then Format.printf "#endif@\n"
+
+
 let print_variant opcode features shape name (ctype, asmtype, elttype) =
   let bits = infoword_value elttype features in
   let modesuf = mode_suffix elttype shape in
@@ -252,7 +270,11 @@ let print_variant opcode features shape name (ctype, asmtype, elttype) =
   let rdecls, stmts = return ctype return_by_ptr builtin in
   let body = pdecls @ rdecls @ stmts
   and fnname = (intrinsic_name name) ^ "_" ^ (string_of_elt elttype) in
-  print_function ctype fnname body
+  begin
+    print_feature_test_start features;
+    print_function ctype fnname body;
+    print_feature_test_end features;
+  end
 
 (* When this function processes the element types in the ops table, it rewrites
    them in a list of tuples (a,b,c):

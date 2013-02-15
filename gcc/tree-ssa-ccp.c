@@ -2396,6 +2396,7 @@ optimize_unreachable (gimple_stmt_iterator i)
 	    gimple_cond_make_true (stmt);
 	  else
 	    gcc_unreachable ();
+	  update_stmt (stmt);
 	}
       else
 	{

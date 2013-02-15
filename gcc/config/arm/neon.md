@@ -723,6 +723,63 @@
                                     (const_string "neon_mla_qqq_32_qqd_32_scalar")))))]
 )
 
+;; Fused multiply-accumulate
+;; We define each insn twice here:
+;;    1: with flag_unsafe_math_optimizations for the widening multiply phase
+;;       to be able to use when converting to FMA.
+;;    2: without flag_unsafe_math_optimizations for the intrinsics to use.
+(define_insn "fma<VCVTF:mode>4"
+  [(set (match_operand:VCVTF 0 "register_operand" "=w")
+        (fma:VCVTF (match_operand:VCVTF 1 "register_operand" "w")
+		 (match_operand:VCVTF 2 "register_operand" "w")
+		 (match_operand:VCVTF 3 "register_operand" "0")))]
+  "TARGET_NEON && TARGET_FMA && flag_unsafe_math_optimizations"
+  "vfma%?.<V_if_elem>\\t%<V_reg>0, %<V_reg>1, %<V_reg>2"
+  [(set (attr "neon_type")
+	(if_then_else (match_test "<Is_d_reg>")
+		      (const_string "neon_fp_vmla_ddd")
+		      (const_string "neon_fp_vmla_qqq")))]
+)
+
+(define_insn "fma<VCVTF:mode>4_intrinsic"
+  [(set (match_operand:VCVTF 0 "register_operand" "=w")
+        (fma:VCVTF (match_operand:VCVTF 1 "register_operand" "w")
+		 (match_operand:VCVTF 2 "register_operand" "w")
+		 (match_operand:VCVTF 3 "register_operand" "0")))]
+  "TARGET_NEON && TARGET_FMA"
+  "vfma%?.<V_if_elem>\\t%<V_reg>0, %<V_reg>1, %<V_reg>2"
+  [(set (attr "neon_type")
+	(if_then_else (match_test "<Is_d_reg>")
+		      (const_string "neon_fp_vmla_ddd")
+		      (const_string "neon_fp_vmla_qqq")))]
+)
+
+(define_insn "*fmsub<VCVTF:mode>4"
+  [(set (match_operand:VCVTF 0 "register_operand" "=w")
+        (fma:VCVTF (neg:VCVTF (match_operand:VCVTF 1 "register_operand" "w"))
+		   (match_operand:VCVTF 2 "register_operand" "w")
+		   (match_operand:VCVTF 3 "register_operand" "0")))]
+  "TARGET_NEON && TARGET_FMA && flag_unsafe_math_optimizations"
+  "vfms%?.<V_if_elem>\\t%<V_reg>0, %<V_reg>1, %<V_reg>2"
+  [(set (attr "neon_type")
+	(if_then_else (match_test "<Is_d_reg>")
+		      (const_string "neon_fp_vmla_ddd")
+		      (const_string "neon_fp_vmla_qqq")))]
+)
+
+(define_insn "fmsub<VCVTF:mode>4_intrinsic"
+  [(set (match_operand:VCVTF 0 "register_operand" "=w")
+        (fma:VCVTF (neg:VCVTF (match_operand:VCVTF 1 "register_operand" "w"))
+		   (match_operand:VCVTF 2 "register_operand" "w")
+		   (match_operand:VCVTF 3 "register_operand" "0")))]
+  "TARGET_NEON && TARGET_FMA"
+  "vfms%?.<V_if_elem>\\t%<V_reg>0, %<V_reg>1, %<V_reg>2"
+  [(set (attr "neon_type")
+	(if_then_else (match_test "<Is_d_reg>")
+		      (const_string "neon_fp_vmla_ddd")
+		      (const_string "neon_fp_vmla_qqq")))]
+)
+
 (define_insn "ior<mode>3"
   [(set (match_operand:VDQ 0 "s_register_operand" "=w,w")
 	(ior:VDQ (match_operand:VDQ 1 "s_register_operand" "w,0")
@@ -2080,6 +2137,32 @@
   else
     emit_insn (gen_neon_vmla<mode>_unspec (operands[0], operands[1],
 					   operands[2], operands[3]));
+  DONE;
+})
+
+(define_expand "neon_vfma<VCVTF:mode>"
+  [(match_operand:VCVTF 0 "s_register_operand")
+   (match_operand:VCVTF 1 "s_register_operand")
+   (match_operand:VCVTF 2 "s_register_operand")
+   (match_operand:VCVTF 3 "s_register_operand")
+   (match_operand:SI 4 "immediate_operand")]
+  "TARGET_NEON && TARGET_FMA"
+{
+  emit_insn (gen_fma<mode>4_intrinsic (operands[0], operands[2], operands[3],
+				       operands[1]));
+  DONE;
+})
+
+(define_expand "neon_vfms<VCVTF:mode>"
+  [(match_operand:VCVTF 0 "s_register_operand")
+   (match_operand:VCVTF 1 "s_register_operand")
+   (match_operand:VCVTF 2 "s_register_operand")
+   (match_operand:VCVTF 3 "s_register_operand")
+   (match_operand:SI 4 "immediate_operand")]
+  "TARGET_NEON && TARGET_FMA"
+{
+  emit_insn (gen_fmsub<mode>4_intrinsic (operands[0], operands[2], operands[3],
+					 operands[1]));
   DONE;
 })
 
@@ -5918,3 +6001,65 @@
                                    (const_string "neon_fp_vadd_qqq_vabs_qq"))
                      (const_string "neon_int_5")))]
 )
+
+;; Copy from core-to-neon regs, then extend, not vice-versa
+
+(define_split
+  [(set (match_operand:DI 0 "s_register_operand" "")
+	(sign_extend:DI (match_operand:SI 1 "s_register_operand" "")))]
+  "TARGET_NEON && reload_completed && IS_VFP_REGNUM (REGNO (operands[0]))"
+  [(set (match_dup 2) (vec_duplicate:V2SI (match_dup 1)))
+   (set (match_dup 0) (ashiftrt:DI (match_dup 0) (const_int 32)))]
+  {
+    operands[2] = gen_rtx_REG (V2SImode, REGNO (operands[0]));
+  })
+
+(define_split
+  [(set (match_operand:DI 0 "s_register_operand" "")
+	(sign_extend:DI (match_operand:HI 1 "s_register_operand" "")))]
+  "TARGET_NEON && reload_completed && IS_VFP_REGNUM (REGNO (operands[0]))"
+  [(set (match_dup 2) (vec_duplicate:V4HI (match_dup 1)))
+   (set (match_dup 0) (ashiftrt:DI (match_dup 0) (const_int 48)))]
+  {
+    operands[2] = gen_rtx_REG (V4HImode, REGNO (operands[0]));
+  })
+
+(define_split
+  [(set (match_operand:DI 0 "s_register_operand" "")
+	(sign_extend:DI (match_operand:QI 1 "s_register_operand" "")))]
+  "TARGET_NEON && reload_completed && IS_VFP_REGNUM (REGNO (operands[0]))"
+  [(set (match_dup 2) (vec_duplicate:V8QI (match_dup 1)))
+   (set (match_dup 0) (ashiftrt:DI (match_dup 0) (const_int 56)))]
+  {
+    operands[2] = gen_rtx_REG (V8QImode, REGNO (operands[0]));
+  })
+
+(define_split
+  [(set (match_operand:DI 0 "s_register_operand" "")
+	(zero_extend:DI (match_operand:SI 1 "s_register_operand" "")))]
+  "TARGET_NEON && reload_completed && IS_VFP_REGNUM (REGNO (operands[0]))"
+  [(set (match_dup 2) (vec_duplicate:V2SI (match_dup 1)))
+   (set (match_dup 0) (lshiftrt:DI (match_dup 0) (const_int 32)))]
+  {
+    operands[2] = gen_rtx_REG (V2SImode, REGNO (operands[0]));
+  })
+
+(define_split
+  [(set (match_operand:DI 0 "s_register_operand" "")
+	(zero_extend:DI (match_operand:HI 1 "s_register_operand" "")))]
+  "TARGET_NEON && reload_completed && IS_VFP_REGNUM (REGNO (operands[0]))"
+  [(set (match_dup 2) (vec_duplicate:V4HI (match_dup 1)))
+   (set (match_dup 0) (lshiftrt:DI (match_dup 0) (const_int 48)))]
+  {
+    operands[2] = gen_rtx_REG (V4HImode, REGNO (operands[0]));
+  })
+
+(define_split
+  [(set (match_operand:DI 0 "s_register_operand" "")
+	(zero_extend:DI (match_operand:QI 1 "s_register_operand" "")))]
+  "TARGET_NEON && reload_completed && IS_VFP_REGNUM (REGNO (operands[0]))"
+  [(set (match_dup 2) (vec_duplicate:V8QI (match_dup 1)))
+   (set (match_dup 0) (lshiftrt:DI (match_dup 0) (const_int 56)))]
+  {
+    operands[2] = gen_rtx_REG (V8QImode, REGNO (operands[0]));
+  })
