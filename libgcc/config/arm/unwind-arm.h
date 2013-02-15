@@ -59,7 +59,7 @@ extern "C" {
         tmp = *(_Unwind_Word *) tmp;
       } else
         tmp = 0;
-#if (defined(linux) && !defined(__uClinux__)) || defined(__NetBSD__)
+#elif (defined(linux) && !defined(__uClinux__)) || defined(__NetBSD__)
       /* Pc-relative indirect.  */
 #define _GLIBCXX_OVERRIDE_TTYPE_ENCODING (DW_EH_PE_pcrel | DW_EH_PE_indirect)
       tmp += ptr;
