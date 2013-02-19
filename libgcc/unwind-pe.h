@@ -173,6 +173,10 @@ read_sleb128 (const unsigned char *p, _sleb128_t *val)
   return p;
 }
 
+#if __FDPIC__
+_Unwind_Ptr __attribute__((weak)) __gnu_Unwind_Find_got (_Unwind_Ptr);
+#endif
+
 /* Load an encoded value from memory at P.  The value is returned in VAL;
    The function returns P incremented past the value.  BASE is as given
    by base_of_encoded_value for this encoding in the appropriate context.  */
@@ -259,10 +263,25 @@ read_encoded_value_with_base (unsigned char encoding, _Unwind_Ptr base,
 
       if (result != 0)
 	{
+#if __FDPIC__
+    if ((encoding & DW_EH_PE_pcrel) && (encoding & DW_EH_PE_indirect)) {
+        if (__gnu_Unwind_Find_got) {
+          result += __gnu_Unwind_Find_got((_Unwind_Ptr) u);
+          result = *(_Unwind_Internal_Ptr *) result;
+        } else
+          result = 0;
+    } else {
+        result += ((encoding & 0x70) == DW_EH_PE_pcrel
+		     ? (_Unwind_Internal_Ptr) u : base);
+	  if (encoding & DW_EH_PE_indirect)
+	    result = *(_Unwind_Internal_Ptr *) result;
+    }
+#else
 	  result += ((encoding & 0x70) == DW_EH_PE_pcrel
 		     ? (_Unwind_Internal_Ptr) u : base);
 	  if (encoding & DW_EH_PE_indirect)
 	    result = *(_Unwind_Internal_Ptr *) result;
+#endif
 	}
     }
 
