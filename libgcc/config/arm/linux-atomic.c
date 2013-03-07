@@ -88,8 +88,10 @@ static int __fdpic_cmpxchg(int oldval, int newval, int *ptr)
 
   asm volatile("1: ldrex r3, [%[ptr]]\n\t"
                "subs  r3, r3, %[oldval]\n\t"
+               "itt eq\n\t"
                "strexeq r3, %[newval], [%[ptr]]\n\t"
                "teqeq r3, #1\n\t"
+               "it eq\n\t"
                "beq 1b\n\t"
                "rsbs  %[result], r3, #0\n\t"
                : [result] "=r" (result)
