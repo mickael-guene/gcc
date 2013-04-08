@@ -37,7 +37,23 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-  _Unwind_Ptr __attribute__((weak)) __gnu_Unwind_Find_got (_Unwind_Ptr);
+_Unwind_Ptr __attribute__((weak)) __gnu_Unwind_Find_got (_Unwind_Ptr);
+
+static inline _Unwind_Ptr gnu_Unwind_Find_got (_Unwind_Ptr ptr)
+{
+    _Unwind_Ptr res;
+
+    if (__gnu_Unwind_Find_got)
+        res =  __gnu_Unwind_Find_got(ptr);
+    else {
+        asm volatile("mov %[result], r9"
+                     : [result]"=r" (res)
+                     :
+                     :);
+    }
+
+    return res;
+}
 
   /* Decode an R_ARM_TARGET2 relocation.  */
   static inline _Unwind_Word
@@ -54,11 +70,8 @@ extern "C" {
 #if __FDPIC__
       /* for fdpic target we store offset of got entry */
       /* so first get got from dl and then use indirect access */
-      if (__gnu_Unwind_Find_got) {
-        tmp += __gnu_Unwind_Find_got(ptr);
-        tmp = *(_Unwind_Word *) tmp;
-      } else
-        tmp = 0;
+      tmp += gnu_Unwind_Find_got(ptr);
+      tmp = *(_Unwind_Word *) tmp;
 #elif (defined(linux) && !defined(__uClinux__)) || defined(__NetBSD__)
       /* Pc-relative indirect.  */
 #define _GLIBCXX_OVERRIDE_TTYPE_ENCODING (DW_EH_PE_pcrel | DW_EH_PE_indirect)

@@ -280,7 +280,7 @@ get_eit_entry (_Unwind_Control_Block *ucbp, _uw return_address, struct funcdesc_
        * For that we use personnality_fdpic parameter. We just fill it
        * with function address and corresponding got module */
       personnality_fdpic->ptr = selfrel_offset31 (ucbp->pr_cache.ehtp);
-      personnality_fdpic->got = (unsigned int *) __gnu_Unwind_Find_got((_Unwind_Ptr) personnality_fdpic->ptr);
+      personnality_fdpic->got = (unsigned int *) gnu_Unwind_Find_got((_Unwind_Ptr) personnality_fdpic->ptr);
 
       UCB_PR_ADDR (ucbp) = (_uw) personnality_fdpic;
 #else
@@ -318,7 +318,7 @@ unwind_phase2 (_Unwind_Control_Block * ucbp, phase2_vrs * vrs)
 
 #if __FDPIC__
       /* r9 could have been lost due to plt jump. Restore correct value. */
-      vrs->core.r[9] = __gnu_Unwind_Find_got(VRS_PC(vrs));
+      vrs->core.r[9] = gnu_Unwind_Find_got(VRS_PC(vrs));
 #endif
 
   uw_restore_core_regs (vrs, &vrs->core);
@@ -409,7 +409,7 @@ unwind_phase2_forced (_Unwind_Control_Block *ucbp, phase2_vrs *entry_vrs,
 
 #if __FDPIC__
   /* r9 could have been lost due to plt jump. Restore correct value. */
-  saved_vrs.core.r[9] = __gnu_Unwind_Find_got(VRS_PC (&saved_vrs));
+  saved_vrs.core.r[9] = gnu_Unwind_Find_got(VRS_PC (&saved_vrs));
 #endif
 
   uw_restore_core_regs (&saved_vrs, &saved_vrs.core);
@@ -526,7 +526,7 @@ __gnu_Unwind_Resume (_Unwind_Control_Block * ucbp, phase2_vrs * entry_vrs)
       /* Upload the registers to enter the landing pad.  */
 #if __FDPIC__
       /* r9 could have been lost due to plt jump. Restore correct value. */
-      entry_vrs->core.r[9] = __gnu_Unwind_Find_got(VRS_PC (entry_vrs));
+      entry_vrs->core.r[9] = gnu_Unwind_Find_got(VRS_PC (entry_vrs));
 #endif
       uw_restore_core_regs (entry_vrs, &entry_vrs->core);
 
