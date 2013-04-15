@@ -1809,6 +1809,14 @@ arm_option_override (void)
       targetm.min_anchor_offset = -248;
       targetm.max_anchor_offset = 4095;
     }
+  if (TARGET_FDPIC)
+    {
+      /* in fdpic we can't resolve relocation that are out of segment
+       * Avoiding negative offset prevent to have to solve a relocation
+       * against an anchor which is out of the data segment
+       */
+      targetm.min_anchor_offset = 0;
+    }
 
   /* V5 code we generate is completely interworking capable, so we turn off
      TARGET_INTERWORK here to avoid many tests later on.  */
