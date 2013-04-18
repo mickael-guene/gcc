@@ -5748,45 +5748,53 @@ arm_load_pic_register (unsigned long saved_regs ATTRIBUTE_UNUSED)
   emit_use (pic_reg);
 }
 
-static bool isInRodata(rtx orig)
+/* Try to know if object will go in text or data segment */
+/* code stolen from frv */
+static bool isSegmentInfoKnown(rtx orig, bool *isReadOnly)
 {
-#if 0
+  bool res = false;
 
-/* TODO : following code make wrong decision when we have such init :
-extern int foo1_main(int a, char **argv);
-extern int foo2_main(int a, char **argv);
+  *isReadOnly = false;
 
-<static or extern> int (*const applet_main[])(int argc, char **argv) = {
-foo1_main,
-foo2_main,
-};
+  if (GET_CODE(orig) == LABEL_REF) {
+    res = true;
+    *isReadOnly = true;
+  } else if (GET_CODE(orig) == SYMBOL_REF) {
+    if (CONSTANT_POOL_ADDRESS_P (orig)) {
+      res = true;
+      *isReadOnly = true;
+    } else if (SYMBOL_REF_LOCAL_P(orig) && !SYMBOL_REF_EXTERNAL_P(orig) && SYMBOL_REF_DECL (orig) &&
+               (!DECL_P(SYMBOL_REF_DECL (orig)) || !DECL_COMMON(SYMBOL_REF_DECL(orig)))) {
+      tree decl = SYMBOL_REF_DECL (orig);
+      tree init = (TREE_CODE (decl) == VAR_DECL)
+                  ? DECL_INITIAL (decl) : (TREE_CODE (decl) == CONSTRUCTOR)
+                                          ? decl : 0;
+      int reloc = 0;
+      bool named_section, readonly;
 
-This is due to the fact that TREE_READONLY() is true whereas applet_main is put into
-data.rel.ro section into data segment. I have not found a direct way to know if
-output section will be writable or not but the good way to proceed is the one into
-frv_emit_movsi from frv.c (look for attribute section + get reloc number and if
-section is readonly (cf frv.c + varasm.c))
+      if (init && init != error_mark_node)
+        reloc = compute_reloc_for_constant(init);
+      named_section = TREE_CODE(decl) == VAR_DECL && lookup_attribute("section", DECL_ATTRIBUTES(decl));
+      readonly = decl_readonly_section(decl, reloc);
 
-for the moment just return false so we will use less optimize way to access it using
-GOT reloc
+      if (named_section) {
+        /* we don't know where the link script will put this section */
+        res = false;
+      } else if (!readonly) {
+        res = true;
+        *isReadOnly = false;
+      } else {
+        res = true;
+        *isReadOnly = true;
+      }
+    } else {
+      /* we don't know */
+      res = false;
+    }
+  } else
+    gcc_unreachable();
 
-*/
-
-  unsigned int flags = SYMBOL_REF_FLAGS(orig);
-  tree dcl = SYMBOL_REF_DECL(orig);
-
-  if (GET_CODE(orig) == LABEL_REF)
-    return true;
-  if (GET_CODE(orig) == SYMBOL_REF && SYMBOL_REF_DECL(orig) && TREE_READONLY(SYMBOL_REF_DECL(orig)))
-    return true;
-  if (GET_CODE(orig) == SYMBOL_REF && (SYMBOL_REF_FLAGS(orig) & SYMBOL_FLAG_ANCHOR))
-  {
-    if ((SYMBOL_REF_BLOCK(orig)->sect->common.flags & SECTION_WRITE) == 0)
-      return true;
-  }
-#endif
-
-  return false;
+  return res;
 }
 
 /* Generate code to load the address of a static var when flag_pic is set.  */
@@ -5797,35 +5805,49 @@ arm_pic_static_addr (rtx orig, rtx reg)
 
   gcc_assert (flag_pic);
 
-#if 0
-  if (TARGET_FDPIC && !isInRodata(orig))
-#else
   if (TARGET_FDPIC && !SYMBOL_REF_FUNCTION_P(orig))
-#endif
   {
-#if 0
-/* code for GOTOFF */
+    bool isReadOnly;
+
+    if (!isSegmentInfoKnown(orig, &isReadOnly)) {
+      /* Use got relocation */
+      rtx pat;
+      rtx mem;
+      rtx pic_reg = gen_rtx_REG (Pmode, 9);
+
+      pat = gen_calculate_pic_address (reg, pic_reg, orig);
+
+      /* Make the MEM as close to a constant as possible.  */
+      mem = SET_SRC (pat);
+      gcc_assert (MEM_P (mem) && !MEM_VOLATILE_P (mem));
+      MEM_READONLY_P (mem) = 1;
+      MEM_NOTRAP_P (mem) = 1;
+
+      insn = emit_insn (pat);
+    } else if (isReadOnly) {
+      /* we can use pc relative access */
+      /* We use an UNSPEC rather than a LABEL_REF because this label
+         never appears in the code stream.  */
+      labelno = GEN_INT (pic_labelno++);
+      l1 = gen_rtx_UNSPEC (Pmode, gen_rtvec (1, labelno), UNSPEC_PIC_LABEL);
+      l1 = gen_rtx_CONST (VOIDmode, l1);
+
+      /* On the ARM the PC register contains 'dot + 8' at the time of the
+         addition, on the Thumb it is 'dot + 4'.  */
+      offset_rtx = plus_constant (l1, TARGET_ARM ? 8 : 4);
+      offset_rtx = gen_rtx_UNSPEC (Pmode, gen_rtvec (2, orig, offset_rtx),
+                                   UNSPEC_SYMBOL_OFFSET);
+      offset_rtx = gen_rtx_CONST (Pmode, offset_rtx);
+
+      insn = emit_insn (gen_pic_load_addr_unified (reg, offset_rtx, labelno));
+    } else {
+      /* we use gotoff relocation */
       rtx pic_reg = gen_rtx_REG (Pmode, 9);
 
       rtx l1 = gen_rtx_UNSPEC(Pmode, gen_rtvec (1, orig), UNSPEC_PIC_SYM);
       emit_insn (gen_movsi (reg, l1));
       insn = emit_insn (gen_addsi3 (reg, reg, pic_reg));
-#else
-/* code for GOT */
-    rtx pat;
-    rtx mem;
-    rtx pic_reg = gen_rtx_REG (Pmode, 9);
-
-    pat = gen_calculate_pic_address (reg, pic_reg, orig);
-
-    /* Make the MEM as close to a constant as possible.  */
-    mem = SET_SRC (pat);
-    gcc_assert (MEM_P (mem) && !MEM_VOLATILE_P (mem));
-    MEM_READONLY_P (mem) = 1;
-    MEM_NOTRAP_P (mem) = 1;
-
-    insn = emit_insn (pat);
-#endif
+    }
   }
   else
   {
@@ -5855,7 +5877,6 @@ arm_pic_static_addr (rtx orig, rtx reg)
       insn = emit_insn (gen_pic_load_addr_unified (reg, offset_rtx, labelno));
     }
   }
-
 
   return insn;
 }
@@ -18744,12 +18765,14 @@ arm_assemble_integer (rtx x, unsigned int size, int aligned_p)
 	  } else {
       if (TARGET_FDPIC && SYMBOL_REF_FUNCTION_P(x))
         fputs ("(GOTOFFFUNCDESC)", asm_out_file);
-      else
-#if 0
-	      fputs ("(GOTOFF)", asm_out_file);
-#else
-        fputs ("(GOT)", asm_out_file); /* see blah blah in isInRodata() */
-#endif
+      else {
+        bool isReadOnly;
+
+        if (isSegmentInfoKnown(x, &isReadOnly))
+          fputs ("(GOTOFF)", asm_out_file);
+        else
+          fputs ("(GOT)", asm_out_file);
+      }
 	  }
    }
     /* for fdpic we also have to mark symbol for .data section */
