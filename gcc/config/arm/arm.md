@@ -8442,19 +8442,6 @@
   "
   {
     rtx callee, pat;
-    
-    /* force r9 before call */
-    if (TARGET_FDPIC )
-    {
-      callee = XEXP (operands[0], 0);
-      if (GET_CODE (callee) != SYMBOL_REF || !SYMBOL_REF_LOCAL_P(callee) ||
-          arm_is_long_call_p (SYMBOL_REF_DECL (callee))) {
-        emit_insn(gen_blockage());
-        rtx pic_reg = gen_rtx_REG (Pmode, 9);
-        emit_move_insn (pic_reg, get_hard_reg_initial_val (Pmode, 9));
-        emit_insn(gen_rtx_USE (VOIDmode, pic_reg));
-      }
-    }
 
     /* In an untyped call, we can get NULL for operand 2.  */
     if (operands[2] == NULL_RTX)
@@ -8487,7 +8474,6 @@
         rtx pic_reg = gen_rtx_REG (Pmode, 9);
         emit_move_insn (pic_reg, get_hard_reg_initial_val (Pmode, 9));
         emit_insn(gen_rtx_USE (VOIDmode, pic_reg));
-        emit_insn(gen_blockage());
       }
     }
 
@@ -8584,18 +8570,6 @@
   "
   {
     rtx pat, callee;
-    
-    if (TARGET_FDPIC)
-    {
-      callee = XEXP (operands[1], 0);
-      if (GET_CODE (callee) != SYMBOL_REF || !SYMBOL_REF_LOCAL_P(callee) ||
-          arm_is_long_call_p (SYMBOL_REF_DECL (callee))) {
-        emit_insn(gen_blockage());
-        rtx pic_reg = gen_rtx_REG (Pmode, 9);
-        emit_move_insn (pic_reg, get_hard_reg_initial_val (Pmode, 9));
-        emit_insn(gen_rtx_USE (VOIDmode, pic_reg));
-      }
-    }
 
     /* In an untyped call, we can get NULL for operand 2.  */
     if (operands[3] == 0)
@@ -8629,7 +8603,6 @@
         rtx pic_reg = gen_rtx_REG (Pmode, 9);
         emit_move_insn (pic_reg, get_hard_reg_initial_val (Pmode, 9));
         emit_insn(gen_rtx_USE (VOIDmode, pic_reg));
-        emit_insn(gen_blockage());
       }
     }
 
