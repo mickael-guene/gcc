@@ -5362,13 +5362,14 @@ arm_function_ok_for_sibcall (tree decl, tree exp)
   if (cfun->machine->sibcall_blocked)
     return false;
 
-  /* no sibcall optimization for fdpic (at least now) */
-  if (TARGET_FDPIC)
-    return false;
-
   /* Never tailcall something for which we have no decl, or if we
      are generating code for Thumb-1.  */
   if (decl == NULL || TARGET_THUMB1)
+    return false;
+
+  /* don't tailcall if we go throught the plt since r9 is then
+     corrupt and we don't restore it for static function call. */
+  if (TARGET_FDPIC && !targetm.binds_local_p (decl))
     return false;
 
   /* The PIC register is live on entry to VxWorks PLT entries, so we
