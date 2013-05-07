@@ -756,8 +756,8 @@ static const char *cpp_unique_options =
  %{remap} %{g3|ggdb3|gstabs3|gcoff3|gxcoff3|gvms3:-dD}\
  %{!iplugindir*:%{fplugin*:%:find-plugindir()}}\
  %{H} %C %{D*&U*&A*} %{i*} %Z %i\
- %{fmudflap:-D_MUDFLAP -include mf-runtime.h}\
- %{fmudflapth:-D_MUDFLAP -D_MUDFLAPTH -include mf-runtime.h}\
+ %{fmudflap:-D_MUDFLAP %{!.S:%{!.sx:-include mf-runtime.h}}}\
+ %{fmudflapth:-D_MUDFLAP -D_MUDFLAPTH %{!.S:%{!.sx:-include mf-runtime.h}}}\
  %{E|M|MM:%W{o*}}";
 
 /* This contains cpp options which are common with cc1_options and are passed
