@@ -14412,23 +14412,22 @@ vfp_emit_fstmd (int base_reg, int count)
 rtx
 arm_load_function_descriptor (rtx funcdesc)
 {
-  rtx r8 = gen_rtx_REG (Pmode, 8);
+  rtx fnaddrReg = gen_reg_rtx (Pmode);
   rtx pic_reg = gen_rtx_REG (Pmode, 9);
   rtx fnaddr = gen_rtx_MEM (Pmode, funcdesc);
   rtx gotaddr = gen_rtx_MEM (Pmode, plus_constant (funcdesc, 4));
   rtx par = gen_rtx_PARALLEL(VOIDmode, rtvec_alloc(3));
 
-  emit_move_insn (r8, fnaddr);
+  emit_move_insn (fnaddrReg, fnaddr);
   /* The ABI requires the entry point address to be loaded first, so
      prevent the load from being moved after that of the GOT
      address.  */
-  emit_insn (gen_blockage ());
   XVECEXP (par, 0, 0) = gen_rtx_UNSPEC(VOIDmode, gen_rtvec (2, pic_reg, gotaddr), UNSPEC_PIC_RESTORE);
   XVECEXP (par, 0, 1) = gen_rtx_USE(VOIDmode, gen_rtx_REG (Pmode, 9));
   XVECEXP (par, 0, 2) = gen_rtx_CLOBBER(VOIDmode, gen_rtx_REG (Pmode, 9));
   emit_insn(par);
 
-  return r8;
+  return fnaddrReg;
 }
 
 /* Emit a call instruction with pattern PAT.  ADDR is the address of
