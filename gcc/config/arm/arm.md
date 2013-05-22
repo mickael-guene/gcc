@@ -117,6 +117,7 @@
 			; that.
   UNSPEC_UNALIGNED_STORE ; Same for str/strh.
   UNSPEC_PIC_UNIFIED    ; Create a common pic addressing form.
+  UNSPEC_PIC_RESTORE    ; Use to restore fdpic register
 ])
 
 ;; UNSPEC_VOLATILE Usage:
@@ -8471,14 +8472,28 @@
       callee = XEXP (operands[0], 0);
       if (GET_CODE (callee) != SYMBOL_REF || !SYMBOL_REF_LOCAL_P(callee) ||
           arm_is_long_call_p (SYMBOL_REF_DECL (callee))) {
-        rtx pic_reg = gen_rtx_REG (Pmode, 9);
-        emit_move_insn (pic_reg, get_hard_reg_initial_val (Pmode, 9));
-        emit_insn(gen_rtx_USE (VOIDmode, pic_reg));
+        rtx par = gen_rtx_PARALLEL(VOIDmode, rtvec_alloc(3));
+
+        XVECEXP (par, 0, 0) = gen_rtx_UNSPEC(VOIDmode, gen_rtvec (2, gen_rtx_REG (Pmode, 9), get_hard_reg_initial_val (Pmode, 9)), UNSPEC_PIC_RESTORE);
+        XVECEXP (par, 0, 1) = gen_rtx_USE(VOIDmode, gen_rtx_REG (Pmode, 9));
+        XVECEXP (par, 0, 2) = gen_rtx_CLOBBER(VOIDmode, gen_rtx_REG (Pmode, 9));
+        emit_insn(par);
       }
     }
 
     DONE;
   }"
+)
+
+(define_insn "*restore_pic_register_after_call"
+  [(parallel [(unspec [(match_operand:SI 0 "s_register_operand" "=r,r") (match_operand:SI 1 "general_operand" "r,m")] UNSPEC_PIC_RESTORE)
+                       (use (match_dup 0))
+                       (clobber (match_dup 0))])
+  ]
+  ""
+  "@
+  mov\t%0, %1
+  ldr\t%0, %1"
 )
 
 (define_expand "call_internal"
@@ -8600,9 +8615,12 @@
       callee = XEXP (operands[1], 0);
       if (GET_CODE (callee) != SYMBOL_REF || !SYMBOL_REF_LOCAL_P(callee) ||
           arm_is_long_call_p (SYMBOL_REF_DECL (callee))) {
-        rtx pic_reg = gen_rtx_REG (Pmode, 9);
-        emit_move_insn (pic_reg, get_hard_reg_initial_val (Pmode, 9));
-        emit_insn(gen_rtx_USE (VOIDmode, pic_reg));
+        rtx par = gen_rtx_PARALLEL(VOIDmode, rtvec_alloc(3));
+
+        XVECEXP (par, 0, 0) = gen_rtx_UNSPEC(VOIDmode, gen_rtvec (2, gen_rtx_REG (Pmode, 9), get_hard_reg_initial_val (Pmode, 9)), UNSPEC_PIC_RESTORE);
+        XVECEXP (par, 0, 1) = gen_rtx_USE(VOIDmode, gen_rtx_REG (Pmode, 9));
+        XVECEXP (par, 0, 2) = gen_rtx_CLOBBER(VOIDmode, gen_rtx_REG (Pmode, 9));
+        emit_insn(par);
       }
     }
 

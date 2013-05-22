@@ -331,7 +331,7 @@ cond_exec_process_insns (ce_if_block_t *ce_info ATTRIBUTE_UNUSED,
 	{
 	  /* ??? Ug.  Actually unlinking the thing is problematic,
 	     given what we'd have to coordinate with our callers.  */
-	  /*SET_INSN_DELETED (insn);*/
+	  SET_INSN_DELETED (insn);
 	  goto insn_done;
 	}
 
