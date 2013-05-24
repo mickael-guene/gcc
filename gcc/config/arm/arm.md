@@ -8990,7 +8990,7 @@
 (define_expand "untyped_return"
   [(match_operand:BLK 0 "memory_operand" "")
    (match_operand 1 "" "")]
-  "TARGET_EITHER"
+  "TARGET_EITHER && !TARGET_FDPIC"
   "
   {
     int i;
