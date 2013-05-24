@@ -2122,6 +2122,47 @@ arm_option_override (void)
   arm_add_gc_roots ();
 }
 
+/* Test whether a local function descriptor is canonical, i.e.,
+   whether we can use GOTOFFFUNCDESC to compute the address of the
+   function.  */
+/* Code stolen from frv */
+static bool
+arm_local_funcdesc_p (rtx fnx)
+{
+  tree fn;
+  enum symbol_visibility vis;
+  bool ret;
+
+  if (!TARGET_FDPIC)
+    return TRUE;
+
+  if (! SYMBOL_REF_LOCAL_P (fnx))
+    return FALSE;
+
+  fn = SYMBOL_REF_DECL (fnx);
+
+  if (! fn)
+    return FALSE;
+
+  /* local function declared as weak must use GOTFUNCDESC so their
+     FUNCDESC is NULL is they are not link. */
+  if (DECL_WEAK(fn))
+    return FALSE;
+
+  vis = DECL_VISIBILITY (fn);
+
+  if (vis == VISIBILITY_PROTECTED)
+    /* Private function descriptors for protected functions are not
+       canonical.  Temporarily change the visibility to global.  */
+    vis = VISIBILITY_DEFAULT;
+
+  ret = default_binds_local_p_1 (fn, flag_pic);
+
+  DECL_VISIBILITY (fn) = vis;
+
+  return ret;
+}
+
 static void
 arm_add_gc_roots (void)
 {
@@ -5522,7 +5563,8 @@ legitimize_pic_address (rtx orig, enum machine_mode mode, rtx reg)
 	 that GOTOFF is never valid on VxWorks.  */
       if ((GET_CODE (orig) == LABEL_REF
 	   || (GET_CODE (orig) == SYMBOL_REF &&
-	       SYMBOL_REF_LOCAL_P (orig)))
+	       SYMBOL_REF_LOCAL_P (orig) &&
+         (!SYMBOL_REF_FUNCTION_P(orig) || arm_local_funcdesc_p(orig))))
 	  && NEED_GOT_RELOC
 	  && !TARGET_VXWORKS_RTP)
 	insn = arm_pic_static_addr (orig, reg);
@@ -18759,7 +18801,7 @@ arm_assemble_integer (rtx x, unsigned int size, int aligned_p)
 	  /* See legitimize_pic_address for an explanation of the
 	     TARGET_VXWORKS_RTP check.  */
 	  if (TARGET_VXWORKS_RTP
-	      || (GET_CODE (x) == SYMBOL_REF && !SYMBOL_REF_LOCAL_P (x)))
+	      || (GET_CODE (x) == SYMBOL_REF && (!SYMBOL_REF_LOCAL_P (x) || (SYMBOL_REF_FUNCTION_P(x) && !arm_local_funcdesc_p(x)))))
     {
       if (TARGET_FDPIC && SYMBOL_REF_FUNCTION_P(x))
         fputs ("(GOTFUNCDESC)", asm_out_file);
