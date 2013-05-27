@@ -2,6 +2,7 @@
    __attribute__ ((interrupt)).  */
 /* { dg-do compile } */
 /* { dg-options "-O1" } */
+/* { dg-skip-if "" { arm-*-linux-uclibceabi } "*" "" } */
 
 /* This test is not valid when -mthum.  We just cheat.  */
 #ifndef __thumb__

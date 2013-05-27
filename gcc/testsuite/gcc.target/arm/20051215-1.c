@@ -3,6 +3,7 @@
    the call would need an output reload.  */
 /* { dg-do run } */
 /* { dg-options "-O2 -fno-omit-frame-pointer" } */
+/* { dg-skip-if "" { arm-*-linux-uclibceabi } "*" "" } */
 extern void abort (void);
 typedef void (*callback) (void);
 

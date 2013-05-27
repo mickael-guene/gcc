@@ -9,6 +9,7 @@
 /* { dg-require-effective-target arm32 } */
 /* { dg-require-effective-target arm_iwmmxt_ok } */
 /* { dg-final { scan-assembler "ldmfd\[ 	]sp!.*ip,\[ ]*pc" } } */
+/* { dg-skip-if "" { arm-*-linux-uclibceabi } "*" "" } */
 
 /* This function uses all the call-saved registers, namely r4, r5, r6,
    r7, r8, r9, sl, fp.  Since we also save lr, that leaves an odd

@@ -16,6 +16,6 @@ tr1 (int array[], unsigned int n)
 /* { dg-final { scan-tree-dump-times "PHI <ivtmp" 1 "ivopts"} } */
 /* { dg-final { scan-tree-dump-times "PHI <x" 0 "ivopts"} } */
 /* { dg-final { scan-tree-dump-times ", x" 0 "ivopts"} } */
-/* { dg-final { object-size text <= 30 { target arm_thumb2 } } } */
+/* { dg-final { object-size text <= 30 { target { arm_thumb2 && !arm-*-linux-uclibceabi } } } } */
 /* { dg-final { cleanup-tree-dump "ivopts" } } */
 /* { dg-final { cleanup-saved-temps "ivopts" } } */

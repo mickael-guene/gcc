@@ -7,6 +7,7 @@
 
 /* { dg-do run } */
 /* { dg-options "-O -fno-pic" } */
+/* { dg-skip-if "" { arm-*-linux-uclibceabi } "*" "" } */
 
 extern void abort (void);
 
