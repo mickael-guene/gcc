@@ -2306,7 +2306,18 @@ arm_allocate_stack_slots_for_args (void)
 static void
 arm_asm_trampoline_template (FILE *f)
 {
-  if (TARGET_ARM)
+  if (TARGET_FDPIC)
+    {
+      /* First two words are a funcdescritor to jump into trampoline code just below */
+      assemble_aligned_integer (UNITS_PER_WORD, const0_rtx);
+      assemble_aligned_integer (UNITS_PER_WORD, const0_rtx);
+      /* Trampoline code which set static chain register but also pic register before jumping into real code */
+      asm_fprintf (f, "\tldr\t%r, [%r, #%d]\n", STATIC_CHAIN_REGNUM, PC_REGNUM, TARGET_THUMB2?8:4);
+      asm_fprintf (f, "\tldr\t%r, [%r, #%d]\n", PIC_OFFSET_TABLE_REGNUM, PC_REGNUM, TARGET_THUMB2?8:4);
+      asm_fprintf (f, "\tldr\t%r, [%r, #%d]\n", PC_REGNUM, PC_REGNUM, TARGET_THUMB2?8:4);
+      assemble_aligned_integer (UNITS_PER_WORD, const0_rtx);
+    }
+  else if (TARGET_ARM)
     {
       asm_fprintf (f, "\tldr\t%r, [%r, #0]\n", STATIC_CHAIN_REGNUM, PC_REGNUM);
       asm_fprintf (f, "\tldr\t%r, [%r, #0]\n", PC_REGNUM, PC_REGNUM);
@@ -2345,12 +2356,33 @@ arm_trampoline_init (rtx m_tramp, tree fndecl, rtx chain_value)
   emit_block_move (m_tramp, assemble_trampoline_template (),
 		   GEN_INT (TRAMPOLINE_SIZE), BLOCK_OP_NORMAL);
 
-  mem = adjust_address (m_tramp, SImode, TARGET_32BIT ? 8 : 12);
-  emit_move_insn (mem, chain_value);
+  if (TARGET_FDPIC) {
+    rtx funcdesc = XEXP (DECL_RTL (fndecl), 0);
+    rtx fnaddr = gen_rtx_MEM (Pmode, funcdesc);
+    rtx gotaddr = gen_rtx_MEM (Pmode, plus_constant (funcdesc, 4));
+    rtx trampolineCodeStart = plus_constant (XEXP (m_tramp, 0), TARGET_THUMB2?9:8);
 
-  mem = adjust_address (m_tramp, SImode, TARGET_32BIT ? 12 : 16);
-  fnaddr = XEXP (DECL_RTL (fndecl), 0);
-  emit_move_insn (mem, fnaddr);
+    /* write initial funcdesc which will jump into trampoline */
+    mem = adjust_address (m_tramp, SImode, 0);
+    emit_move_insn (mem, trampolineCodeStart);
+    mem = adjust_address (m_tramp, SImode, 4);
+    emit_move_insn (mem, gen_rtx_REG (Pmode, PIC_OFFSET_TABLE_REGNUM));
+    /* setup static chain */
+    mem = adjust_address (m_tramp, SImode, 20);
+    emit_move_insn (mem, chain_value);
+    /* got + real function entry point */
+    mem = adjust_address (m_tramp, SImode, 24);
+    emit_move_insn (mem, gotaddr);
+    mem = adjust_address (m_tramp, SImode, 28);
+    emit_move_insn (mem, fnaddr);
+  } else {
+    mem = adjust_address (m_tramp, SImode, TARGET_32BIT ? 8 : 12);
+    emit_move_insn (mem, chain_value);
+
+    mem = adjust_address (m_tramp, SImode, TARGET_32BIT ? 12 : 16);
+    fnaddr = XEXP (DECL_RTL (fndecl), 0);
+    emit_move_insn (mem, fnaddr);
+  }
 
   a_tramp = XEXP (m_tramp, 0);
   emit_library_call (gen_rtx_SYMBOL_REF (Pmode, "__clear_cache"),
@@ -2364,7 +2396,9 @@ arm_trampoline_init (rtx m_tramp, tree fndecl, rtx chain_value)
 static rtx
 arm_trampoline_adjust_address (rtx addr)
 {
-  if (TARGET_THUMB)
+  /* for fdpic don't fix trampoline address since it's a function descriptor and
+     not a function address */
+  if (TARGET_THUMB && !TARGET_FDPIC)
     addr = expand_simple_binop (Pmode, IOR, addr, const1_rtx,
 				NULL, 0, OPTAB_LIB_WIDEN);
   return addr;
