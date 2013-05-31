@@ -5882,7 +5882,7 @@ arm_pic_static_addr (rtx orig, rtx reg)
 
   gcc_assert (flag_pic);
 
-  if (TARGET_FDPIC && !SYMBOL_REF_FUNCTION_P(orig))
+  if (TARGET_FDPIC && GET_CODE (orig) == SYMBOL_REF && !SYMBOL_REF_FUNCTION_P(orig))
   {
     bool isReadOnly;
 
@@ -5928,7 +5928,7 @@ arm_pic_static_addr (rtx orig, rtx reg)
   }
   else
   {
-    if (TARGET_FDPIC && SYMBOL_REF_FUNCTION_P(orig))
+    if (TARGET_FDPIC && GET_CODE (orig) == SYMBOL_REF && SYMBOL_REF_FUNCTION_P(orig))
     {
       rtx pic_reg = gen_rtx_REG (Pmode, 9);
 
