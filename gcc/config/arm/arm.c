@@ -274,6 +274,11 @@ static int arm_cortex_a5_branch_cost (bool, bool);
 static bool arm_vectorize_vec_perm_const_ok (enum machine_mode vmode,
 					     const unsigned char *sel);
 
+
+static int arm_builtin_vectorization_cost (enum vect_cost_for_stmt type_of_cost,
+					   tree vectype,
+					   int misalign ATTRIBUTE_UNUSED);
+
 
 /* Table of machine attributes.  */
 static const struct attribute_spec arm_attribute_table[] =
@@ -627,6 +632,10 @@ static const struct attribute_spec arm_attribute_table[] =
 #define TARGET_VECTORIZE_VEC_PERM_CONST_OK \
   arm_vectorize_vec_perm_const_ok
 
+#undef TARGET_VECTORIZE_BUILTIN_VECTORIZATION_COST
+#define TARGET_VECTORIZE_BUILTIN_VECTORIZATION_COST \
+  arm_builtin_vectorization_cost
+
 struct gcc_target targetm = TARGET_INITIALIZER;
 
 /* Obstack for minipool constant handling.  */
@@ -806,6 +815,10 @@ int arm_arch_thumb2;
 int arm_arch_arm_hwdiv;
 int arm_arch_thumb_hwdiv;
 
+/* Nonzero if we should use Neon to handle 64-bits operations rather
+   than core registers.  */
+int prefer_neon_for_64bits = 0;
+
 /* In case of a PRE_INC, POST_INC, PRE_DEC, POST_DEC memory reference,
    we must report the mode of the memory reference from
    TARGET_PRINT_OPERAND to TARGET_PRINT_OPERAND_ADDRESS.  */
@@ -873,6 +886,23 @@ struct processors
   l1_size, \
   l1_line_size
 
+/* arm generic vectorizer costs.  */
+static const
+struct cpu_vec_costs arm_default_vec_cost = {
+  1,					/* scalar_stmt_cost.  */
+  1,					/* scalar load_cost.  */
+  1,					/* scalar_store_cost.  */
+  1,					/* vec_stmt_cost.  */
+  1,					/* vec_to_scalar_cost.  */
+  1,					/* scalar_to_vec_cost.  */
+  1,					/* vec_align_load_cost.  */
+  1,					/* vec_unalign_load_cost.  */
+  1,					/* vec_unalign_store_cost.  */
+  1,					/* vec_store_cost.  */
+  3,					/* cond_taken_branch_cost.  */
+  1,					/* cond_not_taken_branch_cost.  */
+};
+
 const struct tune_params arm_slowmul_tune =
 {
   arm_slowmul_rtx_costs,
@@ -881,7 +911,10 @@ const struct tune_params arm_slowmul_tune =
   5,						/* Max cond insns.  */
   ARM_PREFETCH_NOT_BENEFICIAL,
   true,						/* Prefer constant pool.  */
-  arm_default_branch_cost
+  arm_default_branch_cost,
+  false,                                        /* Prefer Neon for
+						   64-bits bitops.  */
+  &arm_default_vec_cost,                        /* Vectorizer costs.  */
 };
 
 const struct tune_params arm_fastmul_tune =
@@ -892,7 +925,10 @@ const struct tune_params arm_fastmul_tune =
   5,						/* Max cond insns.  */
   ARM_PREFETCH_NOT_BENEFICIAL,
   true,						/* Prefer constant pool.  */
-  arm_default_branch_cost
+  arm_default_branch_cost,
+  false,                                        /* Prefer Neon for
+						   64-bits bitops.  */
+  &arm_default_vec_cost,                        /* Vectorizer costs.  */
 };
 
 /* StrongARM has early execution of branches, so a sequence that is worth
@@ -906,7 +942,10 @@ const struct tune_params arm_strongarm_tune =
   3,						/* Max cond insns.  */
   ARM_PREFETCH_NOT_BENEFICIAL,
   true,						/* Prefer constant pool.  */
-  arm_default_branch_cost
+  arm_default_branch_cost,
+  false,                                        /* Prefer Neon for
+						   64-bits bitops.  */
+  &arm_default_vec_cost,                        /* Vectorizer costs.  */
 };
 
 const struct tune_params arm_xscale_tune =
@@ -917,7 +956,10 @@ const struct tune_params arm_xscale_tune =
   3,						/* Max cond insns.  */
   ARM_PREFETCH_NOT_BENEFICIAL,
   true,						/* Prefer constant pool.  */
-  arm_default_branch_cost
+  arm_default_branch_cost,
+  false,                                        /* Prefer Neon for
+						   64-bits bitops.  */
+  &arm_default_vec_cost,                        /* Vectorizer costs.  */
 };
 
 const struct tune_params arm_9e_tune =
@@ -928,7 +970,10 @@ const struct tune_params arm_9e_tune =
   5,						/* Max cond insns.  */
   ARM_PREFETCH_NOT_BENEFICIAL,
   true,						/* Prefer constant pool.  */
-  arm_default_branch_cost
+  arm_default_branch_cost,
+  false,                                        /* Prefer Neon for
+						   64-bits bitops.  */
+  &arm_default_vec_cost,                        /* Vectorizer costs.  */
 };
 
 const struct tune_params arm_v6t2_tune =
@@ -939,7 +984,10 @@ const struct tune_params arm_v6t2_tune =
   5,						/* Max cond insns.  */
   ARM_PREFETCH_NOT_BENEFICIAL,
   false,					/* Prefer constant pool.  */
-  arm_default_branch_cost
+  arm_default_branch_cost,
+  false,                                        /* Prefer Neon for
+						   64-bits bitops.  */
+  &arm_default_vec_cost,                        /* Vectorizer costs.  */
 };
 
 /* Generic Cortex tuning.  Use more specific tunings if appropriate.  */
@@ -951,7 +999,10 @@ const struct tune_params arm_cortex_tune =
   5,						/* Max cond insns.  */
   ARM_PREFETCH_NOT_BENEFICIAL,
   false,					/* Prefer constant pool.  */
-  arm_default_branch_cost
+  arm_default_branch_cost,
+  false,                                        /* Prefer Neon for
+						   64-bits bitops.  */
+  &arm_default_vec_cost,                        /* Vectorizer costs.  */
 };
 
 /* Branches can be dual-issued on Cortex-A5, so conditional execution is
@@ -965,7 +1016,10 @@ const struct tune_params arm_cortex_a5_tune =
   1,						/* Max cond insns.  */
   ARM_PREFETCH_NOT_BENEFICIAL,
   false,					/* Prefer constant pool.  */
-  arm_cortex_a5_branch_cost
+  arm_cortex_a5_branch_cost,
+  false,                                        /* Prefer Neon for
+						   64-bits bitops.  */
+  &arm_default_vec_cost,                        /* Vectorizer costs.  */
 };
 
 const struct tune_params arm_cortex_a9_tune =
@@ -976,7 +1030,10 @@ const struct tune_params arm_cortex_a9_tune =
   5,						/* Max cond insns.  */
   ARM_PREFETCH_BENEFICIAL(4,32,32),
   false,					/* Prefer constant pool.  */
-  arm_default_branch_cost
+  arm_default_branch_cost,
+  false,                                        /* Prefer Neon for
+						   64-bits bitops.  */
+  &arm_default_vec_cost,                        /* Vectorizer costs.  */
 };
 
 const struct tune_params arm_fa726te_tune =
@@ -987,7 +1044,10 @@ const struct tune_params arm_fa726te_tune =
   5,						/* Max cond insns.  */
   ARM_PREFETCH_NOT_BENEFICIAL,
   true,						/* Prefer constant pool.  */
-  arm_default_branch_cost
+  arm_default_branch_cost,
+  false,                                        /* Prefer Neon for
+						   64-bits bitops.  */
+  &arm_default_vec_cost,                        /* Vectorizer costs.  */
 };
 
 
@@ -2037,6 +2097,12 @@ arm_option_override (void)
                            current_tune->l1_cache_size,
                            global_options.x_param_values,
                            global_options_set.x_param_values);
+
+  /* Use Neon to perform 64-bits operations rather than core
+     registers.  */
+  prefer_neon_for_64bits = current_tune->prefer_neon_for_64bits;
+  if (use_neon_for_64bits == 1)
+     prefer_neon_for_64bits = true;
 
   /* Register global variables with the garbage collector.  */
   arm_add_gc_roots ();
@@ -8673,6 +8739,63 @@ arm_memory_move_cost (enum machine_mode mode, reg_class_t rclass,
     }
 }
 
+
+/* Vectorizer cost model implementation.  */
+
+/* Implement targetm.vectorize.builtin_vectorization_cost.  */
+static int
+arm_builtin_vectorization_cost (enum vect_cost_for_stmt type_of_cost,
+				tree vectype,
+				int misalign ATTRIBUTE_UNUSED)
+{
+  unsigned elements;
+
+  switch (type_of_cost)
+    {
+      case scalar_stmt:
+        return current_tune->vec_costs->scalar_stmt_cost;
+
+      case scalar_load:
+        return current_tune->vec_costs->scalar_load_cost;
+
+      case scalar_store:
+        return current_tune->vec_costs->scalar_store_cost;
+
+      case vector_stmt:
+        return current_tune->vec_costs->vec_stmt_cost;
+
+      case vector_load:
+        return current_tune->vec_costs->vec_align_load_cost;
+
+      case vector_store:
+        return current_tune->vec_costs->vec_store_cost;
+
+      case vec_to_scalar:
+        return current_tune->vec_costs->vec_to_scalar_cost;
+
+      case scalar_to_vec:
+        return current_tune->vec_costs->scalar_to_vec_cost;
+
+      case unaligned_load:
+        return current_tune->vec_costs->vec_unalign_load_cost;
+
+      case unaligned_store:
+        return current_tune->vec_costs->vec_unalign_store_cost;
+
+      case cond_branch_taken:
+        return current_tune->vec_costs->cond_taken_branch_cost;
+
+      case cond_branch_not_taken:
+        return current_tune->vec_costs->cond_not_taken_branch_cost;
+
+      case vec_perm:
+      case vec_promote_demote:
+        return current_tune->vec_costs->vec_stmt_cost;
+
+      default:
+        gcc_unreachable ();
+    }
+}
 
 /* Return true if and only if this insn can dual-issue only as older.  */
 static bool
@@ -15319,71 +15442,87 @@ shift_op (rtx op, HOST_WIDE_INT *amountp)
   const char * mnem;
   enum rtx_code code = GET_CODE (op);
 
-  switch (GET_CODE (XEXP (op, 1)))
-    {
-    case REG:
-    case SUBREG:
-      *amountp = -1;
-      break;
-
-    case CONST_INT:
-      *amountp = INTVAL (XEXP (op, 1));
-      break;
-
-    default:
-      gcc_unreachable ();
-    }
-
   switch (code)
     {
     case ROTATE:
-      gcc_assert (*amountp != -1);
-      *amountp = 32 - *amountp;
-      code = ROTATERT;
+      if (!CONST_INT_P (XEXP (op, 1)))
+	{
+	  output_operand_lossage ("invalid shift operand");
+	  return NULL;
+	}
 
-      /* Fall through.  */
+      code = ROTATERT;
+      *amountp = 32 - INTVAL (XEXP (op, 1));
+      mnem = "ror";
+      break;
 
     case ASHIFT:
     case ASHIFTRT:
     case LSHIFTRT:
     case ROTATERT:
       mnem = arm_shift_nmem(code);
+      if (CONST_INT_P (XEXP (op, 1)))
+	{
+	  *amountp = INTVAL (XEXP (op, 1));
+	}
+      else if (REG_P (XEXP (op, 1)))
+	{
+	  *amountp = -1;
+	  return mnem;
+	}
+      else
+	{
+	  output_operand_lossage ("invalid shift operand");
+	  return NULL;
+	}
       break;
 
     case MULT:
       /* We never have to worry about the amount being other than a
 	 power of 2, since this case can never be reloaded from a reg.  */
-      gcc_assert (*amountp != -1);
+      if (!CONST_INT_P (XEXP (op, 1)))
+	{
+	  output_operand_lossage ("invalid shift operand");
+	  return NULL;
+	}
+
+      *amountp = INTVAL (XEXP (op, 1)) & 0xFFFFFFFF;
+
+      /* Amount must be a power of two.  */
+      if (*amountp & (*amountp - 1))
+	{
+	  output_operand_lossage ("invalid shift operand");
+	  return NULL;
+	}
+
       *amountp = int_log2 (*amountp);
       return ARM_LSL_NAME;
 
     default:
-      gcc_unreachable ();
+      output_operand_lossage ("invalid shift operand");
+      return NULL;
     }
 
-  if (*amountp != -1)
+  /* This is not 100% correct, but follows from the desire to merge
+     multiplication by a power of 2 with the recognizer for a
+     shift.  >=32 is not a valid shift for "lsl", so we must try and
+     output a shift that produces the correct arithmetical result.
+     Using lsr #32 is identical except for the fact that the carry bit
+     is not set correctly if we set the flags; but we never use the
+     carry bit from such an operation, so we can ignore that.  */
+  if (code == ROTATERT)
+    /* Rotate is just modulo 32.  */
+    *amountp &= 31;
+  else if (*amountp != (*amountp & 31))
     {
-      /* This is not 100% correct, but follows from the desire to merge
-	 multiplication by a power of 2 with the recognizer for a
-	 shift.  >=32 is not a valid shift for "lsl", so we must try and
-	 output a shift that produces the correct arithmetical result.
-	 Using lsr #32 is identical except for the fact that the carry bit
-	 is not set correctly if we set the flags; but we never use the
-	 carry bit from such an operation, so we can ignore that.  */
-      if (code == ROTATERT)
-	/* Rotate is just modulo 32.  */
-	*amountp &= 31;
-      else if (*amountp != (*amountp & 31))
-	{
-	  if (code == ASHIFT)
-	    mnem = "lsr";
-	  *amountp = 32;
-	}
-
-      /* Shifts of 0 are no-ops.  */
-      if (*amountp == 0)
-	return NULL;
+      if (code == ASHIFT)
+	mnem = "lsr";
+      *amountp = 32;
     }
+
+  /* Shifts of 0 are no-ops.  */
+  if (*amountp == 0)
+    return NULL;
 
   return mnem;
 }
@@ -17771,12 +17910,6 @@ arm_print_operand (FILE *stream, rtx x, int code)
       {
 	HOST_WIDE_INT val;
 	const char *shift;
-
-	if (!shift_operator (x, SImode))
-	  {
-	    output_operand_lossage ("invalid shift operand");
-	    break;
-	  }
 
 	shift = shift_op (x, &val);
 

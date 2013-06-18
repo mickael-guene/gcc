@@ -196,7 +196,7 @@
 ; for ARM or Thumb-2 with arm_arch6, and nov6 for ARM without
 ; arm_arch6.  This attribute is used to compute attribute "enabled",
 ; use type "any" to enable an alternative in all cases.
-(define_attr "arch" "any,a,t,32,t1,t2,v6,nov6,onlya8,neon_onlya8,nota8,neon_nota8"
+(define_attr "arch" "any,a,t,32,t1,t2,v6,nov6,neon_for_64bits,avoid_neon_for_64bits"
   (const_string "any"))
 
 (define_attr "arch_enabled" "no,yes"
@@ -231,22 +231,14 @@
 	      (match_test "TARGET_32BIT && !arm_arch6"))
 	 (const_string "yes")
 
-	 (and (eq_attr "arch" "onlya8")
-	      (eq_attr "tune" "cortexa8"))
+	 (and (eq_attr "arch" "avoid_neon_for_64bits")
+	      (match_test "TARGET_NEON")
+	      (not (match_test "TARGET_PREFER_NEON_64BITS")))
 	 (const_string "yes")
 
-	 (and (eq_attr "arch" "neon_onlya8")
-	      (eq_attr "tune" "cortexa8")
-	      (match_test "TARGET_NEON"))
-	 (const_string "yes")
-
-	 (and (eq_attr "arch" "nota8")
-	      (not (eq_attr "tune" "cortexa8")))
-	 (const_string "yes")
-
-	 (and (eq_attr "arch" "neon_nota8")
-	      (not (eq_attr "tune" "cortexa8"))
-	      (match_test "TARGET_NEON"))
+	 (and (eq_attr "arch" "neon_for_64bits")
+	      (match_test "TARGET_NEON")
+	      (match_test "TARGET_PREFER_NEON_64BITS"))
 	 (const_string "yes")]
 	(const_string "no")))
 
@@ -4439,7 +4431,7 @@
   [(set_attr "length" "*,8,8,*")
    (set_attr "predicable" "no,yes,yes,no")
    (set_attr "neon_type" "neon_int_1,*,*,neon_int_1")
-   (set_attr "arch" "neon_nota8,*,*,neon_onlya8")]
+   (set_attr "arch" "neon_for_64bits,*,*,avoid_neon_for_64bits")]
 )
 
 (define_expand "one_cmplsi2"

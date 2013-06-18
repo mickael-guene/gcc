@@ -1,5 +1,5 @@
 This is doc/gfortran.info, produced by makeinfo version 4.13 from
-/work/release/4.7-2013.03/gcc-linaro-4.7-2013.03/gcc/fortran/gfortran.texi.
+/work1/rouxy/work/sources/gcc-linaro/release/4.7-2013.04/gcc-linaro-4.7-2013.04/gcc/fortran/gfortran.texi.
 
 Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
 2008, 2009, 2010, 2011, 2012 Free Software Foundation, Inc.
@@ -17819,357 +17819,357 @@ Keyword Index
 
 
 Tag Table:
-Node: Top2162
-Node: Introduction3540
-Node: About GNU Fortran4289
-Node: GNU Fortran and GCC8278
-Node: Preprocessing and conditional compilation10392
-Node: GNU Fortran and G7712036
-Node: Project Status12609
-Node: Standards15056
-Node: Varying Length Character Strings15994
-Node: Invoking GNU Fortran16530
-Node: Option Summary18253
-Node: Fortran Dialect Options21627
-Node: Preprocessing Options30123
-Node: Error and Warning Options38354
-Node: Debugging Options46596
-Node: Directory Options49579
-Node: Link Options51014
-Node: Runtime Options51638
-Node: Code Gen Options53920
-Node: Environment Variables70876
-Node: Runtime71481
-Node: GFORTRAN_STDIN_UNIT72592
-Node: GFORTRAN_STDOUT_UNIT72959
-Node: GFORTRAN_STDERR_UNIT73360
-Node: GFORTRAN_TMPDIR73754
-Node: GFORTRAN_UNBUFFERED_ALL74206
-Node: GFORTRAN_UNBUFFERED_PRECONNECTED74732
-Node: GFORTRAN_SHOW_LOCUS75376
-Node: GFORTRAN_OPTIONAL_PLUS75872
-Node: GFORTRAN_DEFAULT_RECL76348
-Node: GFORTRAN_LIST_SEPARATOR76837
-Node: GFORTRAN_CONVERT_UNIT77446
-Node: GFORTRAN_ERROR_BACKTRACE80309
-Node: Fortran 2003 and 2008 status80866
-Node: Fortran 2003 status81126
-Node: Fortran 2008 status86028
-Node: TS 29113 status90813
-Node: Compiler Characteristics91585
-Node: KIND Type Parameters92137
-Node: Internal representation of LOGICAL variables93387
-Node: Thread-safety of the runtime library94744
-Node: Data consistency and durability96171
-Node: Extensions99213
-Node: Extensions implemented in GNU Fortran99814
-Node: Old-style kind specifications101172
-Node: Old-style variable initialization102279
-Node: Extensions to namelist103591
-Node: X format descriptor without count field105588
-Node: Commas in FORMAT specifications106115
-Node: Missing period in FORMAT specifications106632
-Node: I/O item lists107194
-Node: `Q' exponent-letter107583
-Node: BOZ literal constants108187
-Node: Real array indices110762
-Node: Unary operators111059
-Node: Implicitly convert LOGICAL and INTEGER values111473
-Node: Hollerith constants support112433
-Node: Cray pointers114205
-Node: CONVERT specifier119652
-Node: OpenMP121650
-Node: Argument list functions123901
-Node: Extensions not implemented in GNU Fortran125507
-Node: STRUCTURE and RECORD126429
-Node: ENCODE and DECODE statements128487
-Node: Variable FORMAT expressions129847
-Node: Alternate complex function syntax130952
-Node: Mixed-Language Programming131472
-Node: Interoperability with C132016
-Node: Intrinsic Types133354
-Node: Derived Types and struct133869
-Node: Interoperable Global Variables135225
-Node: Interoperable Subroutines and Functions136501
-Node: Working with Pointers140114
-Node: Further Interoperability of Fortran with C144432
-Node: GNU Fortran Compiler Directives145268
-Node: Non-Fortran Main Program147460
-Node: _gfortran_set_args149602
-Node: _gfortran_set_options150537
-Node: _gfortran_set_convert153413
-Node: _gfortran_set_record_marker154277
-Node: _gfortran_set_fpe155102
-Node: _gfortran_set_max_subrecord_length156258
-Node: Intrinsic Procedures157214
-Node: Introduction to Intrinsics172637
-Node: ABORT174989
-Node: ABS175645
-Node: ACCESS177262
-Node: ACHAR179183
-Node: ACOS180384
-Node: ACOSH181621
-Node: ADJUSTL182609
-Node: ADJUSTR183550
-Node: AIMAG184497
-Node: AINT185878
-Node: ALARM187465
-Node: ALL189099
-Node: ALLOCATED191017
-Node: AND192154
-Node: ANINT193451
-Node: ANY194929
-Node: ASIN196859
-Node: ASINH198085
-Node: ASSOCIATED199083
-Node: ATAN202088
-Node: ATAN2203507
-Node: ATANH205279
-Node: ATOMIC_DEFINE206279
-Node: ATOMIC_REF207453
-Node: BESSEL_J0208813
-Node: BESSEL_J1209862
-Node: BESSEL_JN210914
-Node: BESSEL_Y0212796
-Node: BESSEL_Y1213796
-Node: BESSEL_YN214796
-Node: BGE216628
-Node: BGT217317
-Node: BIT_SIZE217964
-Node: BLE218785
-Node: BLT219464
-Node: BTEST220099
-Node: C_ASSOCIATED220982
-Node: C_FUNLOC222191
-Node: C_F_PROCPOINTER223560
-Node: C_F_POINTER225061
-Node: C_LOC226479
-Node: C_SIZEOF227756
-Node: CEILING229166
-Node: CHAR230171
-Node: CHDIR231375
-Node: CHMOD232543
-Node: CMPLX234406
-Node: COMMAND_ARGUMENT_COUNT235870
-Node: COMPILER_OPTIONS236784
-Node: COMPILER_VERSION237793
-Node: COMPLEX238757
-Node: CONJG239911
-Node: COS240991
-Node: COSH242437
-Node: COUNT243602
-Node: CPU_TIME245618
-Node: CSHIFT246972
-Node: CTIME248628
-Node: DATE_AND_TIME250281
-Node: DBLE252742
-Node: DCMPLX253535
-Node: DIGITS254729
-Node: DIM255695
-Node: DOT_PRODUCT256953
-Node: DPROD258609
-Node: DREAL259526
-Node: DSHIFTL260192
-Node: DSHIFTR261512
-Node: DTIME262833
-Node: EOSHIFT265636
-Node: EPSILON267709
-Node: ERF268435
-Node: ERFC269209
-Node: ERFC_SCALED270013
-Node: ETIME270705
-Node: EXECUTE_COMMAND_LINE272946
-Node: EXIT275526
-Node: EXP276400
-Node: EXPONENT277673
-Node: EXTENDS_TYPE_OF278433
-Node: FDATE279286
-Node: FGET280768
-Node: FGETC282586
-Node: FLOOR284385
-Node: FLUSH285369
-Node: FNUM287244
-Node: FPUT287966
-Node: FPUTC289591
-Node: FRACTION291362
-Node: FREE292263
-Node: FSEEK293098
-Node: FSTAT295392
-Node: FTELL296472
-Node: GAMMA297450
-Node: GERROR298491
-Node: GETARG299210
-Node: GET_COMMAND300974
-Node: GET_COMMAND_ARGUMENT302338
-Node: GETCWD304372
-Node: GETENV305346
-Node: GET_ENVIRONMENT_VARIABLE306771
-Node: GETGID308924
-Node: GETLOG309461
-Node: GETPID310321
-Node: GETUID311051
-Node: GMTIME311567
-Node: HOSTNM313056
-Node: HUGE313974
-Node: HYPOT314695
-Node: IACHAR315515
-Node: IALL316695
-Node: IAND318172
-Node: IANY319156
-Node: IARGC320642
-Node: IBCLR321663
-Node: IBITS322324
-Node: IBSET323239
-Node: ICHAR323895
-Node: IDATE326067
-Node: IEOR327094
-Node: IERRNO327970
-Node: IMAGE_INDEX328519
-Node: INDEX intrinsic329543
-Node: INT331084
-Node: INT2332786
-Node: INT8333551
-Node: IOR334263
-Node: IPARITY335115
-Node: IRAND336639
-Node: IS_IOSTAT_END337995
-Node: IS_IOSTAT_EOR339092
-Node: ISATTY340219
-Node: ISHFT341002
-Node: ISHFTC341982
-Node: ISNAN343198
-Node: ITIME343946
-Node: KILL344971
-Node: KIND345875
-Node: LBOUND346720
-Node: LCOBOUND348053
-Node: LEADZ349183
-Node: LEN350043
-Node: LEN_TRIM351324
-Node: LGE352306
-Node: LGT353808
-Node: LINK355275
-Node: LLE356310
-Node: LLT357804
-Node: LNBLNK359264
-Node: LOC360040
-Node: LOG360771
-Node: LOG10362174
-Node: LOG_GAMMA363148
-Node: LOGICAL364237
-Node: LONG365045
-Node: LSHIFT365801
-Node: LSTAT366886
-Node: LTIME368080
-Node: MALLOC369491
-Node: MASKL370950
-Node: MASKR371713
-Node: MATMUL372479
-Node: MAX373568
-Node: MAXEXPONENT375067
-Node: MAXLOC375883
-Node: MAXVAL377902
-Node: MCLOCK379535
-Node: MCLOCK8380559
-Node: MERGE381792
-Node: MERGE_BITS382541
-Node: MIN383402
-Node: MINEXPONENT384903
-Node: MINLOC385533
-Node: MINVAL387552
-Node: MOD389204
-Node: MODULO390811
-Node: MOVE_ALLOC392025
-Node: MVBITS393054
-Node: NEAREST394113
-Node: NEW_LINE395236
-Node: NINT396007
-Node: NORM2397410
-Node: NOT398548
-Node: NULL399132
-Node: NUM_IMAGES400037
-Node: OR400853
-Node: PACK402137
-Node: PARITY404129
-Node: PERROR405344
-Node: PRECISION405965
-Node: POPCNT406851
-Node: POPPAR407722
-Node: PRESENT408773
-Node: PRODUCT409879
-Node: RADIX411404
-Node: RAN412226
-Node: RAND412681
-Node: RANDOM_NUMBER414013
-Node: RANDOM_SEED415731
-Node: RANGE417616
-Node: RANK418305
-Node: REAL419085
-Node: RENAME420859
-Node: REPEAT421878
-Node: RESHAPE422604
-Node: RRSPACING424073
-Node: RSHIFT424766
-Node: SAME_TYPE_AS425904
-Node: SCALE426734
-Node: SCAN427514
-Node: SECNDS429064
-Node: SECOND430152
-Node: SELECTED_CHAR_KIND431028
-Node: SELECTED_INT_KIND432619
-Node: SELECTED_REAL_KIND433794
-Node: SET_EXPONENT436460
-Node: SHAPE437456
-Node: SHIFTA438871
-Node: SHIFTL439832
-Node: SHIFTR440667
-Node: SIGN441503
-Node: SIGNAL442787
-Node: SIN444284
-Node: SINH445382
-Node: SIZE446378
-Node: SIZEOF447686
-Node: SLEEP449161
-Node: SPACING449721
-Node: SPREAD450734
-Node: SQRT451879
-Node: SRAND453233
-Node: STAT454401
-Node: STORAGE_SIZE457568
-Node: SUM458447
-Node: SYMLNK459930
-Node: SYSTEM461062
-Node: SYSTEM_CLOCK462313
-Node: TAN464471
-Node: TANH465443
-Node: THIS_IMAGE466600
-Node: TIME468092
-Node: TIME8469217
-Node: TINY470367
-Node: TRAILZ470967
-Node: TRANSFER471784
-Node: TRANSPOSE473818
-Node: TRIM474505
-Node: TTYNAM475362
-Node: UBOUND476277
-Node: UCOBOUND477667
-Node: UMASK478799
-Node: UNLINK479477
-Node: UNPACK480454
-Node: VERIFY481742
-Node: XOR483463
-Node: Intrinsic Modules484835
-Node: ISO_FORTRAN_ENV485078
-Node: ISO_C_BINDING489230
-Node: OpenMP Modules OMP_LIB and OMP_LIB_KINDS493341
-Node: Contributing494627
-Node: Contributors495481
-Node: Projects497148
-Node: Proposed Extensions497952
-Node: Copying499963
-Node: GNU Free Documentation License537527
-Node: Funding562670
-Node: Option Index565195
-Node: Keyword Index579413
+Node: Top2193
+Node: Introduction3571
+Node: About GNU Fortran4320
+Node: GNU Fortran and GCC8309
+Node: Preprocessing and conditional compilation10423
+Node: GNU Fortran and G7712067
+Node: Project Status12640
+Node: Standards15087
+Node: Varying Length Character Strings16025
+Node: Invoking GNU Fortran16561
+Node: Option Summary18284
+Node: Fortran Dialect Options21658
+Node: Preprocessing Options30154
+Node: Error and Warning Options38385
+Node: Debugging Options46627
+Node: Directory Options49610
+Node: Link Options51045
+Node: Runtime Options51669
+Node: Code Gen Options53951
+Node: Environment Variables70907
+Node: Runtime71512
+Node: GFORTRAN_STDIN_UNIT72623
+Node: GFORTRAN_STDOUT_UNIT72990
+Node: GFORTRAN_STDERR_UNIT73391
+Node: GFORTRAN_TMPDIR73785
+Node: GFORTRAN_UNBUFFERED_ALL74237
+Node: GFORTRAN_UNBUFFERED_PRECONNECTED74763
+Node: GFORTRAN_SHOW_LOCUS75407
+Node: GFORTRAN_OPTIONAL_PLUS75903
+Node: GFORTRAN_DEFAULT_RECL76379
+Node: GFORTRAN_LIST_SEPARATOR76868
+Node: GFORTRAN_CONVERT_UNIT77477
+Node: GFORTRAN_ERROR_BACKTRACE80340
+Node: Fortran 2003 and 2008 status80897
+Node: Fortran 2003 status81157
+Node: Fortran 2008 status86059
+Node: TS 29113 status90844
+Node: Compiler Characteristics91616
+Node: KIND Type Parameters92168
+Node: Internal representation of LOGICAL variables93418
+Node: Thread-safety of the runtime library94775
+Node: Data consistency and durability96202
+Node: Extensions99244
+Node: Extensions implemented in GNU Fortran99845
+Node: Old-style kind specifications101203
+Node: Old-style variable initialization102310
+Node: Extensions to namelist103622
+Node: X format descriptor without count field105619
+Node: Commas in FORMAT specifications106146
+Node: Missing period in FORMAT specifications106663
+Node: I/O item lists107225
+Node: `Q' exponent-letter107614
+Node: BOZ literal constants108218
+Node: Real array indices110793
+Node: Unary operators111090
+Node: Implicitly convert LOGICAL and INTEGER values111504
+Node: Hollerith constants support112464
+Node: Cray pointers114236
+Node: CONVERT specifier119683
+Node: OpenMP121681
+Node: Argument list functions123932
+Node: Extensions not implemented in GNU Fortran125538
+Node: STRUCTURE and RECORD126460
+Node: ENCODE and DECODE statements128518
+Node: Variable FORMAT expressions129878
+Node: Alternate complex function syntax130983
+Node: Mixed-Language Programming131503
+Node: Interoperability with C132047
+Node: Intrinsic Types133385
+Node: Derived Types and struct133900
+Node: Interoperable Global Variables135256
+Node: Interoperable Subroutines and Functions136532
+Node: Working with Pointers140145
+Node: Further Interoperability of Fortran with C144463
+Node: GNU Fortran Compiler Directives145299
+Node: Non-Fortran Main Program147491
+Node: _gfortran_set_args149633
+Node: _gfortran_set_options150568
+Node: _gfortran_set_convert153444
+Node: _gfortran_set_record_marker154308
+Node: _gfortran_set_fpe155133
+Node: _gfortran_set_max_subrecord_length156289
+Node: Intrinsic Procedures157245
+Node: Introduction to Intrinsics172668
+Node: ABORT175020
+Node: ABS175676
+Node: ACCESS177293
+Node: ACHAR179214
+Node: ACOS180415
+Node: ACOSH181652
+Node: ADJUSTL182640
+Node: ADJUSTR183581
+Node: AIMAG184528
+Node: AINT185909
+Node: ALARM187496
+Node: ALL189130
+Node: ALLOCATED191048
+Node: AND192185
+Node: ANINT193482
+Node: ANY194960
+Node: ASIN196890
+Node: ASINH198116
+Node: ASSOCIATED199114
+Node: ATAN202119
+Node: ATAN2203538
+Node: ATANH205310
+Node: ATOMIC_DEFINE206310
+Node: ATOMIC_REF207484
+Node: BESSEL_J0208844
+Node: BESSEL_J1209893
+Node: BESSEL_JN210945
+Node: BESSEL_Y0212827
+Node: BESSEL_Y1213827
+Node: BESSEL_YN214827
+Node: BGE216659
+Node: BGT217348
+Node: BIT_SIZE217995
+Node: BLE218816
+Node: BLT219495
+Node: BTEST220130
+Node: C_ASSOCIATED221013
+Node: C_FUNLOC222222
+Node: C_F_PROCPOINTER223591
+Node: C_F_POINTER225092
+Node: C_LOC226510
+Node: C_SIZEOF227787
+Node: CEILING229197
+Node: CHAR230202
+Node: CHDIR231406
+Node: CHMOD232574
+Node: CMPLX234437
+Node: COMMAND_ARGUMENT_COUNT235901
+Node: COMPILER_OPTIONS236815
+Node: COMPILER_VERSION237824
+Node: COMPLEX238788
+Node: CONJG239942
+Node: COS241022
+Node: COSH242468
+Node: COUNT243633
+Node: CPU_TIME245649
+Node: CSHIFT247003
+Node: CTIME248659
+Node: DATE_AND_TIME250312
+Node: DBLE252773
+Node: DCMPLX253566
+Node: DIGITS254760
+Node: DIM255726
+Node: DOT_PRODUCT256984
+Node: DPROD258640
+Node: DREAL259557
+Node: DSHIFTL260223
+Node: DSHIFTR261543
+Node: DTIME262864
+Node: EOSHIFT265667
+Node: EPSILON267740
+Node: ERF268466
+Node: ERFC269240
+Node: ERFC_SCALED270044
+Node: ETIME270736
+Node: EXECUTE_COMMAND_LINE272977
+Node: EXIT275557
+Node: EXP276431
+Node: EXPONENT277704
+Node: EXTENDS_TYPE_OF278464
+Node: FDATE279317
+Node: FGET280799
+Node: FGETC282617
+Node: FLOOR284416
+Node: FLUSH285400
+Node: FNUM287275
+Node: FPUT287997
+Node: FPUTC289622
+Node: FRACTION291393
+Node: FREE292294
+Node: FSEEK293129
+Node: FSTAT295423
+Node: FTELL296503
+Node: GAMMA297481
+Node: GERROR298522
+Node: GETARG299241
+Node: GET_COMMAND301005
+Node: GET_COMMAND_ARGUMENT302369
+Node: GETCWD304403
+Node: GETENV305377
+Node: GET_ENVIRONMENT_VARIABLE306802
+Node: GETGID308955
+Node: GETLOG309492
+Node: GETPID310352
+Node: GETUID311082
+Node: GMTIME311598
+Node: HOSTNM313087
+Node: HUGE314005
+Node: HYPOT314726
+Node: IACHAR315546
+Node: IALL316726
+Node: IAND318203
+Node: IANY319187
+Node: IARGC320673
+Node: IBCLR321694
+Node: IBITS322355
+Node: IBSET323270
+Node: ICHAR323926
+Node: IDATE326098
+Node: IEOR327125
+Node: IERRNO328001
+Node: IMAGE_INDEX328550
+Node: INDEX intrinsic329574
+Node: INT331115
+Node: INT2332817
+Node: INT8333582
+Node: IOR334294
+Node: IPARITY335146
+Node: IRAND336670
+Node: IS_IOSTAT_END338026
+Node: IS_IOSTAT_EOR339123
+Node: ISATTY340250
+Node: ISHFT341033
+Node: ISHFTC342013
+Node: ISNAN343229
+Node: ITIME343977
+Node: KILL345002
+Node: KIND345906
+Node: LBOUND346751
+Node: LCOBOUND348084
+Node: LEADZ349214
+Node: LEN350074
+Node: LEN_TRIM351355
+Node: LGE352337
+Node: LGT353839
+Node: LINK355306
+Node: LLE356341
+Node: LLT357835
+Node: LNBLNK359295
+Node: LOC360071
+Node: LOG360802
+Node: LOG10362205
+Node: LOG_GAMMA363179
+Node: LOGICAL364268
+Node: LONG365076
+Node: LSHIFT365832
+Node: LSTAT366917
+Node: LTIME368111
+Node: MALLOC369522
+Node: MASKL370981
+Node: MASKR371744
+Node: MATMUL372510
+Node: MAX373599
+Node: MAXEXPONENT375098
+Node: MAXLOC375914
+Node: MAXVAL377933
+Node: MCLOCK379566
+Node: MCLOCK8380590
+Node: MERGE381823
+Node: MERGE_BITS382572
+Node: MIN383433
+Node: MINEXPONENT384934
+Node: MINLOC385564
+Node: MINVAL387583
+Node: MOD389235
+Node: MODULO390842
+Node: MOVE_ALLOC392056
+Node: MVBITS393085
+Node: NEAREST394144
+Node: NEW_LINE395267
+Node: NINT396038
+Node: NORM2397441
+Node: NOT398579
+Node: NULL399163
+Node: NUM_IMAGES400068
+Node: OR400884
+Node: PACK402168
+Node: PARITY404160
+Node: PERROR405375
+Node: PRECISION405996
+Node: POPCNT406882
+Node: POPPAR407753
+Node: PRESENT408804
+Node: PRODUCT409910
+Node: RADIX411435
+Node: RAN412257
+Node: RAND412712
+Node: RANDOM_NUMBER414044
+Node: RANDOM_SEED415762
+Node: RANGE417647
+Node: RANK418336
+Node: REAL419116
+Node: RENAME420890
+Node: REPEAT421909
+Node: RESHAPE422635
+Node: RRSPACING424104
+Node: RSHIFT424797
+Node: SAME_TYPE_AS425935
+Node: SCALE426765
+Node: SCAN427545
+Node: SECNDS429095
+Node: SECOND430183
+Node: SELECTED_CHAR_KIND431059
+Node: SELECTED_INT_KIND432650
+Node: SELECTED_REAL_KIND433825
+Node: SET_EXPONENT436491
+Node: SHAPE437487
+Node: SHIFTA438902
+Node: SHIFTL439863
+Node: SHIFTR440698
+Node: SIGN441534
+Node: SIGNAL442818
+Node: SIN444315
+Node: SINH445413
+Node: SIZE446409
+Node: SIZEOF447717
+Node: SLEEP449192
+Node: SPACING449752
+Node: SPREAD450765
+Node: SQRT451910
+Node: SRAND453264
+Node: STAT454432
+Node: STORAGE_SIZE457599
+Node: SUM458478
+Node: SYMLNK459961
+Node: SYSTEM461093
+Node: SYSTEM_CLOCK462344
+Node: TAN464502
+Node: TANH465474
+Node: THIS_IMAGE466631
+Node: TIME468123
+Node: TIME8469248
+Node: TINY470398
+Node: TRAILZ470998
+Node: TRANSFER471815
+Node: TRANSPOSE473849
+Node: TRIM474536
+Node: TTYNAM475393
+Node: UBOUND476308
+Node: UCOBOUND477698
+Node: UMASK478830
+Node: UNLINK479508
+Node: UNPACK480485
+Node: VERIFY481773
+Node: XOR483494
+Node: Intrinsic Modules484866
+Node: ISO_FORTRAN_ENV485109
+Node: ISO_C_BINDING489261
+Node: OpenMP Modules OMP_LIB and OMP_LIB_KINDS493372
+Node: Contributing494658
+Node: Contributors495512
+Node: Projects497179
+Node: Proposed Extensions497983
+Node: Copying499994
+Node: GNU Free Documentation License537558
+Node: Funding562701
+Node: Option Index565226
+Node: Keyword Index579444
 
 End Tag Table

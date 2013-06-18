@@ -1,3 +1,278 @@
+2013-03-28  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* toplev.c (process_options): Do not disable -fomit-frame-pointer on a
+	general basis if unwind info is requested and ACCUMULATE_OUTGOING_ARGS
+	is not enabled.
+
+2013-03-27  Walter Lee  <walt@tilera.com>
+
+	Backport from mainline:
+	2013-03-27  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx.c (tilegx_expand_prologue): Avoid
+	double-decrement of next_scratch_regno.
+
+2013-03-27  Walter Lee  <walt@tilera.com>
+
+	Backport from mainline:
+	2013-03-27  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx.md (insn_v1mulu): Fix predicates on
+	input operands.
+	(insn_v1mulus): Ditto.
+	(insn_v2muls): Ditto.
+
+2013-03-27  Walter Lee  <walt@tilera.com>
+
+	Backport from mainline:
+	2013-03-27  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx.h (ASM_OUTPUT_ADDR_VEC_ELT): Delete
+	extra tab.
+	(ASM_OUTPUT_ADDR_DIFF_ELT): Ditto.
+
+2013-03-27  Walter Lee  <walt@tilera.com>
+
+	Backport from mainline:
+	2013-03-27  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx.md (*sibcall_insn): Fix type atribute
+	for jr.
+	(*sibcall_value): Ditto.
+
+2013-03-27  Walter Lee  <walt@tilera.com>
+
+	Backport from mainline:
+	2013-03-27  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx.md (insn_mnz_<mode>): Replaced by ...
+	(insn_mnz_v8qi): ... this ...
+	(insn_mnz_v4hi): ... and this.  Replace (const_int 0) with the
+	vector equivalent.
+	(insn_v<n>mnz): Replaced by ...
+	(insn_v1mnz): ... this ...
+	(insn_v2mnz): ... and this.  Replace (const_int 0) with the vector
+	equivalent.
+	(insn_mz_<mode>): Replaced by ...
+	(insn_mz_v8qi): ... this ...
+	(insn_mz_v4hi): ... and this.  Replace (const_int 0) with the
+	vector equivalent.
+	(insn_v<n>mz): Replaced by ...
+	(insn_v1mz): ... this ...
+	(insn_v2mz): ... and this.  Replace (const_int 0) with the vector
+	equivalent.
+
+2013-03-26  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* doc/invoke.texi (SPARC options): Remove -mlittle-endian.
+
+2013-03-26  Richard Biener  <rguenther@suse.de>
+
+	Backport from mainline:
+	2013-03-13  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56608
+	* tree-vect-slp.c (vect_schedule_slp): Do not remove scalar
+	calls when vectorizing basic-blocks.
+
+	2013-03-05  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56270
+	* tree-vect-slp.c (vect_schedule_slp): Clear vectorized stmts
+	of loads after scheduling an SLP instance.
+
+2013-03-26  Walter Lee  <walt@tilera.com>
+
+	Backport from mainline:
+	2013-03-26  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx.h (PROFILE_BEFORE_PROLOGUE): Define.
+	* config/tilegx/tilepro.h (PROFILE_BEFORE_PROLOGUE): Define.
+
+2013-03-26  Walter Lee  <walt@tilera.com>
+
+	Backport from mainline:
+	2013-03-25  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx-builtins.h (enum tilegx_builtin): Add
+	TILEGX_INSN_SHUFFLEBYTES1.
+	* config/tilegx/tilegx.c (tilegx_builtin_info): Add entry for
+	shufflebytes1.
+	(tilegx_builtins): Ditto.
+	* config/tilegx/tilegx.md (insn_shufflebytes1): New pattern.
+
+2013-03-26  Walter Lee  <walt@tilera.com>
+
+	Backport from mainline:
+	2013-03-25  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx.c (expand_set_cint64_one_inst): Inline
+	tests for constraint J, K, N, P.
+
+2013-03-26  Walter Lee  <walt@tilera.com>
+
+	Backport from mainline:
+	2013-03-25  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx.c (tilegx_asm_preferred_eh_data_format):
+	Use indirect/pcrel encoding.
+	* config/tilepro/tilepro.c (tilepro_asm_preferred_eh_data_format):
+	Ditto.
+
+2013-03-25  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	Backport from mainline:
+	2013-03-13  Oleg Endo  <olegendo@gcc.gnu.org>
+	2013-03-14  Kaz Kojima  <kkojima@gcc.gnu.org>
+
+	PR target/49880
+	* config/sh/sh.opt (FPU_SINGLE_ONLY): New mask.
+	(musermode): Convert to Var(TARGET_USERMODE).
+	* config/sh/sh.h (SELECT_SH2A_SINGLE_ONLY, SELECT_SH4_SINGLE_ONLY,
+	MASK_ARCH): Add MASK_FPU_SINGLE_ONLY.
+	* config/sh/sh.c (sh_option_override): Use
+	TARGET_FPU_DOUBLE || TARGET_FPU_SINGLE_ONLY for call-fp case.
+	* config/sh/sh.md (udivsi3_i1, divsi3_i1): Remove ! TARGET_SH4
+	condition.
+	(udivsi3_i4, divsi3_i4): Use TARGET_FPU_DOUBLE condition instead of
+	TARGET_SH4.
+	(udivsi3_i4_single, divsi3_i4_single): Use
+	TARGET_FPU_SINGLE_ONLY || TARGET_FPU_DOUBLE instead of TARGET_HARD_SH4.
+	* config/sh/linux.h (TARGET_DEFAULT): Remove MASK_USERMODE.
+	(SUBTARGET_OVERRIDE_OPTIONS): Set TARGET_USERMODE as default.
+	* config/sh/netbsd-elf.h (TARGET_DEFAULT): Remove MASK_USERMODE.
+	(SUBTARGET_OVERRIDE_OPTIONS): New.
+
+2013-03-25  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	Backport from mainline:
+	2012-04-03  Kaz Kojima  <kkojima@gcc.gnu.org>
+
+	* config/sh/t-sh (MULTILIB_MATCHES): Match m2a-single-only
+	to m2a-single instead of m2e.
+
+2013-03-22  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR target/56560
+	* config/i386/i386.h (ix86_args): Define only if USED_FOR_TARGET
+	isn't defined.
+
+2013-03-22  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR target/56560
+	* config/i386/i386.c (init_cumulative_args): Also set
+	cum->callee_return_avx256_p.
+	(ix86_function_arg): Set cum->callee_pass_avx256_p.  Set
+	cfun->machine->callee_pass_avx256_p only when MODE == VOIDmode.
+
+	* config/i386/i386.h (ix86_args): Add callee_pass_avx256_p and
+	callee_return_avx256_p.
+
+2013-03-20  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	Backport from mainline:
+	2012-12-04  Ian Lance Taylor  <iant@google.com>
+
+	* godump.c (find_dummy_types): Output a dummy type if we couldn't
+	output the real type.
+
+2013-03-20  Jack Howarth  <howarth@bromo.med.uc.edu>
+
+	PR bootstrap/56258
+	* doc/generic.texi (POINTER_PLUS_EXPR): Use @item instead of @itemx.
+	(PLUS_EXPR): Likewise.
+	* doc/cppopts.texi (--help): Likewise.
+	* doc/invoke.texi (-fenable-@var{kind}-@var{pass}): Likewise.
+	(-fdump-rtl-cprop_hardreg): Likewise.
+	(-fdump-rtl-csa): Likewise.
+	(-fdump-rtl-dce): Likewise.
+	(-fdump-rtl-dbr): Likewise.
+	(-fdump-rtl-into_cfglayout): Likewise.
+	(-fdump-rtl-outof_cfglayout): Likewise.
+
+2013-03-18  Richard Earnshaw  <rearnsha@arm.com>
+
+	PR target/56470
+	* config/arm/arm.c (shift_op): Validate RTL pattern on the fly.
+	(arm_print_operand, case 'S'): Don't use shift_operator to validate
+	the RTL.
+
+2013-03-14  Seth LaForge  <sethml@google.com>
+
+	PR target/56351
+	Backport from mainline
+	2012-10-22  Julian Brown  <julian@codesourcery.com>
+
+	* config/arm/arm.h (CANNOT_CHANGE_MODE_CLASS): Avoid subreg'ing
+	VFP D registers in big-endian mode.
+
+2013-03-08  Joey Ye  <joey.ye@arm.com>
+
+	Backport from mainline
+	2013-03-06  Joey Ye  <joey.ye@arm.com>
+
+	PR lto/50293
+	* gcc.c (convert_white_space): New function.
+	(main): Handles white space in function name.
+
+2013-03-06  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	Backport from mainline
+	2013-03-06  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/56529
+	* config/sh/sh.c (sh_option_override): Check for TARGET_DYNSHIFT
+	instead of TARGET_SH2 for call-table case.  Do not set sh_div_strategy
+	to SH_DIV_CALL_TABLE for TARGET_SH2.
+	* config.gcc (sh_multilibs): Add m2 and m2a to sh*-*-linux* multilib
+	list.
+	* doc/invoke.texi (SH options): Use table for mdiv= option.  Document
+	mdiv= call-div1, call-fp, call-table options.
+
+2013-03-06  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* config.gcc (arm*-*-rtemself*): New.
+	(arm*-*-rtems*): Removed.
+	(arm*-*-eabi* | arm*-*-symbianelf* | arm*-*-rtemseabi*): Rename
+	"arm*-*-rtemseabi*" to "arm*-*-rtems*".
+
+2013-03-01  Richard Biener  <rguenther@suse.de>
+
+	Backport from mainline
+	2012-12-12  Zdenek Dvorak  <ook@ucw.cz>
+
+	PR tree-optimization/55481
+	* tree-ssa-loop-ivopts.c (rewrite_use_nonlinear_expr): Fall
+	back to general rewriting if we cannot leave an original biv
+	definition alone.
+
+2013-03-01  Richard Biener  <rguenther@suse.de>
+
+	Backport from mainline
+	2012-04-10  Richard Guenther  <rguenther@suse.de>
+ 
+	PR middle-end/52888
+	* gimple-low.c (gimple_check_call_args): Properly account for
+	compatible aggregate types.
+
+2013-02-26  Nick Clifton  <nickc@redhat.com>
+
+	PR target/56453
+	Import this patch from the mainline:
+
+	2012-08-17  Nick Clifton  <nickc@redhat.com>
+
+	* config/fr30/fr30.md (cbranchsi4): Remove mode from comparison.
+	(branch_true): Likewise.
+	(branch_false): Likewise.
+
+2013-02-26  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/56443
+	* tree-vect-stmts.c (get_vectype_for_scalar_type_and_size): For
+	overaligned types, pass TYPE_UNSIGNED (scalar_type) as second argument
+	to type_for_mode langhook.
+
 2013-02-21  Jakub Jelinek  <jakub@redhat.com>
 
 	PR bootstrap/56258

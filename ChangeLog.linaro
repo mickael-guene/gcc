@@ -1,3 +1,113 @@
+2013-04-08  Yvan Roux  <yvan.roux@linaro.org>
+
+	GCC Linaro 4.7-2013.04 released.
+
+	gcc/
+	* LINARO-VERSION: Update.
+
+2013-04-08  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	Merge from FSF arm/aarch64-4.7-branch r196346..r196381.
+
+	Backport /work/sources/gcc-bzr/arm-aarch64-4.7 r196346:
+	[AArch64/AArch64-4.7] Fix warning - aarch64_simd_make_constant has no prototype.
+	
+	gcc/
+	* config/aarch64/aarch64.c
+	(aarch64_simd_make_constant): Make static.
+
+	Backport /work/sources/gcc-bzr/arm-aarch64-4.7 r196348:
+	[AArch64/AArch64-4.7] Fix warning - No previous prototype for aarch64_init_simd_builtins.
+	
+	gcc/
+	* config/aarch64/aarch64-builtins.c
+	(aarch64_init_simd_builtins): Make static.
+
+	Backport /work/sources/gcc-bzr/arm-aarch64-4.7 r196351:
+	[AArch64/AArch64-4.7] Fix warning - aarch64_mangle_type has no prototype.
+	
+	gcc/
+	* config/aarch64/aarch64.c (aarch64_mangle_type): Make static.
+
+	Backport /work/sources/gcc-bzr/arm-aarch64-4.7 r196353:
+	[AArch64/AArch64-4.7] Fix warning - Unused variable in aarch64_float_const_representable.
+	
+	gcc/
+	* config/aarch64/aarch64.c
+	(aarch64_float_const_representable): Remove unused variable.
+
+	Backport /work/sources/gcc-bzr/arm-aarch64-4.7 r196375:
+	[AArch64-4.7] Fix warning: TARGET_FIXED_CONDITION_CODE_REGS redefined.
+	
+	gcc/
+	* config/aarch64/aarch64.c:
+	Fix typo in `#undef TARGET_FIXED_CONDITION_CODE_REGS'
+
+	Backport /work/sources/gcc-bzr/arm-aarch64-4.7 r196381:
+	[AArch64/AArch64-4.7][libgcc] Silence warnings in sync-cache.c
+	
+	libgcc/
+	* config/aarch64/sync-cache.c
+	(__aarch64_sync_cache_range): Silence warnings.
+
+2013-04-08  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	Merge from FSF GCC 4.7.3 (svn branches/gcc-4_7-branch 197188).
+
+2013-04-03  Christophe Lyon  <christophe.lyon@linaro.org>
+
+	Partial backport from mainline r195977:
+	2013-02-12  Christophe Lyon <christophe.lyon@linaro.org>
+
+	* config/arm/arm-protos.h (struct cpu_vec_costs): New struct type.
+	(struct tune_params): Add vec_costs field.
+	* config/arm/arm.c (arm_builtin_vectorization_cost): New function.
+	(TARGET_VECTORIZE_BUILTIN_VECTORIZATION_COST): Define.
+	(arm_default_vec_cost): New struct of type cpu_vec_costs.
+	(arm_slowmul_tune, arm_fastmul_tune, arm_strongarm_tune)
+	(arm_xscale_tune, arm_9e_tune, arm_v6t2_tune, arm_cortex_tune)
+	(arm_cortex_a15_tune, arm_cortex_a5_tune, arm_cortex_a9_tune)
+	(arm_v6m_tune, arm_fa726te_tune): Define new vec_costs field.
+
+2013-04-02  Christophe Lyon  <christophe.lyon@linaro.org>
+
+	Backport from mainline r196876:
+	2013-02-12  Christophe Lyon  <christophe.lyon@linaro.org>
+
+	gcc/
+	* config/arm/arm-protos.h (tune_params): Add
+	prefer_neon_for_64bits field.
+	* config/arm/arm.c (prefer_neon_for_64bits): New variable.
+	(arm_slowmul_tune): Default prefer_neon_for_64bits to false.
+	(arm_fastmul_tune, arm_strongarm_tune, arm_xscale_tune): Ditto.
+	(arm_9e_tune, arm_v6t2_tune, arm_cortex_tune): Ditto.
+	(arm_cortex_a5_tune, arm_cortex_a15_tune): Ditto.
+	(arm_cortex_a9_tune, arm_fa726te_tune): Ditto.
+	(arm_option_override): Handle -mneon-for-64bits new option.
+	* config/arm/arm.h (TARGET_PREFER_NEON_64BITS): New macro.
+	(prefer_neon_for_64bits): Declare new variable.
+	* config/arm/arm.md (arch): Rename neon_onlya8 and neon_nota8 to
+	avoid_neon_for_64bits and neon_for_64bits. Remove onlya8 and
+	nota8.
+	(arch_enabled): Handle new arch types. Remove support for onlya8
+	and nota8.
+	(one_cmpldi2): Use new arch names.
+	* config/arm/arm.opt (mneon-for-64bits): Add option.
+	* config/arm/neon.md (adddi3_neon, subdi3_neon, iordi3_neon)
+	(anddi3_neon, xordi3_neon, ashldi3_neon, <shift>di3_neon): Use
+	neon_for_64bits instead of nota8 and avoid_neon_for_64bits instead
+	of onlya8.
+	* doc/invoke.texi (-mneon-for-64bits): Document.
+
+	gcc/testsuite/
+	* gcc.target/arm/neon-for-64bits-1.c: New tests.
+	* gcc.target/arm/neon-for-64bits-2.c: Likewise.
+
+2013-03-11  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	gcc/
+	* LINARO-VERSION: Bump version.
+
 2013-03-11  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
 
 	GCC Linaro 4.7-2013.03 released.
