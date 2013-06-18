@@ -1,3 +1,53 @@
+2013-05-14  Yvan Roux  <yvan.roux@linaro.org>
+
+	GCC Linaro 4.7-2013.05 released.
+
+	gcc/
+	* LINARO-VERSION: Update.
+
+2013-05-08  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	Merge from FSF arm/aarch64-4.7-branch r198254..r198689.
+
+	Backport /work/sources/gcc-bzr/arm-aarch64-4.7 r198254:
+	[Backport AArch64] Fix vld1<q>_* asm constraints in arm_neon.h
+	
+	gcc/
+	* config/aarch64/arm_neon.h (vld1<q>_lane*): Fix constraints.
+	(vld1<q>_dup_<sufp><8, 16, 32, 64>): Likewise.
+	(vld1<q>_<sufp><8, 16, 32, 64>): Likewise.
+
+	Backport /work/sources/gcc-bzr/arm-aarch64-4.7 r198452:
+	gcc/
+	Backported from mainline.
+	* config/aarch64/aarch64-simd.md (aarch64_vcond_internal): Fix
+	floating-point vector comparisons against 0.
+	
+	gcc/testsuite/
+	Backported from mainline.
+	* gcc.target/aarch64/vect-fcm.x: Add check for zero forms of
+	inverse operands.
+	* gcc.target/aarch64/vect-fcm-eq-d.c: Check that new zero form
+	loop is vectorized.
+	* gcc.target/aarch64/vect-fcm-eq-f.c: Likewise.
+	* gcc.target/aarch64/vect-fcm-ge-d.c: Check that new zero form
+	loop is vectorized and that the correct instruction is generated.
+	* gcc.target/aarch64/vect-fcm-ge-f.c: Likewise.
+	* gcc.target/aarch64/vect-fcm-gt-d.c: Likewise.
+	* gcc.target/aarch64/vect-fcm-gt-f.c: Likewise.
+
+	Backport /work/sources/gcc-bzr/arm-aarch64-4.7 r198689:
+	Backport of AArch64 -fomit-frame-pointer fix
+
+2013-05-08  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	Merge from FSF GCC 4.7.3 (svn branches/gcc-4_7-branch 198701).
+
+2013-04-08  Yvan Roux  <yvan.roux@linaro.org>
+
+	gcc/
+	* LINARO-VERSION: Bump version.
+
 2013-04-08  Yvan Roux  <yvan.roux@linaro.org>
 
 	GCC Linaro 4.7-2013.04 released.

@@ -9364,7 +9364,10 @@ cp_parser_range_for (cp_parser *parser, tree scope, tree init, tree range_decl)
 	range_expr = error_mark_node;
       stmt = begin_range_for_stmt (scope, init);
       finish_range_for_decl (stmt, range_decl, range_expr);
-      if (!type_dependent_expression_p (range_expr)
+      if (range_expr != error_mark_node
+	  && !type_dependent_expression_p (range_expr)
+	  /* The length of an array might be dependent.  */
+	  && COMPLETE_TYPE_P (TREE_TYPE (range_expr))
 	  /* do_auto_deduction doesn't mess with template init-lists.  */
 	  && !BRACE_ENCLOSED_INITIALIZER_P (range_expr))
 	do_range_for_auto_deduction (range_decl, range_expr);
@@ -16688,7 +16691,7 @@ static tree
 cp_parser_late_return_type_opt (cp_parser* parser, cp_cv_quals quals)
 {
   cp_token *token;
-  tree type;
+  tree type, save_ccp, save_ccr;
 
   /* Peek at the next token.  */
   token = cp_lexer_peek_token (parser->lexer);
@@ -16699,8 +16702,8 @@ cp_parser_late_return_type_opt (cp_parser* parser, cp_cv_quals quals)
   /* Consume the ->.  */
   cp_lexer_consume_token (parser->lexer);
 
-  tree save_ccp = current_class_ptr;
-  tree save_ccr = current_class_ref;
+  save_ccp = current_class_ptr;
+  save_ccr = current_class_ref;
   if (quals >= 0)
     {
       /* DR 1207: 'this' is in scope in the trailing return type.  */

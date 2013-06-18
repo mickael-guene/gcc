@@ -1,5 +1,5 @@
 This is doc/gccint.info, produced by makeinfo version 4.13 from
-/work1/rouxy/work/sources/gcc-linaro/release/4.7-2013.04/gcc-linaro-4.7-2013.04/gcc/doc/gccint.texi.
+/work1/rouxy/work/sources/gcc-linaro/release/4.7-2013.05/gcc-linaro-4.7-2013.05/gcc/doc/gccint.texi.
 
 Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 Free
@@ -61,7 +61,7 @@ Introduction
 This manual documents the internals of the GNU compilers, including how
 to port them to new targets and some information about how to write
 front ends for new languages.  It corresponds to the compilers
-(Linaro GCC 4.7-2013.04) version 4.7.3.  The use of the GNU compilers
+(Linaro GCC 4.7-2013.05) version 4.7.4.  The use of the GNU compilers
 is documented in a separate manual.  *Note Introduction: (gcc)Top.
 
  This manual is mainly a reference manual rather than a tutorial.  It
@@ -35261,6 +35261,11 @@ Here are macros for SDB and DWARF output.
      should be emitted.  These sections are not used on most platforms,
      and in particular GDB does not use them.
 
+ -- Target Hook: bool TARGET_FORCE_AT_COMP_DIR
+     True if the `DW_AT_comp_dir' attribute should be emitted for each
+     compilation unit.  This attribute is required for the darwin
+     linker  to emit debug information.
+
  -- Target Hook: bool TARGET_DELAY_SCHED2
      True if sched2 is not to be run at its normal place.  This usually
      means it will be run as part of machine-specific reorg.
@@ -44930,11 +44935,11 @@ Concept Index
 * ASM_OUTPUT_DEBUG_LABEL:                Label Output.       (line  355)
 * ASM_OUTPUT_DEF:                        Label Output.       (line  404)
 * ASM_OUTPUT_DEF_FROM_DECLS:             Label Output.       (line  412)
-* ASM_OUTPUT_DWARF_DELTA:                SDB and DWARF.      (line   69)
-* ASM_OUTPUT_DWARF_OFFSET:               SDB and DWARF.      (line   78)
-* ASM_OUTPUT_DWARF_PCREL:                SDB and DWARF.      (line   84)
-* ASM_OUTPUT_DWARF_TABLE_REF:            SDB and DWARF.      (line   89)
-* ASM_OUTPUT_DWARF_VMS_DELTA:            SDB and DWARF.      (line   73)
+* ASM_OUTPUT_DWARF_DELTA:                SDB and DWARF.      (line   74)
+* ASM_OUTPUT_DWARF_OFFSET:               SDB and DWARF.      (line   83)
+* ASM_OUTPUT_DWARF_PCREL:                SDB and DWARF.      (line   89)
+* ASM_OUTPUT_DWARF_TABLE_REF:            SDB and DWARF.      (line   94)
+* ASM_OUTPUT_DWARF_VMS_DELTA:            SDB and DWARF.      (line   78)
 * ASM_OUTPUT_EXTERNAL:                   Label Output.       (line  284)
 * ASM_OUTPUT_FDESC:                      Data Output.        (line   60)
 * ASM_OUTPUT_FUNCTION_LABEL:             Label Output.       (line   17)
@@ -47190,7 +47195,7 @@ Concept Index
 * PUT_CODE:                              RTL Objects.        (line   47)
 * PUT_MODE:                              Machine Modes.      (line  283)
 * PUT_REG_NOTE_KIND:                     Insns.              (line  351)
-* PUT_SDB_:                              SDB and DWARF.      (line  101)
+* PUT_SDB_:                              SDB and DWARF.      (line  106)
 * QCmode:                                Machine Modes.      (line  197)
 * QFmode:                                Machine Modes.      (line   54)
 * QImode:                                Machine Modes.      (line   25)
@@ -47461,11 +47466,11 @@ Concept Index
 * scratch_operand:                       Machine-Independent Predicates.
                                                              (line   50)
 * SDATA_SECTION_ASM_OP:                  Sections.           (line   58)
-* SDB_ALLOW_FORWARD_REFERENCES:          SDB and DWARF.      (line  119)
-* SDB_ALLOW_UNKNOWN_REFERENCES:          SDB and DWARF.      (line  114)
+* SDB_ALLOW_FORWARD_REFERENCES:          SDB and DWARF.      (line  124)
+* SDB_ALLOW_UNKNOWN_REFERENCES:          SDB and DWARF.      (line  119)
 * SDB_DEBUGGING_INFO:                    SDB and DWARF.      (line    9)
-* SDB_DELIM:                             SDB and DWARF.      (line  107)
-* SDB_OUTPUT_SOURCE_LINE:                SDB and DWARF.      (line  124)
+* SDB_DELIM:                             SDB and DWARF.      (line  112)
+* SDB_OUTPUT_SOURCE_LINE:                SDB and DWARF.      (line  129)
 * SDmode:                                Machine Modes.      (line   85)
 * sdot_prodM instruction pattern:        Standard Names.     (line  338)
 * search options:                        Including Patterns. (line   44)
@@ -47804,7 +47809,7 @@ Concept Index
 * TARGET_ASM_OPEN_PAREN:                 Data Output.        (line  130)
 * TARGET_ASM_OUTPUT_ADDR_CONST_EXTRA:    Data Output.        (line   40)
 * TARGET_ASM_OUTPUT_ANCHOR:              Anchored Addresses. (line   44)
-* TARGET_ASM_OUTPUT_DWARF_DTPREL:        SDB and DWARF.      (line   96)
+* TARGET_ASM_OUTPUT_DWARF_DTPREL:        SDB and DWARF.      (line  101)
 * TARGET_ASM_OUTPUT_MI_THUNK:            Function Entry.     (line  195)
 * TARGET_ASM_OUTPUT_SOURCE_FILENAME:     File Framework.     (line   94)
 * TARGET_ASM_RECORD_GCC_SWITCHES:        File Framework.     (line  164)
@@ -47875,8 +47880,8 @@ Concept Index
 * TARGET_DEFAULT_SHORT_ENUMS:            Type Layout.        (line  167)
 * TARGET_DEFAULT_TARGET_FLAGS:           Run-time Target.    (line   56)
 * TARGET_DEFERRED_OUTPUT_DEFS:           Label Output.       (line  422)
-* TARGET_DELAY_SCHED2:                   SDB and DWARF.      (line   61)
-* TARGET_DELAY_VARTRACK:                 SDB and DWARF.      (line   65)
+* TARGET_DELAY_SCHED2:                   SDB and DWARF.      (line   66)
+* TARGET_DELAY_VARTRACK:                 SDB and DWARF.      (line   70)
 * TARGET_DELEGITIMIZE_ADDRESS:           Addressing Modes.   (line  238)
 * TARGET_DLLIMPORT_DECL_ATTRIBUTES:      Target Attributes.  (line   55)
 * TARGET_DWARF_CALLING_CONVENTION:       SDB and DWARF.      (line   18)
@@ -47918,6 +47923,7 @@ Concept Index
 * TARGET_FLT_EVAL_METHOD:                Type Layout.        (line  148)
 * TARGET_FN_ABI_VA_LIST:                 Register Arguments. (line  289)
 * TARGET_FOLD_BUILTIN:                   Misc.               (line  650)
+* TARGET_FORCE_AT_COMP_DIR:              SDB and DWARF.      (line   61)
 * TARGET_FORMAT_TYPES:                   Misc.               (line  850)
 * TARGET_FRAME_POINTER_REQUIRED:         Elimination.        (line    9)
 * TARGET_FUNCTION_ARG:                   Register Arguments. (line   12)
@@ -48891,40 +48897,40 @@ Node: DBX Options1521917
 Node: DBX Hooks1527366
 Node: File Names and DBX1529292
 Node: SDB and DWARF1531404
-Node: VMS Debug1537251
-Node: Floating Point1537838
-Node: Mode Switching1542661
-Node: Target Attributes1546587
-Node: Emulated TLS1554499
-Node: MIPS Coprocessors1557889
-Node: PCH Target1559458
-Node: C++ ABI1561300
-Node: Named Address Spaces1566092
-Node: Misc1571031
-Ref: TARGET_SHIFT_TRUNCATION_MASK1578459
-Node: Host Config1621581
-Node: Host Common1622649
-Node: Filesystem1625028
-Node: Host Misc1629143
-Node: Fragments1631592
-Node: Target Fragment1632787
-Node: Host Fragment1641817
-Node: Collect21642057
-Node: Header Dirs1644693
-Node: Type Information1646116
-Node: GTY Options1648473
-Node: GGC Roots1662301
-Node: Files1663021
-Node: Invoking the garbage collector1665767
-Node: Troubleshooting1667270
-Node: Plugins1668346
-Node: LTO1685224
-Node: Funding1710270
-Node: GNU Project1712753
-Node: Copying1713402
-Node: GNU Free Documentation License1750933
-Node: Contributors1776073
-Node: Option Index1813478
-Node: Concept Index1814282
+Node: VMS Debug1537476
+Node: Floating Point1538063
+Node: Mode Switching1542886
+Node: Target Attributes1546812
+Node: Emulated TLS1554724
+Node: MIPS Coprocessors1558114
+Node: PCH Target1559683
+Node: C++ ABI1561525
+Node: Named Address Spaces1566317
+Node: Misc1571256
+Ref: TARGET_SHIFT_TRUNCATION_MASK1578684
+Node: Host Config1621806
+Node: Host Common1622874
+Node: Filesystem1625253
+Node: Host Misc1629368
+Node: Fragments1631817
+Node: Target Fragment1633012
+Node: Host Fragment1642042
+Node: Collect21642282
+Node: Header Dirs1644918
+Node: Type Information1646341
+Node: GTY Options1648698
+Node: GGC Roots1662526
+Node: Files1663246
+Node: Invoking the garbage collector1665992
+Node: Troubleshooting1667495
+Node: Plugins1668571
+Node: LTO1685449
+Node: Funding1710495
+Node: GNU Project1712978
+Node: Copying1713627
+Node: GNU Free Documentation License1751158
+Node: Contributors1776298
+Node: Option Index1813703
+Node: Concept Index1814507
 
 End Tag Table
