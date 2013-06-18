@@ -1,3 +1,77 @@
+2013-03-11  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	GCC Linaro 4.7-2013.03 released.
+
+	gcc/
+	* LINARO-VERSION: Update.
+
+2013-03-06  Venkataramanan Kumar  <venkataramanan.kumar@linaro.org>
+
+	2013-03-05  Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/56484
+	* ifcvt.c (noce_process_if_block): If else_bb is NULL, avoid extending
+	lifetimes of hard registers on small register class machines.
+
+	* gcc.c-torture/compile/pr56484.c: New test.
+
+2013-02-26  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	Merge from FSF arm/aarch64-4.7-branch r196014..r196225.
+
+	Backport /work/sources/gcc-bzr/arm-aarch64-4.7 r196014:
+	[AArch64-4.7] Backport: Implement section anchors
+
+	gcc/
+	* common/config/aarch64/aarch64-common.c
+	(aarch_option_optimization_table): New.
+	(TARGET_OPTION_OPTIMIZATION_TABLE): Define.
+	* gcc/config/aarch64/aarch64-elf.h (ASM_OUTPUT_DEF): New definition.
+	* gcc/config/aarch64/aarch64.c (TARGET_MIN_ANCHOR_OFFSET): Define.
+	(TARGET_MAX_ANCHOR_OFFSET): Likewise.
+
+	Backport /work/sources/gcc-bzr/arm-aarch64-4.7 r196015:
+	[AArch64-4.7] Backport: Fix g++.dg/abi/aarch64_guard1.C
+
+	gcc/testsuite/
+	* g++.dg/abi/aarch64_guard1.C: Add -fno-section-anchors.
+
+	Backport /work/sources/gcc-bzr/arm-aarch64-4.7 r196225:
+	Subject: [AArch64] Add missing copyright and build dependency for  aarch64-simd-builtins.def
+
+	gcc/
+	* config/aarch64/aarch64-simd-builtins.def: Add copyright header.
+	* config/aarch64/t-aarch64
+	(aarch64-builtins.o): Depend on aarch64-simd-builtins.def.
+
+2013-02-26  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	Merge from FSF GCC 4.7.3 (svn branches/gcc-4_7-branch 196272).
+
+2013-02-18  Yvan Roux  <yvan.roux@linaro.org>
+
+	gcc/
+	* LINARO-VERSION: Bump version.
+
+2013-02-18  Yvan Roux  <yvan.roux@linaro.org>
+
+	GCC Linaro 4.7-2013.02-01 released.
+
+	gcc/
+	* LINARO-VERSION: Update.
+
+2013-02-14  Yvan Roux  <yvan.roux@linaro.org>
+	    Matthias Klose  <doko@ubuntu.com>
+
+	gcc/
+	* config/i386/t-linux64: Fix multiarch merge issues.
+	* config/i386/t-kfreebsd: Likewise.
+
+2013-02-11  Christophe Lyon  <christophe.lyon@linaro.org>
+
+	gcc/
+	* LINARO-VERSION: Bump version.
+
 2013-02-11  Christophe Lyon  <christophe.lyon@linaro.org>
 
 	GCC Linaro 4.7-2013.02 released.
