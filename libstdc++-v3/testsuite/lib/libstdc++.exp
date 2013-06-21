@@ -208,7 +208,7 @@ proc libstdc++_init { testfile } {
     }
 
     # Set the default timeout for v3 tests.
-    set tool_timeout 600
+    set tool_timeout 30
 
     # Default settings.
     set cxx [transform "g++"]
