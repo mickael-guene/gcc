@@ -2,6 +2,7 @@
 /* { dg-require-effective-target tls  }  */
 /* { dg-require-effective-target pthread } */
 /* { dg-options "-pthread" } */
+/* { dg-skip-if "" { arm-*-linux-uclibceabi } "*" "" } */
 
 #include <pthread.h>
 extern int printf (char *,...);
