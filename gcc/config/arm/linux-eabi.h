@@ -86,7 +86,7 @@
 		       LINUX_TARGET_LINK_SPEC " " ANDROID_LINK_SPEC)
 
 #undef  CC1_SPEC
-#define CC1_SPEC "%{!mno-fdpic:-mfdpic -fPIC}"	    \
+#define CC1_SPEC "%{!marm:-mthumb} %{!mno-fdpic:-mfdpic -fPIC}"	    \
   LINUX_OR_ANDROID_CC (GNU_USER_TARGET_CC1_SPEC,			\
 		       GNU_USER_TARGET_CC1_SPEC " " ANDROID_CC1_SPEC)
 
