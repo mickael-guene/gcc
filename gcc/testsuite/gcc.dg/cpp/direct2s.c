@@ -7,6 +7,7 @@
 
 /* { dg-do compile } */
 /* { dg-options "-save-temps -ansi -pedantic-errors" } */
+/* { dg-skip-if "" { arm-*-linux-uclibceabi } "*" "" } */
 
 #define HASH #
 #define HASHDEFINE #define
