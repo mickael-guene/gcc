@@ -5,6 +5,7 @@
 // { dg-require-cstdint "" }
 // { dg-require-gthreads "" }
 // { dg-require-sched-yield "" }
+// { dg-skip-if "" { arm-*-linux-uclibceabi } "*" "" }
  
 // Copyright (C) 2011, 2012 Free Software Foundation, Inc.
 //
