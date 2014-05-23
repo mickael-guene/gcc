@@ -5930,7 +5930,8 @@
   "*
     (*targetm.asm_out.internal_label) (asm_out_file, \"LPIC\",
 				       INTVAL (operands[2]));
-    return \"ldr%?\\t%0, [%|pc, %1]\t\t@ tls_load_dot_plus_eight\";
+    //return \"ldr%?\\t%0, [%|pc, %1]\t\t@ tls_load_dot_plus_eight\";
+    return \"ldr%?\\t%0, [%|r9, %1]\t\t@ tls_load_dot_plus_eight_fdpic\";
   "
   [(set_attr "predicable" "yes")]
 )
