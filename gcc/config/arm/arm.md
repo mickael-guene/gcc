@@ -5920,6 +5920,22 @@
   [(set_attr "predicable" "yes")]
 )
 
+(define_insn "pic_add_dot_plus_eight_tls"
+  [(set (match_operand:SI 0 "register_operand" "=r")
+	(unspec:SI [(match_operand:SI 1 "register_operand" "r")
+		    (const_int 9)
+		    (match_operand 2 "" "")]
+		   UNSPEC_PIC_BASE))]
+  "TARGET_ARM"
+  "*
+    (*targetm.asm_out.internal_label) (asm_out_file, \"LPIC\",
+				       INTVAL (operands[2]));
+    //return \"add%?\\t%0, %|pc, %1\";
+    return \"add%?\\t%0, %|r9, %1\";
+  "
+  [(set_attr "predicable" "yes")]
+)
+
 (define_insn "tls_load_dot_plus_eight"
   [(set (match_operand:SI 0 "register_operand" "=r")
 	(mem:SI (unspec:SI [(match_operand:SI 1 "register_operand" "r")

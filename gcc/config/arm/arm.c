@@ -6624,12 +6624,12 @@ arm_call_tls_get_addr (rtx x, rtx reg, rtx *valuep, int reloc)
 
   sum = gen_rtx_UNSPEC (Pmode,
 			gen_rtvec (4, x, GEN_INT (reloc), label,
-				   GEN_INT (TARGET_ARM ? 8 : 4)),
+				   GEN_INT (TARGET_ARM ? 9 : 4)),
 			UNSPEC_TLS);
   reg = load_tls_operand (sum, reg);
 
   if (TARGET_ARM)
-    emit_insn (gen_pic_add_dot_plus_eight (reg, reg, labelno));
+    emit_insn (gen_pic_add_dot_plus_eight_tls (reg, reg, labelno));
   else
     emit_insn (gen_pic_add_dot_plus_four (reg, reg, labelno));
 
