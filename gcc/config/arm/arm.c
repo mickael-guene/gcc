@@ -1102,9 +1102,12 @@ static const struct arm_fpu_desc all_fpus[] =
 
 enum tls_reloc {
   TLS_GD32,
+  TLS_GD32_FDPIC,
   TLS_LDM32,
+  TLS_LDM32_FDPIC,
   TLS_LDO32,
   TLS_IE32,
+  TLS_IE32_FDPIC,
   TLS_LE32,
   TLS_DESCSEQ	/* GNU scheme */
 };
@@ -6611,6 +6614,30 @@ load_tls_operand (rtx x, rtx reg)
 }
 
 static rtx
+arm_call_tls_get_addr_fdpic (rtx x, rtx reg, rtx *valuep, int reloc)
+{
+    rtx insns, sum;
+
+    gcc_assert (reloc != TLS_DESCSEQ);
+    start_sequence ();
+
+    sum = gen_rtx_UNSPEC (Pmode,
+		    gen_rtvec (2, x, GEN_INT (reloc)),
+		    UNSPEC_TLS);
+    reg = load_tls_operand (sum, reg);
+    emit_insn (gen_addsi3 (reg, reg, gen_rtx_REG (Pmode, 9)));
+
+    *valuep = emit_library_call_value (get_tls_get_addr (), NULL_RTX,
+			         LCT_PURE, /* LCT_CONST?  */
+			         Pmode, 1, reg, Pmode);
+
+    insns = get_insns ();
+    end_sequence ();
+
+    return insns;
+}
+
+static rtx
 arm_call_tls_get_addr (rtx x, rtx reg, rtx *valuep, int reloc)
 {
   rtx insns, label, labelno, sum;
@@ -6624,12 +6651,12 @@ arm_call_tls_get_addr (rtx x, rtx reg, rtx *valuep, int reloc)
 
   sum = gen_rtx_UNSPEC (Pmode,
 			gen_rtvec (4, x, GEN_INT (reloc), label,
-				   GEN_INT (TARGET_ARM ? 9 : 4)),
+				   GEN_INT (TARGET_ARM ? 8 : 4)),
 			UNSPEC_TLS);
   reg = load_tls_operand (sum, reg);
 
   if (TARGET_ARM)
-    emit_insn (gen_pic_add_dot_plus_eight_tls (reg, reg, labelno));
+    emit_insn (gen_pic_add_dot_plus_eight (reg, reg, labelno));
   else
     emit_insn (gen_pic_add_dot_plus_four (reg, reg, labelno));
 
@@ -6666,8 +6693,65 @@ arm_tls_descseq_addr (rtx x, rtx reg)
   return reg;
 }
 
-rtx
-legitimize_tls_address (rtx x, rtx reg)
+static rtx
+legitimize_tls_address_fdpic (rtx x, rtx reg)
+{
+    rtx dest, insns, ret, eqv, addend, sum, tp;
+    unsigned int model = SYMBOL_REF_TLS_MODEL (x);
+
+    switch (model) {
+        case TLS_MODEL_GLOBAL_DYNAMIC:
+            if (TARGET_GNU2_TLS) {
+                abort();
+            } else {
+                /* Original scheme */
+                insns = arm_call_tls_get_addr_fdpic (x, reg, &ret, TLS_GD32_FDPIC);
+                dest = gen_reg_rtx (Pmode);
+                emit_libcall_block (insns, dest, ret, x);
+            }
+            return dest;
+            break;
+        case TLS_MODEL_LOCAL_DYNAMIC:
+            if (TARGET_GNU2_TLS) {
+                abort();
+            } else {
+                insns = arm_call_tls_get_addr_fdpic (x, reg, &ret, TLS_LDM32_FDPIC);
+                /* Attach a unique REG_EQUIV, to allow the RTL optimizers to
+                   share the LDM result with other LD model accesses.  */
+                eqv = gen_rtx_UNSPEC (Pmode, gen_rtvec (1, const1_rtx),
+                            UNSPEC_TLS);
+                dest = gen_reg_rtx (Pmode);
+                emit_libcall_block (insns, dest, ret, eqv);
+
+                /* Load the addend.  */
+                addend = gen_rtx_UNSPEC (Pmode, gen_rtvec (2, x, GEN_INT (TLS_LDO32)),
+                                         UNSPEC_TLS);
+                addend = force_reg (SImode, gen_rtx_CONST (SImode, addend));
+                dest = gen_rtx_PLUS (Pmode, dest, addend);
+            }
+            return dest;
+            break;
+        case TLS_MODEL_INITIAL_EXEC:
+            sum = gen_rtx_UNSPEC (Pmode,
+			                      gen_rtvec (2, x, GEN_INT (TLS_IE32_FDPIC)),
+			                      UNSPEC_TLS);
+            reg = load_tls_operand (sum, reg);
+            /* FIXME : optimize below ? */
+            emit_insn (gen_addsi3 (reg, reg, gen_rtx_REG (Pmode, 9)));
+            emit_insn (gen_movsi (reg, gen_rtx_MEM (Pmode, reg)));
+            tp = arm_load_tp (NULL_RTX);
+
+            return gen_rtx_PLUS (Pmode, tp, reg);
+            break;
+        case TLS_MODEL_LOCAL_EXEC:
+            abort();
+        default:
+            abort ();
+    }
+}
+
+static rtx
+legitimize_tls_address_not_fdpic (rtx x, rtx reg)
 {
   rtx dest, tp, label, labelno, sum, insns, ret, eqv, addend;
   unsigned int model = SYMBOL_REF_TLS_MODEL (x);
@@ -6758,6 +6842,15 @@ legitimize_tls_address (rtx x, rtx reg)
     default:
       abort ();
     }
+}
+
+rtx
+legitimize_tls_address (rtx x, rtx reg)
+{
+    if (TARGET_FDPIC)
+        return legitimize_tls_address_fdpic(x, reg);
+    else
+        return legitimize_tls_address_not_fdpic(x, reg);
 }
 
 /* Try machine-dependent ways of modifying an illegitimate address
@@ -25127,15 +25220,18 @@ arm_emit_tls_decoration (FILE *fp, rtx x)
   switch (reloc)
     {
     case TLS_GD32:
+    case TLS_GD32_FDPIC:
       fputs ("(tlsgd)", fp);
       break;
     case TLS_LDM32:
+    case TLS_LDM32_FDPIC:
       fputs ("(tlsldm)", fp);
       break;
     case TLS_LDO32:
       fputs ("(tlsldo)", fp);
       break;
     case TLS_IE32:
+    case TLS_IE32_FDPIC:
       fputs ("(gottpoff)", fp);
       break;
     case TLS_LE32:
