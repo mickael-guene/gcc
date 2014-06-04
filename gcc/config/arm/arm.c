@@ -6744,7 +6744,13 @@ legitimize_tls_address_fdpic (rtx x, rtx reg)
             return gen_rtx_PLUS (Pmode, tp, reg);
             break;
         case TLS_MODEL_LOCAL_EXEC:
-            abort();
+            tp = arm_load_tp (NULL_RTX);
+            reg = gen_rtx_UNSPEC (Pmode,
+                                  gen_rtvec (2, x, GEN_INT (TLS_LE32)),
+			                      UNSPEC_TLS);
+            reg = force_reg (SImode, gen_rtx_CONST (SImode, reg));
+
+            return gen_rtx_PLUS (Pmode, tp, reg);
         default:
             abort ();
     }
