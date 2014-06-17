@@ -25226,19 +25226,25 @@ arm_emit_tls_decoration (FILE *fp, rtx x)
   switch (reloc)
     {
     case TLS_GD32:
-    case TLS_GD32_FDPIC:
       fputs ("(tlsgd)", fp);
       break;
+    case TLS_GD32_FDPIC:
+      fputs ("(tlsgd_fdpic)", fp);
+      break;
     case TLS_LDM32:
-    case TLS_LDM32_FDPIC:
       fputs ("(tlsldm)", fp);
+      break;
+    case TLS_LDM32_FDPIC:
+      fputs ("(tlsldm_fdpic)", fp);
       break;
     case TLS_LDO32:
       fputs ("(tlsldo)", fp);
       break;
     case TLS_IE32:
-    case TLS_IE32_FDPIC:
       fputs ("(gottpoff)", fp);
+      break;
+    case TLS_IE32_FDPIC:
+      fputs ("(gottpoff_fdpic)", fp);
       break;
     case TLS_LE32:
       fputs ("(tpoff)", fp);
