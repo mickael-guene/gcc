@@ -30,6 +30,21 @@
 #include <sys/sdt.h>
 #endif
 
+#if __FDPIC__
+/* load of r7 with rt_sigreturn value */
+#define ARM_SET_R7_RT_SIGRETURN             0xe3a070ad
+#define THUMB2_SET_R7_RT_SIGRETURN          0x07adf04f
+/* fdpic jump to restorer sequence */
+#define FDPIC_LDR_R12_WITH_FUNCDESC         0xe59fc004
+#define FDPIC_LDR_R9_WITH_GOT               0xe59c9004
+#define FDPIC_LDR_PC_WITH_RESTORER          0xe59cf000
+#define FDPIC_FUNCDESC_OFFSET               12
+/* signal frame offsets */
+#define ARM_NEW_RT_SIGFRAME_UCONTEXT        0x80
+#define ARM_UCONTEXT_SIGCONTEXT             0x14
+#define ARM_SIGCONTEXT_R0                   0xc
+#endif
+
 /* We add a prototype for abort here to avoid creating a dependency on
    target headers.  */
 extern void abort (void);
@@ -195,6 +210,40 @@ search_EIT_table (const __EIT_entry * table, int nrec, _uw return_address)
     }
 }
 
+#if __FDPIC__
+/* FIXME : support partial (vfp not restored) but should be sufficient to allow unwinding */
+static _Unwind_Reason_Code
+__gnu_personality_sigframe_fdpic (_Unwind_State state,
+                        _Unwind_Control_Block *ucbp,
+                        _Unwind_Context *context)
+{
+    unsigned int sp;
+    unsigned int pc;
+    unsigned int funcdesc;
+    unsigned int handler;
+    unsigned int first_handler_instruction;
+    int i;
+
+    _Unwind_VRS_Get (context, _UVRSC_CORE, R_SP, _UVRSD_UINT32, &sp);
+    _Unwind_VRS_Get (context, _UVRSC_CORE, R_PC, _UVRSD_UINT32, &pc);
+
+    funcdesc = *(unsigned int *)(pc + FDPIC_FUNCDESC_OFFSET);
+    handler = *(unsigned int *)(funcdesc);
+    first_handler_instruction = *(unsigned int *)(handler & ~1);
+
+    /* adjust sp to point to the start of register according to signal type */
+    if (first_handler_instruction == ARM_SET_R7_RT_SIGRETURN || first_handler_instruction == THUMB2_SET_R7_RT_SIGRETURN)
+        sp += ARM_NEW_RT_SIGFRAME_UCONTEXT + ARM_UCONTEXT_SIGCONTEXT + ARM_SIGCONTEXT_R0;
+    else
+        sp += ARM_UCONTEXT_SIGCONTEXT + ARM_SIGCONTEXT_R0;
+    /* restore regs save on stack by the kernel */
+    for(i = 0; i < 16; i++)
+        _Unwind_VRS_Set (context, _UVRSC_CORE, i, _UVRSD_UINT32, sp + 4 * i);
+
+    return _URC_CONTINUE_UNWIND;
+}
+#endif
+
 /* Find the exception index table eintry for the given address.
    Fill in the relevant fields of the UCB.
    Returns _URC_FAILURE if an error occurred, _URC_OK on success.  */
@@ -218,6 +267,20 @@ get_eit_entry (_Unwind_Control_Block *ucbp, _uw return_address)
 							    &nrec);
       if (!eitp)
 	{
+#if __FDPIC__
+      /* if we are unwinding a signal handler then perhaps we have reach a trampoline.
+       *  Try to detect jump to restorer sequence
+       */
+      _uw *pc = (_uw *)((return_address+2) & ~3);
+      if (pc[0] == FDPIC_LDR_R12_WITH_FUNCDESC && pc[1] == FDPIC_LDR_R9_WITH_GOT && pc[2] == FDPIC_LDR_PC_WITH_RESTORER) {
+          struct funcdesc_t *funcdesc = (struct funcdesc_t *) &__gnu_personality_sigframe_fdpic;
+
+          UCB_PR_ADDR (ucbp) = funcdesc->ptr;
+          UCB_PR_GOT (ucbp) = funcdesc->got;
+
+          return _URC_OK;
+     }
+#endif
 	  UCB_PR_ADDR (ucbp) = 0;
 	  return _URC_FAILURE;
 	}
