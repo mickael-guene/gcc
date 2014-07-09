@@ -2,6 +2,7 @@
 
 /* { dg-do assemble } */
 /* { dg-options "-O2 -fPIC -mtls-dialect=gnu2" } */
+/* { dg-skip-if "" { arm-*-linux-uclibceabi } "*" "" } */
 
 typedef struct _IO_FILE FILE;
 
