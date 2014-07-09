@@ -21,6 +21,7 @@
 // { dg-do run { target *-*-freebsd* *-*-netbsd* *-*-linux* *-*-solaris* *-*-cygwin *-*-darwin* alpha*-*-osf* mips-sgi-irix6* } }
 // { dg-options "-pthread" { target *-*-freebsd* *-*-netbsd* *-*-linux* alpha*-*-osf* mips-sgi-irix6* } }
 // { dg-options "-pthreads" { target *-*-solaris* } }
+/* { dg-skip-if "" { arm-*-linux-uclibceabi } "*" "" } */
 
 // This multi-threading C++/STL/POSIX code adheres to rules outlined here:
 // http://www.sgi.com/tech/stl/thread_safety.html
