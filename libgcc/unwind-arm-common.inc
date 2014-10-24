@@ -295,6 +295,20 @@ get_eit_entry (_Unwind_Control_Block *ucbp, _uw return_address)
 
   if (!eitp)
     {
+#if __FDPIC__
+      /* if we are unwinding a signal handler then perhaps we have reach a trampoline.
+       *  Try to detect jump to restorer sequence
+       */
+      _uw *pc = (_uw *)((return_address+2) & ~3);
+      if (pc[0] == FDPIC_LDR_R12_WITH_FUNCDESC && pc[1] == FDPIC_LDR_R9_WITH_GOT && pc[2] == FDPIC_LDR_PC_WITH_RESTORER) {
+          struct funcdesc_t *funcdesc = (struct funcdesc_t *) &__gnu_personality_sigframe_fdpic;
+
+          UCB_PR_ADDR (ucbp) = funcdesc->ptr;
+          UCB_PR_GOT (ucbp) = funcdesc->got;
+
+          return _URC_OK;
+      }
+#endif
       UCB_PR_ADDR (ucbp) = 0;
       return _URC_FAILURE;
     }
@@ -303,6 +317,20 @@ get_eit_entry (_Unwind_Control_Block *ucbp, _uw return_address)
   /* Can this frame be unwound at all?  */
   if (eitp->content == EXIDX_CANTUNWIND)
     {
+#if __FDPIC__
+      /* if we are unwinding a signal handler then perhaps we have reach a trampoline.
+       *  Try to detect jump to restorer sequence
+       */
+      _uw *pc = (_uw *)((return_address+2) & ~3);
+      if (pc[0] == FDPIC_LDR_R12_WITH_FUNCDESC && pc[1] == FDPIC_LDR_R9_WITH_GOT && pc[2] == FDPIC_LDR_PC_WITH_RESTORER) {
+          struct funcdesc_t *funcdesc = (struct funcdesc_t *) &__gnu_personality_sigframe_fdpic;
+
+          UCB_PR_ADDR (ucbp) = funcdesc->ptr;
+          UCB_PR_GOT (ucbp) = funcdesc->got;
+
+          return _URC_OK;
+      }
+#endif
       UCB_PR_ADDR (ucbp) = 0;
       return _URC_END_OF_STACK;
     }
