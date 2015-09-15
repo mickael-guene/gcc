@@ -210,6 +210,11 @@ _Unwind_VRS_Result _Unwind_VRS_Set (_Unwind_Context *context,
 	return _UVRSR_FAILED;
 
       vrs->core.r[regno] = *(_uw *) valuep;
+#if defined(__ARM_ARCH_7M__)
+      /* force lsb bit since we always run thumb code */
+      if (regno == 15)
+          vrs->core.r[regno] |= 1;
+#endif
       return _UVRSR_OK;
 
     case _UVRSC_VFP:

@@ -6590,7 +6590,18 @@ arm_load_tp (rtx target)
 
       rtx tmp;
 
-      emit_insn (gen_load_tp_soft ());
+      if (TARGET_FDPIC)
+      {
+        rtx par = gen_rtx_PARALLEL(VOIDmode, rtvec_alloc(3));
+
+        emit_insn (gen_load_tp_soft_fdpic ());
+        XVECEXP (par, 0, 0) = gen_rtx_UNSPEC(VOIDmode, gen_rtvec (2, gen_rtx_REG (Pmode, 9), get_hard_reg_initial_val (Pmode, 9)), UNSPEC_PIC_RESTORE);
+        XVECEXP (par, 0, 1) = gen_rtx_USE(VOIDmode, gen_rtx_REG (Pmode, 9));
+        XVECEXP (par, 0, 2) = gen_rtx_CLOBBER(VOIDmode, gen_rtx_REG (Pmode, 9));
+        emit_insn(par);
+      } else {
+        emit_insn (gen_load_tp_soft ());
+      }
 
       tmp = gen_rtx_REG (SImode, 0);
       emit_move_insn (target, tmp);
