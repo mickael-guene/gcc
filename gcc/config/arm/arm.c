@@ -3203,9 +3203,8 @@ arm_option_override (void)
 
   /* We only support -mslow-flash-data on armv7-m targets.  */
   if (target_slow_flash_data
-      && ((!(arm_arch7 && !arm_arch_notm) && !arm_arch7em)
-	  || (TARGET_THUMB1 || flag_pic || TARGET_NEON)))
-    error ("-mslow-flash-data only supports non-pic code on armv7-m targets");
+      && ((flag_pic || TARGET_NEON)))
+    error ("-mslow-flash-data only supports non-pic code");
 
   /* Currently, for slow flash data, we just disable literal pools.  */
   if (target_slow_flash_data)
@@ -7401,7 +7400,7 @@ thumb1_legitimate_address_p (machine_mode mode, rtx x, int strict_p)
   /* This is PC relative data before arm_reorg runs.  */
   else if (GET_MODE_SIZE (mode) >= 4 && CONSTANT_P (x)
 	   && GET_CODE (x) == SYMBOL_REF
-           && CONSTANT_POOL_ADDRESS_P (x) && !flag_pic)
+           && CONSTANT_POOL_ADDRESS_P (x) && !flag_pic && !arm_disable_literal_pool)
     return 1;
 
   /* This is PC relative data after arm_reorg runs.  */
@@ -7469,6 +7468,7 @@ thumb1_legitimate_address_p (machine_mode mode, rtx x, int strict_p)
 	   && GET_MODE_SIZE (mode) == 4
 	   && GET_CODE (x) == SYMBOL_REF
 	   && CONSTANT_POOL_ADDRESS_P (x)
+	   && !arm_disable_literal_pool
 	   && ! (flag_pic
 		 && symbol_mentioned_p (get_pool_constant (x))
 		 && ! pcrel_constant_p (get_pool_constant (x))))

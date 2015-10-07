@@ -41,7 +41,14 @@
 ;; differently).  In particular there is no Thumb1 armv6-m pattern for
 ;; sbc or adc.
 
-
+(define_insn "thumb1_movsi_symbol_ref"
+  [(set (match_operand:SI 0 "register_operand" "=l")
+        (match_operand:SI 1 "general_operand" ""))
+   (clobber (reg:CC CC_REGNUM))]
+  "TARGET_THUMB1 && GET_CODE (operands[1]) == SYMBOL_REF"
+  "eors\\t%0, %0\;adds\\t%0, #:high_high:%1\;lsls\\t%0, #8\;adds\\t%0, #:high_low:%1\;lsls\\t%0, #8\;adds\\t%0, #:low_high:%1\;lsls\\t%0, #8\;adds\\t%0, #:low_low:%1"
+  [(set_attr "length" "14")]
+)
 
 (define_insn "*thumb1_adddi3"
   [(set (match_operand:DI          0 "register_operand" "=l")
