@@ -8216,6 +8216,10 @@ arm_legitimate_constant_p_1 (machine_mode, rtx x)
 static bool
 thumb_legitimate_constant_p (machine_mode mode ATTRIBUTE_UNUSED, rtx x)
 {
+  /* allow more constant in that case */
+  if (arm_disable_literal_pool)
+    return arm_legitimate_constant_p_1(mode, x);
+
   return (CONST_INT_P (x)
 	  || CONST_DOUBLE_P (x)
 	  || CONSTANT_ADDRESS_P (x)

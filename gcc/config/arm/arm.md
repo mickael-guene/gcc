@@ -5603,11 +5603,15 @@
           if (!REG_P (operands[0]))
 	    operands[1] = force_reg (SImode, operands[1]);
         }
-      if (GET_CODE (operands[1]) == SYMBOL_REF)
-        {
+      if (arm_disable_literal_pool) {
+        if (GET_CODE (operands[1]) == SYMBOL_REF) {
             emit_insn(gen_thumb1_movsi_symbol_ref(operands[0], operands[1]));
             DONE;
+        } else if (GET_CODE (operands[1]) == CONST_INT) {
+            emit_insn(gen_thumb1_movsi_cons_int(operands[0], operands[1]));
+            DONE;
         }
+      }
     }
 
   if (ARM_OFFSETS_MUST_BE_WITHIN_SECTIONS_P)

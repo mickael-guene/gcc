@@ -45,9 +45,30 @@
   [(set (match_operand:SI 0 "register_operand" "=l")
         (match_operand:SI 1 "general_operand" ""))
    (clobber (reg:CC CC_REGNUM))]
-  "TARGET_THUMB1 && GET_CODE (operands[1]) == SYMBOL_REF"
+  "TARGET_THUMB1 && arm_disable_literal_pool && GET_CODE (operands[1]) == SYMBOL_REF"
   "eors\\t%0, %0\;adds\\t%0, #:high_high:%1\;lsls\\t%0, #8\;adds\\t%0, #:high_low:%1\;lsls\\t%0, #8\;adds\\t%0, #:low_high:%1\;lsls\\t%0, #8\;adds\\t%0, #:low_low:%1"
   [(set_attr "length" "14")]
+)
+
+(define_insn "thumb1_movsi_cons_int"
+  [(set (match_operand:SI 0 "register_operand" "=l")
+        (match_operand:SI 1 "immediate_operand" "i"))
+   (clobber (reg:CC CC_REGNUM))]
+  "TARGET_THUMB1&& arm_disable_literal_pool && GET_CODE (operands[1]) == CONST_INT"
+  "eors\\t%0, %0\;adds\\t%0, #(%c1>>24)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>16)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>8)&0xff\;lsls\\t%0, #8\;adds\\t%0, #%c1&0xff"
+  [(set_attr "length" "14")]
+)
+
+(define_split
+  [(set (match_operand:SI 0 "arm_general_register_operand" "")
+	(const:SI (plus:SI (match_operand:SI 1 "general_operand" "")
+			   (match_operand:SI 2 "const_int_operand" ""))))]
+  "TARGET_THUMB1 && arm_disable_literal_pool && GET_CODE (operands[1]) == SYMBOL_REF"
+  [(clobber (const_int 0))]
+  "
+    emit_insn(gen_thumb1_movsi_symbol_ref(operands[0], operands[1]));
+    emit_insn (gen_rtx_SET (SImode, operands[0], gen_rtx_PLUS (SImode, operands[0], operands[2])));
+  "
 )
 
 (define_insn "*thumb1_adddi3"
