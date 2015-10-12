@@ -29619,7 +29619,7 @@ arm_function_section (tree decl,
 			bool startup,
 			bool exit)
 {
-    return arm_disable_literal_pool?get_section (".text.pcrop", SECTION_CODE, decl): \
+    return arm_disable_literal_pool?get_named_text_section (decl, ".text.pcrop", NULL): \
                                     default_function_section (decl, freq, startup, exit);
 }
 
