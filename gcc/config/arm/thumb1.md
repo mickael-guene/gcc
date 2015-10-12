@@ -68,6 +68,7 @@
   "
     emit_insn(gen_thumb1_movsi_symbol_ref(operands[0], operands[1]));
     emit_insn (gen_rtx_SET (SImode, operands[0], gen_rtx_PLUS (SImode, operands[0], operands[2])));
+    DONE;
   "
 )
 
