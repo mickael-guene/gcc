@@ -325,6 +325,8 @@ static void arm_canonicalize_comparison (int *code, rtx *op0, rtx *op1,
 static unsigned HOST_WIDE_INT arm_asan_shadow_offset (void);
 
 static void arm_sched_fusion_priority (rtx_insn *, int, int *, int*);
+
+static section *arm_function_section (tree decl, enum node_frequency freq, bool startup, bool exit);
 
 /* Table of machine attributes.  */
 static const struct attribute_spec arm_attribute_table[] =
@@ -738,6 +740,9 @@ static const struct attribute_spec arm_attribute_table[] =
 
 #undef TARGET_SCHED_FUSION_PRIORITY
 #define TARGET_SCHED_FUSION_PRIORITY arm_sched_fusion_priority
+
+#undef  TARGET_ASM_FUNCTION_SECTION
+#define TARGET_ASM_FUNCTION_SECTION arm_function_section
 
 struct gcc_target targetm = TARGET_INITIALIZER;
 
@@ -29606,4 +29611,16 @@ arm_sched_fusion_priority (rtx_insn *insn, int max_pri,
   *pri = tmp;
   return;
 }
+
+/* Implement the TARGET_ASM_FUNCTION_SECTION hook. */
+static section *
+arm_function_section (tree decl,
+			enum node_frequency freq,
+			bool startup,
+			bool exit)
+{
+    return arm_disable_literal_pool?get_section (".text.pcrop", SECTION_CODE, decl): \
+                                    default_function_section (decl, freq, startup, exit);
+}
+
 #include "gt-arm.h"
