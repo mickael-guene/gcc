@@ -46,7 +46,7 @@
         (match_operand:SI 1 "general_operand" ""))
    (clobber (reg:CC CC_REGNUM))]
   "TARGET_THUMB1 && arm_disable_literal_pool && GET_CODE (operands[1]) == SYMBOL_REF"
-  "eors\\t%0, %0\;adds\\t%0, #:high_high:%1\;lsls\\t%0, #8\;adds\\t%0, #:high_low:%1\;lsls\\t%0, #8\;adds\\t%0, #:low_high:%1\;lsls\\t%0, #8\;adds\\t%0, #:low_low:%1"
+  "movs\\t%0, #:high_high:%1\;lsls\\t%0, #8\;adds\\t%0, #:high_low:%1\;lsls\\t%0, #8\;adds\\t%0, #:low_high:%1\;lsls\\t%0, #8\;adds\\t%0, #:low_low:%1"
   [(set_attr "length" "14")]
 )
 
@@ -55,7 +55,7 @@
         (match_operand:SI 1 "immediate_operand" "i"))
    (clobber (reg:CC CC_REGNUM))]
   "TARGET_THUMB1&& arm_disable_literal_pool && GET_CODE (operands[1]) == CONST_INT"
-  "eors\\t%0, %0\;adds\\t%0, #(%c1>>24)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>16)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>8)&0xff\;lsls\\t%0, #8\;adds\\t%0, #%c1&0xff"
+  "movs\\t%0, #(%c1>>24)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>16)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>8)&0xff\;lsls\\t%0, #8\;adds\\t%0, #%c1&0xff"
   [(set_attr "length" "14")]
 )
 
