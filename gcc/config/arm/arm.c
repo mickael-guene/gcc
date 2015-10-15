@@ -3208,11 +3208,21 @@ arm_option_override (void)
 
   /* We only support -mslow-flash-data on armv7-m targets.  */
   if (target_slow_flash_data
-      && ((flag_pic || TARGET_NEON)))
-    error ("-mslow-flash-data only supports non-pic code");
+      && ((!(arm_arch7 && !arm_arch_notm) && !arm_arch7em)
+	  || (TARGET_THUMB1 || flag_pic || TARGET_NEON)))
+    error ("-mslow-flash-data only supports non-pic code on armv7-m targets");
 
   /* Currently, for slow flash data, we just disable literal pools.  */
   if (target_slow_flash_data)
+    arm_disable_literal_pool = true;
+
+  /* We don't support pic code. */
+  if (target_execute_only && flag_pic)
+    error ("-mexecute-only only supports non-pic code");
+
+  /* In execute only mode we don't want any load into test section and so we
+     disable literal pool */
+  if (target_execute_only && flag_pic)
     arm_disable_literal_pool = true;
 
   /* Thumb2 inline assembly code should always use unified syntax.
@@ -29612,15 +29622,18 @@ arm_sched_fusion_priority (rtx_insn *insn, int max_pri,
   return;
 }
 
-/* Implement the TARGET_ASM_FUNCTION_SECTION hook. */
+/* Implement the TARGET_ASM_FUNCTION_SECTION hook. 
+
+   Be sure that code compile with -mexecute-section is move into well known
+   section name so they can be group in specific segment. */
 static section *
 arm_function_section (tree decl,
 			enum node_frequency freq,
 			bool startup,
 			bool exit)
 {
-    return arm_disable_literal_pool?get_named_text_section (decl, ".text.pcrop", NULL): \
-                                    default_function_section (decl, freq, startup, exit);
+    return target_execute_only?get_named_text_section (decl, ".text.pcrop", NULL): \
+                               default_function_section (decl, freq, startup, exit);
 }
 
 #include "gt-arm.h"

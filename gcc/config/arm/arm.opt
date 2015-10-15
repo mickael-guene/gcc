@@ -277,3 +277,7 @@ Assume loading data from flash is slower than fetching instructions.
 masm-syntax-unified
 Target Report Var(inline_asm_unified) Init(0)
 Assume unified syntax for Thumb inline assembly code.
+
+mexecute-only
+Target Report Var(target_execute_only) Init(0)
+Forbid load into text sections.
