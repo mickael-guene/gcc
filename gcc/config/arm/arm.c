@@ -3222,7 +3222,7 @@ arm_option_override (void)
 
   /* In execute only mode we don't want any load into test section and so we
      disable literal pool */
-  if (target_execute_only && flag_pic)
+  if (target_execute_only)
     arm_disable_literal_pool = true;
 
   /* Thumb2 inline assembly code should always use unified syntax.
