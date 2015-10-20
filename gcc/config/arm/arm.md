@@ -6575,6 +6575,12 @@
            if (!REG_P (operands[0]))
 	     operands[1] = force_reg (SFmode, operands[1]);
         }
+        if (arm_disable_literal_pool) {
+            if (GET_CODE (operands[1]) == CONST_DOUBLE) {
+                emit_insn(gen_thumb1_movsf_const_float(operands[0], operands[1]));
+                DONE;
+            }
+        }
     }
   "
 )
@@ -6633,6 +6639,12 @@
           if (!REG_P (operands[0]))
 	    operands[1] = force_reg (DFmode, operands[1]);
         }
+      if (arm_disable_literal_pool) {
+        if (GET_CODE (operands[1]) == CONST_DOUBLE) {
+            emit_insn(gen_thumb1_movdf_const_double(operands[0], operands[1]));
+            DONE;
+        }
+      }
     }
   "
 )

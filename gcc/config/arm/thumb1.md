@@ -59,6 +59,31 @@
   [(set_attr "length" "14")]
 )
 
+(define_insn "thumb1_movsf_const_float"
+  [(set (match_operand:SF 0 "register_operand" "=l")
+        (match_operand:SF 1 "immediate_operand" "i"))
+   (clobber (reg:CC CC_REGNUM))]
+  "TARGET_THUMB1&& arm_disable_literal_pool && GET_CODE (operands[1]) == CONST_DOUBLE"
+  "*
+   operands[1] = gen_lowpart (SImode, operands[1]);
+   return \"movs\\t%0, #(%c1>>24)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>16)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>8)&0xff\;lsls\\t%0, #8\;adds\\t%0, #%c1&0xff\";
+  "
+  [(set_attr "length" "14")]
+)
+
+(define_insn "thumb1_movdf_const_double"
+  [(set (match_operand:DF 0 "register_operand" "=l")
+        (match_operand:DF 1 "immediate_operand" "i"))
+   (clobber (reg:CC CC_REGNUM))]
+  "TARGET_THUMB1&& arm_disable_literal_pool && GET_CODE (operands[1]) == CONST_DOUBLE"
+  "*
+   operands[2] = gen_highpart (SImode, operands[1]);
+   operands[1] = gen_lowpart (SImode, operands[1]);
+   return \"movs\\t%0, #(%c1>>24)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>16)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>8)&0xff\;lsls\\t%0, #8\;adds\\t%0, #%c1&0xff\;movs\\t%H0, #(%c2>>24)&0xff\;lsls\\t%H0, #8\;adds\\t%H0, #(%c2>>16)&0xff\;lsls\\t%H0, #8\;adds\\t%H0, #(%c2>>8)&0xff\;lsls\\t%H0, #8\;adds\\t%H0, #%c2&0xff\";
+  "
+  [(set_attr "length" "28")]
+)
+
 (define_split
   [(set (match_operand:SI 0 "arm_general_register_operand" "")
 	(const:SI (plus:SI (match_operand:SI 1 "general_operand" "")
