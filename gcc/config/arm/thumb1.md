@@ -689,10 +689,10 @@
    (set_attr "pool_range" "*,*,*,*,*,1018,*,*")]
 )
 
-(define_insn "*thumb1_movsi_insn"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "=l,l,l,l,l,>,l,l, m,*l*h*k")
-	(match_operand:SI 1 "general_operand"      "l, I,J,K,>,l,m,i,l,*l*h*k"))]
-  "TARGET_THUMB1
+(define_insn "*thumb1_movsi_insn_no_pool"
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=l,l,l,l,l,>,l, m,*l*h*k")
+       (match_operand:SI 1 "general_operand"      "l, I,J,K,>,l,m,l,*l*h*k"))]
+  "TARGET_THUMB1 && arm_disable_literal_pool
    && (   register_operand (operands[0], SImode)
        || register_operand (operands[1], SImode))"
   "@
@@ -703,14 +703,33 @@
    ldmia\\t%1, {%0}
    stmia\\t%0, {%1}
    ldr\\t%0, %1
+   str\\t%1, %0
+   mov\\t%0, %1"
+  [(set_attr "length" "2,2,4,4,2,2,2,2,2")
+   (set_attr "type" "mov_reg,mov_imm,multiple,multiple,load1,store1,load1,store1,mov_reg")
+   (set_attr "pool_range" "*,*,*,*,*,*,1018,*,*")
+   (set_attr "conds" "set,clob,*,*,nocond,nocond,nocond,nocond,nocond")])
+
+(define_insn "*thumb1_movsi_insn"
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=l,l,l,l,l,>,l, m,*l*h*k")
+       (match_operand:SI 1 "general_operand"      "l, I,J,K,>,l,mi,l,*l*h*k"))]
+  "TARGET_THUMB1 && !arm_disable_literal_pool
+   && (   register_operand (operands[0], SImode)
+       || register_operand (operands[1], SImode))"
+  "@
+   movs	%0, %1
+   movs	%0, %1
+   #
+   #
+   ldmia\\t%1, {%0}
+   stmia\\t%0, {%1}
    ldr\\t%0, %1
    str\\t%1, %0
    mov\\t%0, %1"
-  [(set_attr "length" "2,2,4,4,2,2,2,2,2,2")
-   (set_attr "type" "mov_reg,mov_imm,multiple,multiple,load1,store1,load1,load1,store1,mov_reg")
-   (set_attr "pool_range" "*,*,*,*,*,*,*,1018,*,*")
-   (set_attr "conds" "set,clob,*,*,nocond,nocond,nocond,nocond,nocond,nocond")
-   (set_attr "use_literal_pool" "no,no,no,no,no,no,no,yes,no,no")])
+  [(set_attr "length" "2,2,4,4,2,2,2,2,2")
+   (set_attr "type" "mov_reg,mov_imm,multiple,multiple,load1,store1,load1,store1,mov_reg")
+   (set_attr "pool_range" "*,*,*,*,*,*,1018,*,*")
+   (set_attr "conds" "set,clob,*,*,nocond,nocond,nocond,nocond,nocond")])
 
 ; Split the load of 64-bit constant into two loads for high and low 32-bit parts respectively
 ; to see if we can load them in fewer instructions or fewer cycles.
