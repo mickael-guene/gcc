@@ -44,44 +44,48 @@
 (define_insn "thumb1_movsi_symbol_ref"
   [(set (match_operand:SI 0 "register_operand" "=l")
         (match_operand:SI 1 "general_operand" ""))
-   (clobber (reg:CC CC_REGNUM))]
+   ]
   "TARGET_THUMB1 && arm_disable_literal_pool && GET_CODE (operands[1]) == SYMBOL_REF"
   "movs\\t%0, #:high_high:%1\;lsls\\t%0, #8\;adds\\t%0, #:high_low:%1\;lsls\\t%0, #8\;adds\\t%0, #:low_high:%1\;lsls\\t%0, #8\;adds\\t%0, #:low_low:%1"
-  [(set_attr "length" "14")]
+  [(set_attr "length" "14")
+   (set_attr "conds" "clob")]
 )
 
 (define_insn "thumb1_movsi_cons_int"
   [(set (match_operand:SI 0 "register_operand" "=l")
         (match_operand:SI 1 "immediate_operand" "i"))
-   (clobber (reg:CC CC_REGNUM))]
+   ]
   "TARGET_THUMB1&& arm_disable_literal_pool && GET_CODE (operands[1]) == CONST_INT"
   "movs\\t%0, #(%c1>>24)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>16)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>8)&0xff\;lsls\\t%0, #8\;adds\\t%0, #%c1&0xff"
-  [(set_attr "length" "14")]
+  [(set_attr "length" "14")
+   (set_attr "conds" "clob")]
 )
 
 (define_insn "thumb1_movsf_const_float"
   [(set (match_operand:SF 0 "register_operand" "=l")
         (match_operand:SF 1 "immediate_operand" "i"))
-   (clobber (reg:CC CC_REGNUM))]
+   ]
   "TARGET_THUMB1&& arm_disable_literal_pool && GET_CODE (operands[1]) == CONST_DOUBLE"
   "*
    operands[1] = gen_lowpart (SImode, operands[1]);
    return \"movs\\t%0, #(%c1>>24)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>16)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>8)&0xff\;lsls\\t%0, #8\;adds\\t%0, #%c1&0xff\";
   "
-  [(set_attr "length" "14")]
+  [(set_attr "length" "14")
+   (set_attr "conds" "clob")]
 )
 
 (define_insn "thumb1_movdf_const_double"
   [(set (match_operand:DF 0 "register_operand" "=l")
         (match_operand:DF 1 "immediate_operand" "i"))
-   (clobber (reg:CC CC_REGNUM))]
+   ]
   "TARGET_THUMB1&& arm_disable_literal_pool && GET_CODE (operands[1]) == CONST_DOUBLE"
   "*
    operands[2] = gen_highpart (SImode, operands[1]);
    operands[1] = gen_lowpart (SImode, operands[1]);
    return \"movs\\t%0, #(%c1>>24)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>16)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>8)&0xff\;lsls\\t%0, #8\;adds\\t%0, #%c1&0xff\;movs\\t%H0, #(%c2>>24)&0xff\;lsls\\t%H0, #8\;adds\\t%H0, #(%c2>>16)&0xff\;lsls\\t%H0, #8\;adds\\t%H0, #(%c2>>8)&0xff\;lsls\\t%H0, #8\;adds\\t%H0, #%c2&0xff\";
   "
-  [(set_attr "length" "28")]
+  [(set_attr "length" "28")
+   (set_attr "conds" "clob")]
 )
 
 (define_split
@@ -686,8 +690,8 @@
 )
 
 (define_insn "*thumb1_movsi_insn"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "=l,l,l,l,l,>,l, m,*l*h*k")
-	(match_operand:SI 1 "general_operand"      "l, I,J,K,>,l,mi,l,*l*h*k"))]
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=l,l,l,l,l,>,l,l, m,*l*h*k")
+	(match_operand:SI 1 "general_operand"      "l, I,J,K,>,l,m,i,l,*l*h*k"))]
   "TARGET_THUMB1
    && (   register_operand (operands[0], SImode)
        || register_operand (operands[1], SImode))"
@@ -699,12 +703,14 @@
    ldmia\\t%1, {%0}
    stmia\\t%0, {%1}
    ldr\\t%0, %1
+   ldr\\t%0, %1
    str\\t%1, %0
    mov\\t%0, %1"
-  [(set_attr "length" "2,2,4,4,2,2,2,2,2")
-   (set_attr "type" "mov_reg,mov_imm,multiple,multiple,load1,store1,load1,store1,mov_reg")
-   (set_attr "pool_range" "*,*,*,*,*,*,1018,*,*")
-   (set_attr "conds" "set,clob,*,*,nocond,nocond,nocond,nocond,nocond")])
+  [(set_attr "length" "2,2,4,4,2,2,2,2,2,2")
+   (set_attr "type" "mov_reg,mov_imm,multiple,multiple,load1,store1,load1,load1,store1,mov_reg")
+   (set_attr "pool_range" "*,*,*,*,*,*,*,1018,*,*")
+   (set_attr "conds" "set,clob,*,*,nocond,nocond,nocond,nocond,nocond,nocond")
+   (set_attr "use_literal_pool" "no,no,no,no,no,no,no,yes,no,no")])
 
 ; Split the load of 64-bit constant into two loads for high and low 32-bit parts respectively
 ; to see if we can load them in fewer instructions or fewer cycles.
