@@ -1839,7 +1839,7 @@
 (define_expand "tablejump"
   [(parallel [(set (pc) (match_operand:SI 0 "register_operand" ""))
 	      (use (label_ref (match_operand 1 "" "")))])]
-  "TARGET_THUMB1"
+  "TARGET_THUMB1 && !arm_disable_literal_pool"
   "
   if (flag_pic)
     {
