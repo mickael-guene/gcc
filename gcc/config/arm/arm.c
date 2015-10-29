@@ -25894,6 +25894,7 @@ arm_internal_label (FILE *stream, const char *prefix, unsigned long labelno)
 
 /* Output code to add DELTA to the first argument, and then jump
    to FUNCTION.  Used for C++ multiple inheritance.  */
+
 static void
 arm_output_mi_thunk (FILE *file, tree thunk ATTRIBUTE_UNUSED,
 		     HOST_WIDE_INT delta,
@@ -25923,14 +25924,33 @@ arm_output_mi_thunk (FILE *file, tree thunk ATTRIBUTE_UNUSED,
 	  /* push r3 so we can use it as a temporary.  */
 	  /* TODO: Omit this save if r3 is not used.  */
 	  fputs ("\tpush {r3}\n", file);
-	  fputs ("\tldr\tr3, ", file);
+	  if (arm_disable_literal_pool) {
+        fputs ("\tmovs\tr3, #:high_high:#", file);
+        assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
+        fputc ('\n', file);
+        fputs ("\tlsls r3, #8\n", file);
+        fputs ("\tadds\tr3, #:high_low:#", file);
+        assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
+        fputc ('\n', file);
+        fputs ("\tlsls r3, #8\n", file);
+        fputs ("\tadds\tr3, #:low_high:#", file);
+        assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
+        fputc ('\n', file);
+        fputs ("\tlsls r3, #8\n", file);
+        fputs ("\tadds\tr3, #:low_low:#", file);
+        assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
+        fputc ('\n', file);
+	  } else
+	    fputs ("\tldr\tr3, ", file);
 	}
       else
 	{
 	  fputs ("\tldr\tr12, ", file);
 	}
-      assemble_name (file, label);
-      fputc ('\n', file);
+	  if (!arm_disable_literal_pool) {
+          assemble_name (file, label);
+          fputc ('\n', file);
+      }
       if (flag_pic)
 	{
 	  /* If we are generating PIC, the ldr instruction below loads
