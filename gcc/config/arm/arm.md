@@ -5603,15 +5603,6 @@
           if (!REG_P (operands[0]))
 	    operands[1] = force_reg (SImode, operands[1]);
         }
-      if (arm_disable_literal_pool) {
-        if (GET_CODE (operands[1]) == SYMBOL_REF) {
-            emit_insn(gen_thumb1_movsi_symbol_ref(operands[0], operands[1]));
-            DONE;
-        } else if (GET_CODE (operands[1]) == CONST_INT) {
-            emit_insn(gen_thumb1_movsi_cons_int(operands[0], operands[1]));
-            DONE;
-        }
-      }
     }
 
   if (ARM_OFFSETS_MUST_BE_WITHIN_SECTIONS_P)
@@ -6575,12 +6566,6 @@
            if (!REG_P (operands[0]))
 	     operands[1] = force_reg (SFmode, operands[1]);
         }
-        if (arm_disable_literal_pool) {
-            if (GET_CODE (operands[1]) == CONST_DOUBLE) {
-                emit_insn(gen_thumb1_movsf_const_float(operands[0], operands[1]));
-                DONE;
-            }
-        }
     }
   "
 )
@@ -6639,12 +6624,6 @@
           if (!REG_P (operands[0]))
 	    operands[1] = force_reg (DFmode, operands[1]);
         }
-      if (arm_disable_literal_pool) {
-        if (GET_CODE (operands[1]) == CONST_DOUBLE) {
-            emit_insn(gen_thumb1_movdf_const_double(operands[0], operands[1]));
-            DONE;
-        }
-      }
     }
   "
 )
@@ -8165,7 +8144,7 @@
    (match_operand:SI 2 "const_int_operand" "")	; total range
    (match_operand:SI 3 "" "")			; table label
    (match_operand:SI 4 "" "")]			; Out of range label
-  "(TARGET_32BIT || optimize_size || flag_pic) && !arm_disable_literal_pool"
+  "(TARGET_32BIT || optimize_size || flag_pic) && !target_execute_only"
   "
   {
     enum insn_code code;

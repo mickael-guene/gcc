@@ -3759,6 +3759,32 @@ const_ok_for_dimode_op (HOST_WIDE_INT i, enum rtx_code code)
     }
 }
 
+/* emit a sequence of movs/adds/shift to produce a 32 bits constant.
+   avoid to generate useless code when byte is zero. */
+void
+thumb1_gen_const_int (rtx op0, HOST_WIDE_INT op1)
+{
+  int is_mov_done = 0;
+  int i;
+
+  /* emit upper 3 bytes if needed */
+  for(i = 0; i < 3; i++) {
+    int byte = (op1 >> (8 * (3 - i))) & 0xff;
+
+    if (byte) {
+      emit_set_insn(op0, is_mov_done?gen_rtx_PLUS (SImode, op0, GEN_INT(byte)):GEN_INT(byte));
+      is_mov_done = 1;
+    }
+    if (is_mov_done)
+      emit_set_insn(op0, gen_rtx_ASHIFT( SImode, op0, GEN_INT(8)));
+  }
+  /* emit lower byte if needed */
+  if (!is_mov_done)
+    emit_set_insn(op0, GEN_INT(op1&0xff));
+  else if (op1&0xff)
+    emit_set_insn(op0, gen_rtx_PLUS (SImode, op0, GEN_INT(op1&0xff)));
+}
+
 /* Emit a sequence of insns to handle a large constant.
    CODE is the code of the operation required, it can be any of SET, PLUS,
    IOR, AND, XOR, MINUS;
@@ -8231,9 +8257,6 @@ arm_legitimate_constant_p_1 (machine_mode, rtx x)
 static bool
 thumb_legitimate_constant_p (machine_mode mode ATTRIBUTE_UNUSED, rtx x)
 {
-  /* allow more constant in that case */
-  if (arm_disable_literal_pool)
-    return arm_legitimate_constant_p_1(mode, x);
 
   return (CONST_INT_P (x)
 	  || CONST_DOUBLE_P (x)
@@ -8325,7 +8348,7 @@ thumb1_rtx_costs (rtx x, enum rtx_code code, enum rtx_code outer)
 	    return 0;
 	  if (thumb_shiftable_const (INTVAL (x)))
 	    return COSTS_N_INSNS (2);
-	  return COSTS_N_INSNS (3);
+	  return arm_disable_literal_pool?COSTS_N_INSNS (8):COSTS_N_INSNS (3);
 	}
       else if ((outer == PLUS || outer == COMPARE)
 	       && INTVAL (x) < 256 && INTVAL (x) > -256)
@@ -9074,7 +9097,7 @@ thumb1_size_rtx_costs (rtx x, enum rtx_code code, enum rtx_code outer)
 	  /* See split "TARGET_THUMB1 && satisfies_constraint_K".  */
           if (thumb_shiftable_const (INTVAL (x)))
             return COSTS_N_INSNS (2);
-          return COSTS_N_INSNS (3);
+          return arm_disable_literal_pool?COSTS_N_INSNS (8):COSTS_N_INSNS (3);
         }
       else if ((outer == PLUS || outer == COMPARE)
                && INTVAL (x) < 256 && INTVAL (x) > -256)
@@ -25924,7 +25947,7 @@ arm_output_mi_thunk (FILE *file, tree thunk ATTRIBUTE_UNUSED,
 	  /* push r3 so we can use it as a temporary.  */
 	  /* TODO: Omit this save if r3 is not used.  */
 	  fputs ("\tpush {r3}\n", file);
-	  if (arm_disable_literal_pool) {
+	  if (target_execute_only) {
         fputs ("\tmovs\tr3, #:high_high:#", file);
         assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
         fputc ('\n', file);
@@ -25947,7 +25970,7 @@ arm_output_mi_thunk (FILE *file, tree thunk ATTRIBUTE_UNUSED,
 	{
 	  fputs ("\tldr\tr12, ", file);
 	}
-	  if (!arm_disable_literal_pool) {
+	  if (!target_execute_only) {
           assemble_name (file, label);
           fputc ('\n', file);
       }
