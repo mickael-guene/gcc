@@ -327,6 +327,7 @@ static unsigned HOST_WIDE_INT arm_asan_shadow_offset (void);
 static void arm_sched_fusion_priority (rtx_insn *, int, int *, int*);
 
 static section *arm_function_section (tree decl, enum node_frequency freq, bool startup, bool exit);
+
 
 /* Table of machine attributes.  */
 static const struct attribute_spec arm_attribute_table[] =
@@ -29675,7 +29676,7 @@ arm_function_section (tree decl,
 			bool startup,
 			bool exit)
 {
-    return target_execute_only?get_named_text_section (decl, ".text.pcrop", NULL): \
+    return target_execute_only?get_named_text_section (decl, ".text.noread", NULL): \
                                default_function_section (decl, freq, startup, exit);
 }
 
