@@ -328,9 +328,6 @@ static void arm_sched_fusion_priority (rtx_insn *, int, int *, int*);
 
 static section *arm_function_section (tree decl, enum node_frequency freq, bool startup, bool exit);
 
-static unsigned int arm_section_type_flags (tree, const char *, int);
-
-static void arm_asm_named_section (const char *, unsigned int, tree);
 
 /* Table of machine attributes.  */
 static const struct attribute_spec arm_attribute_table[] =
@@ -747,12 +744,6 @@ static const struct attribute_spec arm_attribute_table[] =
 
 #undef  TARGET_ASM_FUNCTION_SECTION
 #define TARGET_ASM_FUNCTION_SECTION arm_function_section
-
-#undef  TARGET_SECTION_TYPE_FLAGS
-#define TARGET_SECTION_TYPE_FLAGS arm_section_type_flags
-
-#undef  TARGET_ASM_NAMED_SECTION
-#define TARGET_ASM_NAMED_SECTION arm_asm_named_section
 
 struct gcc_target targetm = TARGET_INITIALIZER;
 
@@ -29687,97 +29678,6 @@ arm_function_section (tree decl,
 {
     return target_execute_only?get_named_text_section (decl, ".text.noread", NULL): \
                                default_function_section (decl, freq, startup, exit);
-}
-
-#define SECTION_ARM_NOREAD	SECTION_MACH_DEP
-
-/* Implement the TARGET_SECTION_TYPE_FLAGS hook. */
-
-static unsigned int
-arm_section_type_flags (tree decl, const char *name, int reloc)
-{
-  unsigned int flags = default_section_type_flags (decl, name, reloc);
-
-  return target_execute_only?flags|SECTION_ARM_NOREAD:flags;
-}
-
-/* Implement the TARGET_ASM_NAMED_SECTION hook. */
-#ifndef TLS_SECTION_ASM_FLAG
-#define TLS_SECTION_ASM_FLAG 'T'
-#endif
-
-static void
-arm_asm_named_section (const char *name, unsigned int flags, tree decl ATTRIBUTE_UNUSED)
-{
-  char flagchars[11], *f = flagchars;
-
-  /* If we have already declared this section, we can use an
-     abbreviated form to switch back to it -- unless this section is
-     part of a COMDAT groups, in which case GAS requires the full
-     declaration every time.  */
-  if (!(HAVE_COMDAT_GROUP && (flags & SECTION_LINKONCE))
-      && (flags & SECTION_DECLARED))
-    {
-      fprintf (asm_out_file, "\t.section\t%s\n", name);
-      return;
-    }
-
-  if (!(flags & SECTION_DEBUG))
-    *f++ = 'a';
-#if defined (HAVE_GAS_SECTION_EXCLUDE) && HAVE_GAS_SECTION_EXCLUDE == 1
-  if (flags & SECTION_EXCLUDE)
-    *f++ = 'e';
-#endif
-  if (flags & SECTION_WRITE)
-    *f++ = 'w';
-  if (flags & SECTION_CODE)
-    *f++ = 'x';
-  if (flags & SECTION_SMALL)
-    *f++ = 's';
-  if (flags & SECTION_MERGE)
-    *f++ = 'M';
-  if (flags & SECTION_STRINGS)
-    *f++ = 'S';
-  if (flags & SECTION_TLS)
-    *f++ = TLS_SECTION_ASM_FLAG;
-  if (HAVE_COMDAT_GROUP && (flags & SECTION_LINKONCE))
-    *f++ = 'G';
-  if (flags & SECTION_ARM_NOREAD)
-    *f++ = 'y';
-  *f = '\0';
-
-  fprintf (asm_out_file, "\t.section\t%s,\"%s\"", name, flagchars);
-
-  if (!(flags & SECTION_NOTYPE))
-    {
-      const char *type;
-      const char *format;
-
-      if (flags & SECTION_BSS)
-	type = "nobits";
-      else
-	type = "progbits";
-
-      format = ",@%s";
-      /* On platforms that use "@" as the assembly comment character,
-	 use "%" instead.  */
-      if (strcmp (ASM_COMMENT_START, "@") == 0)
-	format = ",%%%s";
-      fprintf (asm_out_file, format, type);
-
-      if (flags & SECTION_ENTSIZE)
-	fprintf (asm_out_file, ",%d", flags & SECTION_ENTSIZE);
-      if (HAVE_COMDAT_GROUP && (flags & SECTION_LINKONCE))
-	{
-	  if (TREE_CODE (decl) == IDENTIFIER_NODE)
-	    fprintf (asm_out_file, ",%s,comdat", IDENTIFIER_POINTER (decl));
-	  else
-	    fprintf (asm_out_file, ",%s,comdat",
-		     IDENTIFIER_POINTER (DECL_COMDAT_GROUP (decl)));
-	}
-    }
-
-  putc ('\n', asm_out_file);
 }
 
 #include "gt-arm.h"
