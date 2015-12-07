@@ -46,7 +46,7 @@
         (match_operand:SI 1 "general_operand" ""))
    ]
   "TARGET_THUMB1 && arm_disable_literal_pool && GET_CODE (operands[1]) == SYMBOL_REF"
-  "movs\\t%0, #:high_high:%1\;lsls\\t%0, #8\;adds\\t%0, #:high_low:%1\;lsls\\t%0, #8\;adds\\t%0, #:low_high:%1\;lsls\\t%0, #8\;adds\\t%0, #:low_low:%1"
+  "movs\\t%0, #:upper8_15:%1\;lsls\\t%0, #8\;adds\\t%0, #:upper0_7:%1\;lsls\\t%0, #8\;adds\\t%0, #:lower8_15:%1\;lsls\\t%0, #8\;adds\\t%0, #:lower0_7:%1"
   [(set_attr "length" "14")
    (set_attr "conds" "clob")]
 )

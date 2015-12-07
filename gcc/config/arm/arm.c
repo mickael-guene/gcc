@@ -25949,19 +25949,19 @@ arm_output_mi_thunk (FILE *file, tree thunk ATTRIBUTE_UNUSED,
 	  /* TODO: Omit this save if r3 is not used.  */
 	  fputs ("\tpush {r3}\n", file);
 	  if (target_execute_only) {
-        fputs ("\tmovs\tr3, #:high_high:#", file);
+        fputs ("\tmovs\tr3, #:upper8_15:#", file);
         assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
         fputc ('\n', file);
         fputs ("\tlsls r3, #8\n", file);
-        fputs ("\tadds\tr3, #:high_low:#", file);
+        fputs ("\tadds\tr3, #:upper0_7:#", file);
         assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
         fputc ('\n', file);
         fputs ("\tlsls r3, #8\n", file);
-        fputs ("\tadds\tr3, #:low_high:#", file);
+        fputs ("\tadds\tr3, #:lower8_15:#", file);
         assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
         fputc ('\n', file);
         fputs ("\tlsls r3, #8\n", file);
-        fputs ("\tadds\tr3, #:low_low:#", file);
+        fputs ("\tadds\tr3, #:lower0_7:#", file);
         assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
         fputc ('\n', file);
 	  } else
