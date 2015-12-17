@@ -45,9 +45,9 @@
   [(set (match_operand:SI 0 "register_operand" "=l")
 	(match_operand:SI 1 "general_operand" ""))
    ]
-  "TARGET_THUMB1 &&
-   arm_disable_literal_pool &&
-   GET_CODE (operands[1]) == SYMBOL_REF"
+  "TARGET_THUMB1
+   && arm_disable_literal_pool
+   && GET_CODE (operands[1]) == SYMBOL_REF"
   "movs\\t%0, #:upper8_15:%1\;lsls\\t%0, #8\;adds\\t%0, #:upper0_7:%1\;lsls\\t%0, #8\;adds\\t%0, #:lower8_15:%1\;lsls\\t%0, #8\;adds\\t%0, #:lower0_7:%1"
   [(set_attr "length" "14")
    (set_attr "conds" "clob")]
@@ -57,10 +57,10 @@
   [(set (match_operand:SI 0 "register_operand" "=l")
 	(match_operand:SI 1 "immediate_operand" "i"))
    ]
-  "TARGET_THUMB1 &&
-   arm_disable_literal_pool &&
-   GET_CODE (operands[1]) == CONST_INT &&
-   !satisfies_constraint_I (operands[1])"
+  "TARGET_THUMB1
+   && arm_disable_literal_pool
+   && GET_CODE (operands[1]) == CONST_INT
+   && !satisfies_constraint_I (operands[1])"
   "movs\\t%0, #(%c1>>24)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>16)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>8)&0xff\;lsls\\t%0, #8\;adds\\t%0, #%c1&0xff"
   [(set_attr "length" "14")
    (set_attr "conds" "clob")]
@@ -69,10 +69,10 @@
 (define_split
   [(set (match_operand:SI 0 "register_operand" "")
 	(match_operand:SI 1 "immediate_operand" ""))]
-  "TARGET_THUMB1 &&
-   arm_disable_literal_pool &&
-   GET_CODE (operands[1]) == CONST_INT &&
-   !satisfies_constraint_I (operands[1])"
+  "TARGET_THUMB1
+   && arm_disable_literal_pool
+   && GET_CODE (operands[1]) == CONST_INT
+   && !satisfies_constraint_I (operands[1])"
   [(clobber (const_int 0))]
   "
     thumb1_gen_const_int (operands[0], INTVAL (operands[1]));

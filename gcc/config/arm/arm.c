@@ -7447,8 +7447,8 @@ thumb1_legitimate_address_p (machine_mode mode, rtx x, int strict_p)
   /* This is PC relative data before arm_reorg runs.  */
   else if (GET_MODE_SIZE (mode) >= 4 && CONSTANT_P (x)
 	   && GET_CODE (x) == SYMBOL_REF
-	   && CONSTANT_POOL_ADDRESS_P (x) && !flag_pic &&
-	   !arm_disable_literal_pool)
+	   && CONSTANT_POOL_ADDRESS_P (x) && !flag_pic
+	   && !arm_disable_literal_pool)
     return 1;
 
   /* This is PC relative data after arm_reorg runs.  */
@@ -8264,7 +8264,6 @@ arm_legitimate_constant_p_1 (machine_mode, rtx x)
 static bool
 thumb_legitimate_constant_p (machine_mode mode ATTRIBUTE_UNUSED, rtx x)
 {
-
   return (CONST_INT_P (x)
 	  || CONST_DOUBLE_P (x)
 	  || CONSTANT_ADDRESS_P (x)
@@ -25924,7 +25923,6 @@ arm_internal_label (FILE *stream, const char *prefix, unsigned long labelno)
 
 /* Output code to add DELTA to the first argument, and then jump
    to FUNCTION.  Used for C++ multiple inheritance.  */
-
 static void
 arm_output_mi_thunk (FILE *file, tree thunk ATTRIBUTE_UNUSED,
 		     HOST_WIDE_INT delta,
