@@ -3218,9 +3218,9 @@ arm_option_override (void)
   if (target_slow_flash_data)
     arm_disable_literal_pool = true;
 
-  /* We don't support pic code.  */
-  if (target_execute_only && flag_pic)
-    error ("-mexecute-only only supports non-pic code");
+  /* We only support -mexecute-only on m profile targets.  */
+  if (target_execute_only && (flag_pic || !(!arm_arch_notm || arm_arch7em)))
+    error ("-mexecute-only only supports non-pic code on m profile targets");
 
   /* In execute only mode we don't want any memory read into text section and
      so we disable literal pool.  */
