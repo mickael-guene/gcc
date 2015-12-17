@@ -568,6 +568,7 @@ Objective-C and Objective-C++ Dialects}.
 -munaligned-access @gol
 -mneon-for-64bits @gol
 -mslow-flash-data @gol
+-mexecute-only @gol
 -masm-syntax-unified @gol
 -mrestrict-it}
 
@@ -13489,6 +13490,12 @@ Assume loading data from flash is slower than fetching instruction.
 Therefore literal load is minimized for better performance.
 This option is only supported when compiling for ARMv7 M-profile and
 off by default.
+
+@item -mexecute-only
+@opindex mexecute-only
+Disable read memory access inside code sections. Only code fetching is
+allowed.
+This option is off by default.
 
 @item -masm-syntax-unified
 @opindex masm-syntax-unified
