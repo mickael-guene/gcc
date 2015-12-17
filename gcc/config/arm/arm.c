@@ -326,7 +326,8 @@ static unsigned HOST_WIDE_INT arm_asan_shadow_offset (void);
 
 static void arm_sched_fusion_priority (rtx_insn *, int, int *, int*);
 
-static section *arm_function_section (tree decl, enum node_frequency freq, bool startup, bool exit);
+static section *arm_function_section (tree decl, enum node_frequency freq,
+				      bool startup, bool exit);
 
 
 /* Table of machine attributes.  */
@@ -3217,12 +3218,12 @@ arm_option_override (void)
   if (target_slow_flash_data)
     arm_disable_literal_pool = true;
 
-  /* We don't support pic code. */
+  /* We don't support pic code.  */
   if (target_execute_only && flag_pic)
     error ("-mexecute-only only supports non-pic code");
 
-  /* In execute only mode we don't want any load into test section and so we
-     disable literal pool */
+  /* In execute only mode we don't want any memory read into text section and
+     so we disable literal pool.  */
   if (target_execute_only)
     arm_disable_literal_pool = true;
 
@@ -3761,29 +3762,33 @@ const_ok_for_dimode_op (HOST_WIDE_INT i, enum rtx_code code)
 }
 
 /* emit a sequence of movs/adds/shift to produce a 32 bits constant.
-   avoid to generate useless code when byte is zero. */
+   Avoid to generate useless code when byte is zero.  */
 void
 thumb1_gen_const_int (rtx op0, HOST_WIDE_INT op1)
 {
   int is_mov_done = 0;
   int i;
 
-  /* emit upper 3 bytes if needed */
-  for(i = 0; i < 3; i++) {
-    int byte = (op1 >> (8 * (3 - i))) & 0xff;
+  /* Emit upper 3 bytes if needed.  */
+  for (i = 0; i < 3; i++)
+    {
+      int byte = (op1 >> (8 * (3 - i))) & 0xff;
 
-    if (byte) {
-      emit_set_insn(op0, is_mov_done?gen_rtx_PLUS (SImode, op0, GEN_INT(byte)):GEN_INT(byte));
-      is_mov_done = 1;
+      if (byte)
+        {
+	  emit_set_insn (op0, is_mov_done?
+			      gen_rtx_PLUS (SImode,op0, GEN_INT(byte)):
+			      GEN_INT(byte));
+	  is_mov_done = 1;
+        }
+      if (is_mov_done)
+        emit_set_insn (op0, gen_rtx_ASHIFT( SImode, op0, GEN_INT(8)));
     }
-    if (is_mov_done)
-      emit_set_insn(op0, gen_rtx_ASHIFT( SImode, op0, GEN_INT(8)));
-  }
-  /* emit lower byte if needed */
+  /* Emit lower byte if needed.  */
   if (!is_mov_done)
-    emit_set_insn(op0, GEN_INT(op1&0xff));
+    emit_set_insn (op0, GEN_INT(op1&0xff));
   else if (op1&0xff)
-    emit_set_insn(op0, gen_rtx_PLUS (SImode, op0, GEN_INT(op1&0xff)));
+    emit_set_insn (op0, gen_rtx_PLUS (SImode, op0, GEN_INT(op1&0xff)));
 }
 
 /* Emit a sequence of insns to handle a large constant.
@@ -7442,7 +7447,8 @@ thumb1_legitimate_address_p (machine_mode mode, rtx x, int strict_p)
   /* This is PC relative data before arm_reorg runs.  */
   else if (GET_MODE_SIZE (mode) >= 4 && CONSTANT_P (x)
 	   && GET_CODE (x) == SYMBOL_REF
-           && CONSTANT_POOL_ADDRESS_P (x) && !flag_pic && !arm_disable_literal_pool)
+	   && CONSTANT_POOL_ADDRESS_P (x) && !flag_pic &&
+	   !arm_disable_literal_pool)
     return 1;
 
   /* This is PC relative data after arm_reorg runs.  */
@@ -25948,23 +25954,25 @@ arm_output_mi_thunk (FILE *file, tree thunk ATTRIBUTE_UNUSED,
 	  /* push r3 so we can use it as a temporary.  */
 	  /* TODO: Omit this save if r3 is not used.  */
 	  fputs ("\tpush {r3}\n", file);
-	  if (target_execute_only) {
-        fputs ("\tmovs\tr3, #:upper8_15:#", file);
-        assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
-        fputc ('\n', file);
-        fputs ("\tlsls r3, #8\n", file);
-        fputs ("\tadds\tr3, #:upper0_7:#", file);
-        assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
-        fputc ('\n', file);
-        fputs ("\tlsls r3, #8\n", file);
-        fputs ("\tadds\tr3, #:lower8_15:#", file);
-        assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
-        fputc ('\n', file);
-        fputs ("\tlsls r3, #8\n", file);
-        fputs ("\tadds\tr3, #:lower0_7:#", file);
-        assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
-        fputc ('\n', file);
-	  } else
+	  if (target_execute_only)
+	    {
+	      fputs ("\tmovs\tr3, #:upper8_15:#", file);
+	      assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
+	      fputc ('\n', file);
+	      fputs ("\tlsls r3, #8\n", file);
+	      fputs ("\tadds\tr3, #:upper0_7:#", file);
+	      assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
+	      fputc ('\n', file);
+	      fputs ("\tlsls r3, #8\n", file);
+	      fputs ("\tadds\tr3, #:lower8_15:#", file);
+	      assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
+	      fputc ('\n', file);
+	      fputs ("\tlsls r3, #8\n", file);
+	      fputs ("\tadds\tr3, #:lower0_7:#", file);
+	      assemble_name (file, XSTR (XEXP (DECL_RTL (function), 0), 0));
+	      fputc ('\n', file);
+	    }
+	  else
 	    fputs ("\tldr\tr3, ", file);
 	}
       else
@@ -29666,18 +29674,19 @@ arm_sched_fusion_priority (rtx_insn *insn, int max_pri,
   return;
 }
 
-/* Implement the TARGET_ASM_FUNCTION_SECTION hook. 
+/* Implement the TARGET_ASM_FUNCTION_SECTION hook.
 
    Be sure that code compile with -mexecute-section is move into well known
-   section name so they can be group in specific segment. */
+   section name so they can be group in specific segment.  */
 static section *
 arm_function_section (tree decl,
 			enum node_frequency freq,
 			bool startup,
 			bool exit)
 {
-    return target_execute_only?get_named_text_section (decl, ".text.noread", NULL): \
-                               default_function_section (decl, freq, startup, exit);
+    return target_execute_only?
+		get_named_text_section (decl, ".text.noread", NULL):
+		default_function_section (decl, freq, startup, exit);
 }
 
 #include "gt-arm.h"
