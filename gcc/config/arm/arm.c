@@ -3775,20 +3775,20 @@ thumb1_gen_const_int (rtx op0, HOST_WIDE_INT op1)
       int byte = (op1 >> (8 * (3 - i))) & 0xff;
 
       if (byte)
-        {
+	{
 	  emit_set_insn (op0, is_mov_done?
-			      gen_rtx_PLUS (SImode,op0, GEN_INT(byte)):
-			      GEN_INT(byte));
+			      gen_rtx_PLUS (SImode,op0, GEN_INT (byte)):
+			      GEN_INT (byte));
 	  is_mov_done = 1;
-        }
+	}
       if (is_mov_done)
-        emit_set_insn (op0, gen_rtx_ASHIFT( SImode, op0, GEN_INT(8)));
+	emit_set_insn (op0, gen_rtx_ASHIFT ( SImode, op0, GEN_INT (8)));
     }
   /* Emit lower byte if needed.  */
   if (!is_mov_done)
-    emit_set_insn (op0, GEN_INT(op1&0xff));
+    emit_set_insn (op0, GEN_INT (op1&0xff));
   else if (op1&0xff)
-    emit_set_insn (op0, gen_rtx_PLUS (SImode, op0, GEN_INT(op1&0xff)));
+    emit_set_insn (op0, gen_rtx_PLUS (SImode, op0, GEN_INT (op1&0xff)));
 }
 
 /* Emit a sequence of insns to handle a large constant.
@@ -9104,7 +9104,7 @@ thumb1_size_rtx_costs (rtx x, enum rtx_code code, enum rtx_code outer)
 	  /* See split "TARGET_THUMB1 && satisfies_constraint_K".  */
           if (thumb_shiftable_const (INTVAL (x)))
             return COSTS_N_INSNS (2);
-          return arm_disable_literal_pool?COSTS_N_INSNS (8):COSTS_N_INSNS (3);
+	  return arm_disable_literal_pool?COSTS_N_INSNS (8):COSTS_N_INSNS (3);
         }
       else if ((outer == PLUS || outer == COMPARE)
                && INTVAL (x) < 256 && INTVAL (x) > -256)
@@ -25979,10 +25979,11 @@ arm_output_mi_thunk (FILE *file, tree thunk ATTRIBUTE_UNUSED,
 	{
 	  fputs ("\tldr\tr12, ", file);
 	}
-	  if (!target_execute_only) {
-          assemble_name (file, label);
-          fputc ('\n', file);
-      }
+      if (!target_execute_only)
+	{
+	  assemble_name (file, label);
+	  fputc ('\n', file);
+	}
       if (flag_pic)
 	{
 	  /* If we are generating PIC, the ldr instruction below loads
