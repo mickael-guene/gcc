@@ -6,16 +6,16 @@
 int
 foo (int a)
 {
-  switch(a)
+  switch (a)
     {
       case 0: return 12;
       case 1: return 2;
       case 2: return 1231;
       case 3: return 0xdead;
       default:
-        break;
+	break;
     }
-  
+
   return -1;
 }
 
