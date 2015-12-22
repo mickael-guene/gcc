@@ -3220,7 +3220,7 @@ arm_option_override (void)
 
   /* We only support -mexecute-only on m profile targets.  */
   if (target_execute_only && (flag_pic || !(!arm_arch_notm || arm_arch7em)))
-    error ("-mexecute-only only supports non-pic code on m profile targets");
+    error ("-mexecute-only only supports non-pic code on m-profile targets");
 
   /* In execute only mode we don't want any memory read into text section and
      so we disable literal pool.  */
@@ -3782,7 +3782,7 @@ thumb1_gen_const_int (rtx op0, HOST_WIDE_INT op1)
 	  is_mov_done = 1;
 	}
       if (is_mov_done)
-	emit_set_insn (op0, gen_rtx_ASHIFT ( SImode, op0, GEN_INT (8)));
+	emit_set_insn (op0, gen_rtx_ASHIFT (SImode, op0, GEN_INT (8)));
     }
   /* Emit lower byte if needed.  */
   if (!is_mov_done)
@@ -8354,7 +8354,8 @@ thumb1_rtx_costs (rtx x, enum rtx_code code, enum rtx_code outer)
 	    return 0;
 	  if (thumb_shiftable_const (INTVAL (x)))
 	    return COSTS_N_INSNS (2);
-	  return arm_disable_literal_pool?COSTS_N_INSNS (8):COSTS_N_INSNS (3);
+	  return arm_disable_literal_pool ? COSTS_N_INSNS (8) :\
+					    COSTS_N_INSNS (3);
 	}
       else if ((outer == PLUS || outer == COMPARE)
 	       && INTVAL (x) < 256 && INTVAL (x) > -256)
@@ -9103,7 +9104,8 @@ thumb1_size_rtx_costs (rtx x, enum rtx_code code, enum rtx_code outer)
 	  /* See split "TARGET_THUMB1 && satisfies_constraint_K".  */
           if (thumb_shiftable_const (INTVAL (x)))
             return COSTS_N_INSNS (2);
-	  return arm_disable_literal_pool?COSTS_N_INSNS (8):COSTS_N_INSNS (3);
+	  return arm_disable_literal_pool ? COSTS_N_INSNS (8) :\
+					    COSTS_N_INSNS (3);
         }
       else if ((outer == PLUS || outer == COMPARE)
                && INTVAL (x) < 256 && INTVAL (x) > -256)

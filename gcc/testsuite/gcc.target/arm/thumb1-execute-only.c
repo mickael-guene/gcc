@@ -45,7 +45,7 @@ int
 foo (int a, int b)
 {
   int i;
-  volatile int *labelref = &&label1;
+  int *labelref = &&label1;
 
   if (a > b)
     {
