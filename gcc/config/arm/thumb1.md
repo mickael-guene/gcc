@@ -48,7 +48,16 @@
   "TARGET_THUMB1
    && arm_disable_literal_pool
    && GET_CODE (operands[1]) == SYMBOL_REF"
-  "movs\\t%0, #:upper8_15:%1\;lsls\\t%0, #8\;adds\\t%0, #:upper0_7:%1\;lsls\\t%0, #8\;adds\\t%0, #:lower8_15:%1\;lsls\\t%0, #8\;adds\\t%0, #:lower0_7:%1"
+  "*
+  output_asm_insn (\"movs\\t%0, #:upper8_15:%1\", operands);
+  output_asm_insn (\"lsls\\t%0, #8\", operands);
+  output_asm_insn (\"adds\\t%0, #:upper0_7:%1\", operands);
+  output_asm_insn (\"lsls\\t%0, #8\", operands);
+  output_asm_insn (\"adds\\t%0, #:lower8_15:%1\", operands);
+  output_asm_insn (\"lsls\\t%0, #8\", operands);
+  output_asm_insn (\"adds\\t%0, #:lower0_7:%1\", operands);
+  return \"\";
+  "
   [(set_attr "length" "14")
    (set_attr "conds" "clob")]
 )
@@ -61,7 +70,16 @@
    && arm_disable_literal_pool
    && GET_CODE (operands[1]) == CONST_INT
    && !satisfies_constraint_I (operands[1])"
-  "movs\\t%0, #(%c1>>24)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>16)&0xff\;lsls\\t%0, #8\;adds\\t%0, #(%c1>>8)&0xff\;lsls\\t%0, #8\;adds\\t%0, #%c1&0xff"
+  "*
+  output_asm_insn (\"movs\\t%0, #(%c1>>24)&0xff\", operands);
+  output_asm_insn (\"lsls\\t%0, #8\", operands);
+  output_asm_insn (\"adds\\t%0, #(%c1>>16)&0xff\", operands);
+  output_asm_insn (\"lsls\\t%0, #8\", operands);
+  output_asm_insn (\"adds\\t%0, #(%c1>>8)&0xff\", operands);
+  output_asm_insn (\"lsls\\t%0, #8\", operands);
+  output_asm_insn (\"adds\\t%0, #%c1&0xff\", operands);
+  return \"\";
+  "
   [(set_attr "length" "14")
    (set_attr "conds" "clob")]
 )
