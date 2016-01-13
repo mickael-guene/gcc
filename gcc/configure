@@ -22067,7 +22067,6 @@ else
 $as_echo "$gcc_cv_readelf" >&6; }
 fi
 
-# Figure out what assembler alignment features are present.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking assembler flags" >&5
 $as_echo_n "checking assembler flags... " >&6; }
 if test "${gcc_cv_as_flags+set}" = set; then :
@@ -22094,6 +22093,39 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $gcc_cv_as_flags" >&5
 $as_echo "$gcc_cv_as_flags" >&6; }
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking assembler for .section with y" >&5
+$as_echo_n "checking assembler for .section with y... " >&6; }
+if test "${gcc_cv_as_section_has_y+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  gcc_cv_as_section_has_y=no
+  if test x$gcc_cv_as != x; then
+    $as_echo '.section foo1,"y"
+.byte 0,0,0,0' > conftest.s
+    if { ac_try='$gcc_cv_as $gcc_cv_as_flags  -o conftest.o conftest.s >&5'
+  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }
+    then
+	gcc_cv_as_section_has_y=yes
+    else
+      echo "configure: failed program was" >&5
+      cat conftest.s >&5
+    fi
+    rm -f conftest.o conftest.s
+  fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $gcc_cv_as_section_has_y" >&5
+$as_echo "$gcc_cv_as_section_has_y" >&6; }
+if test $gcc_cv_as_section_has_y = yes; then
+
+$as_echo "#define HAVE_GAS_SECTION_NOREAD 1" >>confdefs.h
+
+fi
+
+# Figure out what assembler alignment features are present.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking assembler for .balign and .p2align" >&5
 $as_echo_n "checking assembler for .balign and .p2align... " >&6; }
 if test "${gcc_cv_as_balign_and_p2align+set}" = set; then :

@@ -2356,6 +2356,12 @@ else
 	AC_MSG_RESULT($gcc_cv_readelf)
 fi
 
+gcc_GAS_CHECK_FEATURE([.section with y], gcc_cv_as_section_has_y,,,
+[.section foo1,"y"
+.byte 0,0,0,0],,
+[AC_DEFINE(HAVE_GAS_SECTION_NOREAD, 1,
+  [Define if your assembler supports specifying the section flag y.])])
+
 # Figure out what assembler alignment features are present.
 gcc_GAS_CHECK_FEATURE([.balign and .p2align], gcc_cv_as_balign_and_p2align,
  [2,6,0],,
