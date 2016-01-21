@@ -13493,7 +13493,7 @@ off by default.
 
 @item -mexecute-only
 @opindex mexecute-only
-Disable read memory access inside code sections. Only code fetching is
+Disable read memory access inside code sections.  Only code fetching is
 allowed.
 This option is off by default.
 

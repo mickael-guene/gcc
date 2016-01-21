@@ -3223,11 +3223,11 @@ arm_option_override (void)
   if (target_slow_flash_data)
     arm_disable_literal_pool = true;
 
-  /* We only support -mexecute-only on m profile targets.  */
+  /* We only support -mexecute-only on M-profile targets.  */
   if (target_execute_only && (flag_pic || !(!arm_arch_notm || arm_arch7em)))
-    error ("-mexecute-only only supports non-pic code on m-profile targets");
+    error ("-mexecute-only only supports non-pic code on M-profile targets");
 
-  /* In execute only mode we don't want any memory read into text section and
+  /* In execute-only mode we don't want any memory read into text section and
      so we disable literal pool.  */
   if (target_execute_only)
     arm_disable_literal_pool = true;
@@ -3766,8 +3766,8 @@ const_ok_for_dimode_op (HOST_WIDE_INT i, enum rtx_code code)
     }
 }
 
-/* emit a sequence of movs/adds/shift to produce a 32 bits constant.
-   Avoid to generate useless code when byte is zero.  */
+/* Emit a sequence of movs/adds/shift to produce a 32-bit constant.
+   Avoid generating useless code when byte is zero.  */
 void
 thumb1_gen_const_int (rtx op0, HOST_WIDE_INT op1)
 {
@@ -29682,8 +29682,8 @@ arm_sched_fusion_priority (rtx_insn *insn, int max_pri,
 
 /* Implement the TARGET_ASM_FUNCTION_SECTION hook.
 
-   Be sure that code compile with -mexecute-section is move into well known
-   section name so they can be group in specific segment.  */
+   Be sure that code compiled with mexecute-only is not moved in a section
+   name '.text' so SECTION_NOREAD attribute is not removed by assembler.  */
 static section *
 arm_function_section (tree decl,
 			enum node_frequency freq,
@@ -29695,14 +29695,14 @@ arm_function_section (tree decl,
 		default_function_section (decl, freq, startup, exit);
 }
 
-/* Implement the TARGET_SECTION_TYPE_FLAGS hook. */
+/* Implement the TARGET_SECTION_TYPE_FLAGS hook.  */
 
 static unsigned int
 arm_section_type_flags (tree decl, const char *name, int reloc)
 {
   unsigned int flags = default_section_type_flags (decl, name, reloc);
 
-  return target_execute_only?flags|SECTION_NOREAD:flags;
+  return target_execute_only ? flags|SECTION_NOREAD : flags;
 }
 
 #include "gt-arm.h"
