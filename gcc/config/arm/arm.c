@@ -29686,13 +29686,13 @@ arm_sched_fusion_priority (rtx_insn *insn, int max_pri,
    name '.text' so SECTION_NOREAD attribute is not removed by assembler.  */
 static section *
 arm_function_section (tree decl,
-			enum node_frequency freq,
-			bool startup,
-			bool exit)
+		      enum node_frequency freq,
+		      bool startup,
+		      bool exit)
 {
-    return target_execute_only?
-		get_named_text_section (decl, ".text.noread", NULL):
-		default_function_section (decl, freq, startup, exit);
+  return target_execute_only ?
+	 get_named_text_section (decl, ".text.noread", NULL):
+	 default_function_section (decl, freq, startup, exit);
 }
 
 /* Implement the TARGET_SECTION_TYPE_FLAGS hook.  */
