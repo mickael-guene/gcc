@@ -24226,6 +24226,21 @@ arm_setup_incoming_varargs (cumulative_args_t pcum_v,
     *pretend_size = (NUM_ARG_REGS - nregs) * UNITS_PER_WORD;
 }
 
+/* FDPIC restore_pic_register_after_call will not be correctly handled by
+   followings bypasss guards. Detect it and disable bypasses. */
+
+static int arm_fdpic_unspec_p(rtx insn)
+{
+  insn = PATTERN (insn);
+
+  if (GET_CODE (insn) == PARALLEL)
+    insn = XVECEXP (insn, 0, 0);
+  if (GET_CODE (insn) == UNSPEC)
+    return 1;
+
+  return 0;
+}
+
 /* Return nonzero if the CONSUMER instruction (a store) does not need
    PRODUCER's value to calculate the address.  */
 
@@ -24234,6 +24249,9 @@ arm_no_early_store_addr_dep (rtx producer, rtx consumer)
 {
   rtx value = PATTERN (producer);
   rtx addr = PATTERN (consumer);
+
+  if (arm_fdpic_unspec_p(producer))
+    return 0;
 
   if (GET_CODE (value) == COND_EXEC)
     value = COND_EXEC_CODE (value);
@@ -24255,6 +24273,9 @@ arm_no_early_store_addr_dep (rtx producer, rtx consumer)
 int
 arm_early_store_addr_dep (rtx producer, rtx consumer)
 {
+  if (arm_fdpic_unspec_p(producer))
+    return 0;
+
   return !arm_no_early_store_addr_dep (producer, consumer);
 }
 
@@ -24266,6 +24287,9 @@ arm_early_load_addr_dep (rtx producer, rtx consumer)
 {
   rtx value = PATTERN (producer);
   rtx addr = PATTERN (consumer);
+
+  if (arm_fdpic_unspec_p(producer))
+    return 0;
 
   if (GET_CODE (value) == COND_EXEC)
     value = COND_EXEC_CODE (value);
