@@ -278,6 +278,11 @@ mslow-flash-data
 Target Report Var(target_slow_flash_data) Init(0)
 Assume loading data from flash is slower than fetching instructions.
 
+masset
+Target Report Var(target_asset_prot) Init(0)
+Compile using asset protection abi. R9 is use to access rw data segment
+whereas R10 is use to access ro data. No read is allow in code segment.
+
 masm-syntax-unified
 Target Report Var(inline_asm_unified) Init(0) Save
 Assume unified syntax for inline assembly code.

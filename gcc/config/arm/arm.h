@@ -1978,10 +1978,12 @@ enum arm_auto_incmodes
    the assembler in use; this is more general than the APCS restriction of
    using sb (r9) all the time.  */
 extern unsigned arm_pic_register;
+extern unsigned arm_pic_register2;
 
 /* The register number of the register used to address a table of static
    data addresses in memory.  */
 #define PIC_OFFSET_TABLE_REGNUM arm_pic_register
+#define PIC_OFFSET_TABLE_REGNUM2 arm_pic_register2
 
 /* We can't directly access anything that contains a symbol,
    nor can we indirect via the constant pool.  One exception is

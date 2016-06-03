@@ -5803,6 +5803,20 @@
   DONE;
 })
 
+(define_insn "asset_load_symbol_offset"
+  [(set (match_operand:SI 0 "s_register_operand" "=r")
+        (unspec:SI [(match_operand:SI 1 "" "X") (const_int 1)] UNSPEC_PIC_SYM))]
+  "target_asset_prot"
+  "movw%?\t%0, #:lower16_brel:%c1\;movt%?\t%0, #:upper16_brel:%c1"
+)
+
+(define_insn "asset_load_function_addr"
+  [(set (match_operand:SI 0 "s_register_operand" "=r")
+        (unspec:SI [(match_operand:SI 1 "" "X") (const_int 2)] UNSPEC_PIC_SYM))]
+  "target_asset_prot"
+  "movw%?\t%0, #:lower16_prel:%c1\;movt%?\t%0, #:upper16_prel:%c1+4\;add\t%0, %|pc"
+)
+
 ;; When generating pic, we need to load the symbol offset into a register.
 ;; So that the optimizer does not confuse this with a normal symbol load
 ;; we use an unspec.  The offset will be loaded from a constant pool entry,

@@ -868,6 +868,7 @@ bool arm_disable_literal_pool = false;
 
 /* The register number to be used for the PIC offset register.  */
 unsigned arm_pic_register = INVALID_REGNUM;
+unsigned arm_pic_register2 = INVALID_REGNUM;
 
 enum arm_pcs arm_pcs_default;
 
@@ -910,7 +911,8 @@ int arm_regs_in_sequence[] =
 
 #define THUMB2_WORK_REGS (0xff & ~(  (1 << THUMB_HARD_FRAME_POINTER_REGNUM) \
 				   | (1 << SP_REGNUM) | (1 << PC_REGNUM) \
-				   | (1 << PIC_OFFSET_TABLE_REGNUM)))
+				   | (1 << PIC_OFFSET_TABLE_REGNUM) \
+				   | (1 << PIC_OFFSET_TABLE_REGNUM2)))
 
 /* Initialization code.  */
 
@@ -2838,6 +2840,11 @@ arm_option_check_internal (struct gcc_options *opts)
       && ((!(arm_arch7 && !arm_arch_notm) && !arm_arch7em)
 	  || (TARGET_THUMB1_P (flags) || flag_pic || TARGET_NEON)))
     error ("-mslow-flash-data only supports non-pic code on armv7-m targets");
+
+  if (target_asset_prot
+      && ((!(arm_arch7 && !arm_arch_notm) && !arm_arch7em)
+          || (TARGET_THUMB1_P (flags) || TARGET_NEON)))
+    error ("-masset only supports code on armv7-m targets");
 }
 
 /* Recompute the global settings depending on target attribute options.  */
@@ -3479,6 +3486,16 @@ arm_option_override (void)
   /* Currently, for slow flash data, we just disable literal pools.  */
   if (target_slow_flash_data)
     arm_disable_literal_pool = true;
+
+  /* Select following options */
+  if (target_asset_prot) {
+    flag_pic = 1;
+    arm_pic_register = 9;
+    arm_pic_register2 = 10;
+    arm_disable_literal_pool = true;
+    target_flags |= MASK_SINGLE_PIC_BASE;
+    arm_pic_data_is_text_relative = 0;
+  }
 
   /* Disable scheduling fusion by default if it's not armv7 processor
      or doesn't prefer ldrd/strd.  */
@@ -6891,6 +6908,40 @@ require_pic_register (void)
     }
 }
 
+static bool is_ro_segment(rtx orig)
+{
+  bool res = false;
+
+  if (GET_CODE(orig) == LABEL_REF) {
+    res = true;
+  } else if (GET_CODE(orig) == SYMBOL_REF) {
+    if (CONSTANT_POOL_ADDRESS_P (orig)) {
+      /* not sure we need this since no literal pool => to be check */
+      res = true;
+    } else if (SYMBOL_REF_HAS_BLOCK_INFO_P(orig) && SYMBOL_REF_BLOCK(orig) && SYMBOL_REF_BLOCK(orig)->sect == readonly_data_section) {
+      res = true;
+    } else if (SYMBOL_REF_DECL (orig)) {
+      tree decl = SYMBOL_REF_DECL (orig);
+
+      switch(TREE_CODE (decl)) {
+	case VAR_DECL:
+	  res = TREE_READONLY(decl) ? true : false;
+	  break;
+	default:
+	  fprintf(stderr, "unsupported tree code %d\n", TREE_CODE (decl));
+	  gcc_unreachable();
+      }
+    } else {
+      /* ok if we are here we have some troubles since we really don't know */
+      /* but some generated pattern go here to test. So we can't assert */
+      res = false;
+    }
+  } else
+    gcc_unreachable();
+
+  return res;
+}
+
 rtx
 legitimize_pic_address (rtx orig, machine_mode mode, rtx reg)
 {
@@ -6917,6 +6968,28 @@ legitimize_pic_address (rtx orig, machine_mode mode, rtx reg)
 	  && NEED_GOT_RELOC
 	  && arm_pic_data_is_text_relative)
 	insn = arm_pic_static_addr (orig, reg);
+      else if (target_asset_prot)
+	{
+	  rtx pat;
+
+	  if (GET_CODE (orig) == SYMBOL_REF && SYMBOL_REF_DECL (orig) && TREE_CODE (SYMBOL_REF_DECL (orig)) == FUNCTION_DECL) {
+	    /* we need function address */
+	    /* we use a movt/movw pair with pcrel + we generate an add pc for base address */
+	    pat = gen_asset_load_function_addr(reg, orig);
+	    emit_insn (pat);
+	    pat = gen_addsi3 (reg, reg, GEN_INT (-12));
+	    emit_insn (pat);
+	  } else {
+	    /* we need variable address */
+	    /* we use a movt/mocw pair with brel + we generate and add with r9 or r10 according to segment output */
+	    rtx pic_reg_to_use = gen_rtx_REG (Pmode, is_ro_segment(orig) ? arm_pic_register2 : arm_pic_register);
+
+	    pat = gen_asset_load_symbol_offset(reg, orig);
+	    emit_insn (pat);
+	    pat = gen_addsi3(reg , pic_reg_to_use, reg);
+	    emit_insn (pat);
+	  }
+	}
       else
 	{
 	  rtx pat;
@@ -6938,7 +7011,8 @@ legitimize_pic_address (rtx orig, machine_mode mode, rtx reg)
 
       /* Put a REG_EQUAL note on this insn, so that it can be optimized
 	 by loop.  */
-      set_unique_reg_note (insn, REG_EQUAL, orig);
+      if (!target_asset_prot)
+	set_unique_reg_note (insn, REG_EQUAL, orig);
 
       return reg;
     }
@@ -27783,6 +27857,11 @@ arm_conditional_register_usage (void)
     {
       fixed_regs[PIC_OFFSET_TABLE_REGNUM] = 1;
       call_used_regs[PIC_OFFSET_TABLE_REGNUM] = 1;
+      if ((unsigned) PIC_OFFSET_TABLE_REGNUM2 != INVALID_REGNUM)
+	{
+	  fixed_regs[PIC_OFFSET_TABLE_REGNUM2] = 1;
+	  call_used_regs[PIC_OFFSET_TABLE_REGNUM2] = 1;
+	}
     }
   else if (TARGET_APCS_STACK)
     {
