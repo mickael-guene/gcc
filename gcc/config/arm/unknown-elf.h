@@ -29,14 +29,14 @@
 #endif
 
 /* Now we define the strings used to build the spec file.  */
-#define UNKNOWN_ELF_STARTFILE_SPEC	" crti%O%s crtbegin%O%s crt0%O%s"
+#define UNKNOWN_ELF_STARTFILE_SPEC	" %{!masset:crti%O%s crtbegin%O%s crt0%O%s}"
 
 #undef  STARTFILE_SPEC
 #define STARTFILE_SPEC	\
   "%{Ofast|ffast-math|funsafe-math-optimizations:crtfastmath.o%s} "	\
   UNKNOWN_ELF_STARTFILE_SPEC
 
-#define UNKNOWN_ELF_ENDFILE_SPEC	"crtend%O%s crtn%O%s"
+#define UNKNOWN_ELF_ENDFILE_SPEC	"%{!masset:crtend%O%s crtn%O%s}"
 
 #undef  ENDFILE_SPEC
 #define ENDFILE_SPEC	UNKNOWN_ELF_ENDFILE_SPEC
@@ -97,4 +97,4 @@
    udivmoddi4, which will depend on the exception unwind routines,
    which will depend on abort, which is defined in libc.  */ 
 #undef LINK_GCC_C_SEQUENCE_SPEC
-#define LINK_GCC_C_SEQUENCE_SPEC "--start-group %G %L --end-group"
+#define LINK_GCC_C_SEQUENCE_SPEC "%{!masset:--start-group %G %L --end-group}"

@@ -147,6 +147,7 @@
 #define BPABI_LINK_SPEC \
   "%{mbig-endian:-EB} %{mlittle-endian:-EL} "		\
   "%{static:-Bstatic} %{shared:-shared} %{symbolic:-Bsymbolic} "	\
+  "%{masset:-T asset.ld} " \
   "-X" SUBTARGET_EXTRA_LINK_SPEC EABI_LINK_SPEC
 
 #undef  LINK_SPEC
