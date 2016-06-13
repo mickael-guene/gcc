@@ -183,6 +183,8 @@ arm_cpu_builtins (struct cpp_reader* pfile)
   def_or_undef_macro (pfile, "__ARM_FEATURE_IDIV", TARGET_IDIV);
 
   def_or_undef_macro (pfile, "__ARM_ASM_SYNTAX_UNIFIED__", inline_asm_unified);
+  if (target_asset_prot)
+    cpp_define (pfile, "__root=__attribute__ ((section (\".text.noread\")))");
 }
 
 void
