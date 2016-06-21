@@ -3511,6 +3511,7 @@ arm_option_override (void)
     arm_disable_literal_pool = true;
     target_flags |= MASK_SINGLE_PIC_BASE;
     arm_pic_data_is_text_relative = 0;
+    flag_const_data_uninitialized_in_rodata = 1;
   }
 
   /* Disable scheduling fusion by default if it's not armv7 processor
@@ -6997,7 +6998,7 @@ legitimize_pic_address (rtx orig, machine_mode mode, rtx reg)
 	    emit_insn (pat);
 	  } else {
 	    /* we need variable address */
-	    /* we use a movt/mocw pair with brel + we generate and add with r9 or r10 according to segment output */
+	    /* we use a movt/movw pair with brel + we generate and add with r9 or r10 according to segment output */
 	    rtx pic_reg_to_use = gen_rtx_REG (Pmode, is_ro_segment(orig) ? arm_pic_register2 : arm_pic_register);
 
 	    pat = gen_asset_load_symbol_offset(reg, orig);

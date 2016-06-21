@@ -1128,6 +1128,10 @@ get_variable_section (tree decl, bool prefer_noswitch_p)
   if (vnode)
     vnode->get_constructor ();
 
+
+  if (flag_const_data_uninitialized_in_rodata && TREE_READONLY(decl) && !DECL_INITIAL(decl))
+    return readonly_data_section;
+
   if (DECL_COMMON (decl))
     {
       /* If the decl has been given an explicit section name, or it resides
