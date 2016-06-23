@@ -16,8 +16,8 @@
 # along with GCC; see the file COPYING3.  If not see
 # <http://www.gnu.org/licenses/>.
 
-MULTILIB_OPTIONS     = marm/mthumb
-MULTILIB_DIRNAMES    = arm thumb
+MULTILIB_OPTIONS     = march=armv7-m
+MULTILIB_DIRNAMES    = armv7-m
 MULTILIB_EXCEPTIONS  = 
 MULTILIB_MATCHES     =
 
@@ -88,3 +88,5 @@ MULTILIB_EXCEPTIONS    += *mthumb/*mfloat-abi=hard*
 # MULTILIB_MATCHES    += mcpu?arm7=mcpu?arm600
 # MULTILIB_MATCHES    += mcpu?arm7=mcpu?arm610
 # MULTILIB_MATCHES    += mcpu?arm7=mcpu?arm620
+
+MULTILIB_REQUIRED   = march=armv7-m
