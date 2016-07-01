@@ -30591,6 +30591,20 @@ arm_asm_named_section (const char *name, unsigned int flags,
 {
   char flagchars[20], *f = flagchars;
 
+  /* If function was flag as root then output metadata that will allow to
+     automatically generate stub code. */
+  if (strncmp(".text.noread.keep", name, strlen(".text.noread.keep")) == 0) {
+    const char *function_name = get_fnname_from_decl (cfun->decl);
+    unsigned int i;
+
+    //here we generate stub info section with meta data
+    fprintf (asm_out_file, "\t.section\t.stub.info\n");
+    fprintf (asm_out_file, "\t.byte %d\n", crtl->args.size);
+    for(i = 0; i < strlen(function_name); i++)
+      fprintf (asm_out_file, "\t.byte %d\n", function_name[i]);
+    fprintf (asm_out_file, "\t.byte 0\n");
+  }
+
   /* If we have already declared this section, we can use an
      abbreviated form to switch back to it -- unless this section is
      part of a COMDAT groups, in which case GAS requires the full

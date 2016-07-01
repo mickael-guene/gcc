@@ -7156,8 +7156,12 @@ output_section_asm_op (const void *directive)
 void
 switch_to_section (section *new_section)
 {
+  //MG : we always force switch to section
+/* FIXME: use SECTION_FORGET ? */
+#if 0
   if (in_section == new_section)
     return;
+#endif
 
   if (new_section->common.flags & SECTION_FORGET)
     in_section = NULL;
