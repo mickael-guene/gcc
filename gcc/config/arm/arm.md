@@ -8194,7 +8194,7 @@
    (match_operand:SI 2 "const_int_operand" "")	; total range
    (match_operand:SI 3 "" "")			; table label
    (match_operand:SI 4 "" "")]			; Out of range label
-  "TARGET_32BIT || optimize_size || flag_pic"
+  "(TARGET_32BIT || optimize_size || flag_pic) && !target_asset_prot"
   "
   {
     enum insn_code code;
