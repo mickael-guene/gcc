@@ -41,7 +41,62 @@
 ;; differently).  In particular there is no Thumb1 armv6-m pattern for
 ;; sbc or adc.
 
+(define_insn "thumb1_movsi_symbol_ref"
+  [(set (match_operand:SI 0 "register_operand" "=l")
+	(match_operand:SI 1 "general_operand" ""))
+   ]
+  "TARGET_THUMB1
+   && arm_disable_literal_pool
+   && GET_CODE (operands[1]) == SYMBOL_REF"
+  "*
+  output_asm_insn (\"movs\\t%0, #:upper8_15:%1\", operands);
+  output_asm_insn (\"lsls\\t%0, #8\", operands);
+  output_asm_insn (\"adds\\t%0, #:upper0_7:%1\", operands);
+  output_asm_insn (\"lsls\\t%0, #8\", operands);
+  output_asm_insn (\"adds\\t%0, #:lower8_15:%1\", operands);
+  output_asm_insn (\"lsls\\t%0, #8\", operands);
+  output_asm_insn (\"adds\\t%0, #:lower0_7:%1\", operands);
+  return \"\";
+  "
+  [(set_attr "length" "14")
+   (set_attr "conds" "clob")]
+)
 
+(define_insn "*thumb1_movsi_const_int"
+  [(set (match_operand:SI 0 "register_operand" "=l")
+	(match_operand:SI 1 "immediate_operand" "i"))
+   ]
+  "TARGET_THUMB1
+   && arm_disable_literal_pool
+   && GET_CODE (operands[1]) == CONST_INT
+   && !satisfies_constraint_I (operands[1])"
+  "*
+  output_asm_insn (\"movs\\t%0, #(%c1>>24)&0xff\", operands);
+  output_asm_insn (\"lsls\\t%0, #8\", operands);
+  output_asm_insn (\"adds\\t%0, #(%c1>>16)&0xff\", operands);
+  output_asm_insn (\"lsls\\t%0, #8\", operands);
+  output_asm_insn (\"adds\\t%0, #(%c1>>8)&0xff\", operands);
+  output_asm_insn (\"lsls\\t%0, #8\", operands);
+  output_asm_insn (\"adds\\t%0, #%c1&0xff\", operands);
+  return \"\";
+  "
+  [(set_attr "length" "14")
+   (set_attr "conds" "clob")]
+)
+
+(define_split
+  [(set (match_operand:SI 0 "register_operand" "")
+	(match_operand:SI 1 "immediate_operand" ""))]
+  "TARGET_THUMB1
+   && arm_disable_literal_pool
+   && GET_CODE (operands[1]) == CONST_INT
+   && !satisfies_constraint_I (operands[1])"
+  [(clobber (const_int 0))]
+  "
+    thumb1_gen_const_int (operands[0], INTVAL (operands[1]));
+    DONE;
+  "
+)
 
 (define_insn "*thumb1_adddi3"
   [(set (match_operand:DI          0 "register_operand" "=l")
@@ -656,8 +711,8 @@
 )
 
 (define_insn "*thumb1_movsi_insn"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "=l,l,r,l,l,l,>,l, m,*l*h*k")
-	(match_operand:SI 1 "general_operand"      "l, I,j,J,K,>,l,mi,l,*l*h*k"))]
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=l,l,r,l,l,l,>,l,l, m,*l*h*k")
+	(match_operand:SI 1 "general_operand"      "l, I,j,J,K,>,l,m,mi,l,*l*h*k"))]
   "TARGET_THUMB1
    && (   register_operand (operands[0], SImode)
        || register_operand (operands[1], SImode))"
@@ -670,13 +725,15 @@
    ldmia\\t%1, {%0}
    stmia\\t%0, {%1}
    ldr\\t%0, %1
+   ldr\\t%0, %1
    str\\t%1, %0
    mov\\t%0, %1"
-  [(set_attr "length" "2,2,4,4,4,2,2,2,2,2")
-   (set_attr "type" "mov_reg,mov_imm,mov_imm,multiple,multiple,load1,store1,load1,store1,mov_reg")
-   (set_attr "pool_range" "*,*,*,*,*,*,*,1018,*,*")
-   (set_attr "arch" "t1,t1,v8mb,t1,t1,t1,t1,t1,t1,t1")
-   (set_attr "conds" "set,clob,nocond,*,*,nocond,nocond,nocond,nocond,nocond")])
+  [(set_attr "length" "2,2,4,4,4,2,2,2,2,2,2")
+   (set_attr "type" "mov_reg,mov_imm,mov_imm,multiple,multiple,load1,store1,load1,load1,store1,mov_reg")
+   (set_attr "pool_range" "*,*,*,*,*,*,*,1018,1018,*,*")
+   (set_attr "arch" "t1,t1,v8mb,t1,t1,t1,t1,t1,t1,t1,t1")
+   (set_attr "use_literal_pool" "no,no,no,no,no,no,no,no,yes,no,no")
+   (set_attr "conds" "set,clob,nocond,*,*,nocond,nocond,nocond,nocond,nocond,nocond")])
 
 ; Split the load of 64-bit constant into two loads for high and low 32-bit parts respectively
 ; to see if we can load them in fewer instructions or fewer cycles.
@@ -1915,7 +1972,7 @@
 (define_expand "tablejump"
   [(parallel [(set (pc) (match_operand:SI 0 "register_operand" ""))
 	      (use (label_ref (match_operand 1 "" "")))])]
-  "TARGET_THUMB1"
+  "TARGET_THUMB1 && !target_pure_code"
   "
   if (flag_pic)
     {
